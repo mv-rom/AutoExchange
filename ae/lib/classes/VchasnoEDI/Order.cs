@@ -27,11 +27,11 @@ namespace ae.lib.classes.VchasnoEDI
         public string number { get; set; }
         public string order_number { get; set; }
         public string currency { get; set; }
-        public long buyer_gln { get; set; }
-        public long seller_gln { get; set; }
-        public long sender_gln { get; set; }
-        public long delivery_gln { get; set; }
-        public long recipient_gln { get; set; }
+        public string buyer_gln { get; set; }
+        public string seller_gln { get; set; }
+        public string sender_gln { get; set; }
+        public string delivery_gln { get; set; }
+        public string recipient_gln { get; set; }
         public string invoicepartner_gln { get; set; }
         public string date_expected_delivery { get; set; }
         public string delivery_address { get; set; }

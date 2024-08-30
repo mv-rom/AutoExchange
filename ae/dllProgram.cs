@@ -116,7 +116,7 @@ namespace ae
             Dictionary<string, lib.classes.VchasnoEDI.Order> src)
         {
             string gln;
-            string report1c_Name = "EDI_tt_by_gln";
+            string report1cName = "EDI_tt_by_gln";
             List<lib.classes.Base1C.TTbyGLN_Elements> result = null;
 
 
@@ -142,8 +142,8 @@ namespace ae
                         if (!found) {
                             listTT.Add(
                                 new lib.classes.Base1C.TTbyGLN_Elements() {
-                                    glnTT = glnTT,
-                                    glnTT_gruz = glnTT_gruz,
+                                    glnTT = long.Parse(glnTT),
+                                    glnTT_gruz = long.Parse(glnTT_gruz),
                                     externalCodeTT = new lib.classes.Base1C.ExternalCodeTT() {
                                         part1 = 0,
                                         part2 = 0,
@@ -160,7 +160,7 @@ namespace ae
                         list = listTT
                     };
 
-                    var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.TTbyGLN>(report1c_Name, input);
+                    var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.TTbyGLN>(report1cName, input);
                     var output_listTT = output.list;
 
                     if (output_listTT != null)
@@ -171,8 +171,8 @@ namespace ae
                             var glnTT_gruz = input.list[i].glnTT_gruz;
 
                             var item = output_listTT.
-                                Where(x => x.glnTT.Equals(glnTT)).
-                                FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
+                                Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
+                                FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
                             if (item != null)
                             {
                                 listTT[i].externalCodeTT = item.externalCodeTT;
@@ -186,7 +186,7 @@ namespace ae
             else {
                 Base.Log(
                     "Warning in getTTbyGLNfrom1C: before do report " + 
-                    "[" + report1c_Name + "] " +
+                    "[" + report1cName + "] " +
                     "hasn't parametr [gln] in config!"
                 );
             }
