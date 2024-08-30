@@ -20,8 +20,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -144,7 +144,11 @@ namespace ae
                                 new lib.classes.Base1C.TTbyGLN_Elements() {
                                     glnTT = glnTT,
                                     glnTT_gruz = glnTT_gruz,
-                                    externalCodeTT = ""
+                                    externalCodeTT = new lib.classes.Base1C.ExternalCodeTT() {
+                                        part1 = 0,
+                                        part2 = 0,
+                                        part3 = 0
+                                    }
                                 }
                             );
                         }
@@ -152,19 +156,19 @@ namespace ae
                 }
 
                 if (listTT.Count() > 0) {
-                    var input = new lib.classes.Base1C.TTbyGLN_List() {
-                        listTT = listTT
+                    var input = new lib.classes.Base1C.TTbyGLN() {
+                        list = listTT
                     };
 
-                    var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.TTbyGLN_List>(report1c_Name, input);
-                    var output_listTT = output.listTT;
+                    var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.TTbyGLN>(report1c_Name, input);
+                    var output_listTT = output.list;
 
                     if (output_listTT != null)
                     {
                         for (int i = 0; i < listTT.Count(); i++)
                         {
                             var glnTT = listTT[i].glnTT;
-                            var glnTT_gruz = input.listTT[i].glnTT_gruz;
+                            var glnTT_gruz = input.list[i].glnTT_gruz;
 
                             var item = output_listTT.
                                 Where(x => x.glnTT.Equals(glnTT)).
