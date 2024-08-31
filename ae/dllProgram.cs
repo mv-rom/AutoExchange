@@ -438,6 +438,8 @@ namespace ae
                 {
                     if (Directory.Exists(dirPath)) {
                         var DirName = new DirectoryInfo(dirPath).Name;
+
+                        //filter by company gln
                         var Company = Base.Config.ConfigSettings.Companies.FirstOrDefault(x => x.erdpou == DirName);
                         if (Company != null) {
                             var gln = Company.gln;
