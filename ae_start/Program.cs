@@ -201,9 +201,9 @@ namespace ae_start
                             var asm = Assembly.LoadFile(dllPath);
                             //Type typeToExecute = asm.GetTypes()[0];
                             Type typeToExecute = asm.GetType("ae.dllProgram");
-                            var classInstance = Activator.CreateInstance(typeToExecute);
-                            //typeToExecute.GetMethod("Entry").Invoke(null, new object[] { });
-                            typeToExecute.GetMethod("Entry").Invoke(classInstance, new object[] { });
+                            //var classInstance = Activator.CreateInstance(typeToExecute);
+                            typeToExecute.GetMethod("Entry").Invoke(null, new object[] { });
+                            //typeToExecute.GetMethod("Entry").Invoke(classInstance, new object[] { });
                         }
                         catch (System.Reflection.TargetInvocationException ex) {
                             Console.WriteLine("Error: "+ex.Message);
