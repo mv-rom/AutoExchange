@@ -8,6 +8,8 @@ using System.Text;
 using System.Xml.XPath;
 
 //https://forum.infostart.ru/forum9/topic83477/
+//https://forum.infostart.ru/forum9/topic148614/
+//https://anatoly4xs.narod.ru/manual/lang/lang0073.htm
 
 
 /*
@@ -37,7 +39,7 @@ namespace ae.lib
         {
             this.type1C = null;
             this.instance1C = null;
-            this.WorkDir = Base.OutboxDir;
+            this.WorkDir = Base.InboxDir;
 
             if (!Base.Config.ConfigSettings.App1cSetting.TryGetValue("report_dir", out this.ReportDirPath)) {
                 this.ReportDirPath = @"reports1c\";
@@ -207,7 +209,7 @@ namespace ae.lib
             {
                 if (File.Exists(OutputFilePath)) {
                     data = File.ReadAllText(OutputFilePath, Encoding.ASCII);
-                    File.Delete(OutputFilePath);
+                    //File.Delete(OutputFilePath);
                     result = true;
                 } else {
 //                    var ErrorFilePath = Path.Combine(dir, "1CError.xml");

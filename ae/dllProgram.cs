@@ -9,6 +9,7 @@ using ae.lib;
 //using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
+using System.Xml.XPath;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -20,8 +21,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -161,10 +162,9 @@ namespace ae
                     };
 
                     var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.TTbyGLN>(report1cName, input);
-                    var output_listTT = output.list;
+                    if (output != null) {
+                        var output_listTT = output.list;
 
-                    if (output_listTT != null)
-                    {
                         for (int i = 0; i < listTT.Count(); i++)
                         {
                             var glnTT = listTT[i].glnTT;
@@ -173,11 +173,12 @@ namespace ae
                             var item = output_listTT.
                                 Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                                 FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                            if (item != null)
-                            {
+                            if (item != null) {
                                 listTT[i].externalCodeTT = item.externalCodeTT;
                             }
                         }
+
+                        result = listTT;
                         output_listTT = null;
                     }
                 }
@@ -406,8 +407,6 @@ namespace ae
 
             try
             {
-                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-
                 if (!Directory.Exists(Base.OutboxDir))
                     goto __exit;
                 var dirsList = Directory.GetDirectories(Base.OutboxDir);
@@ -415,6 +414,8 @@ namespace ae
 
                 var yesterdayDT = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
                 var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+
+                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
                 var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
                 if (ordersList == null || ordersList.Count() <= 0)
                     goto __exit;
