@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+
+//https://github.com/markglibres/commandlineargs/blob/master/src/CommandLineArgs/Arguments.cs
 
 namespace ae.lib
 {
-    // https://github.com/markglibres/commandlineargs/blob/master/src/CommandLineArgs/Arguments.cs
-    // 
+
     internal class Arguments
     {
         public static Dictionary<string, string> ToDictionary(string[] args)
