@@ -100,7 +100,7 @@ namespace ae_start
             return asm;
         }
 
-        private static void ArgOptionStart(string[] args, string ExecFileName, string AppName)
+        private static List<ArgOption> ArgOptionStart(string[] args, string ExecFileName, string AppName)
         {
             List<ArgOption> argOptions = new List<ArgOption>() {
                 new ArgOption() { Name = "help", NameTemplate = "help|?",
@@ -164,6 +164,8 @@ namespace ae_start
                 //Show help
                 Console.WriteLine(argOptions[0].Value);
             }
+
+            return argWorkOptions;
         }
 
 
@@ -177,7 +179,7 @@ namespace ae_start
 
             Console.WriteLine("[ "+AppName+" v"+AppVersion+ ": author mv-rom, source https://github.com/mv-rom/ae ]");
             if (args.Length > 0) {
-                ArgOptionStart(args, ExecFileName, AppName);
+                var returnArg = ArgOptionStart(args, ExecFileName, AppName);
             }
             else
             {
@@ -199,10 +201,9 @@ namespace ae_start
                             var asm = Assembly.LoadFile(dllPath);
                             //Type typeToExecute = asm.GetTypes()[0];
                             Type typeToExecute = asm.GetType("ae.dllProgram");
-                            typeToExecute.GetMethod("Entry").Invoke(null, new object[] { });
-                            //var typeToExecute = asm.GetType("ae.dllProgram");
-                            //var classInstance = Activator.CreateInstance(typeToExecute);
-                            //typeToExecute.GetMethod("Entry").Invoke(classInstance, new object[] { });
+                            var classInstance = Activator.CreateInstance(typeToExecute);
+                            //typeToExecute.GetMethod("Entry").Invoke(null, new object[] { });
+                            typeToExecute.GetMethod("Entry").Invoke(classInstance, new object[] { });
                         }
                         catch (System.Reflection.TargetInvocationException ex) {
                             Console.WriteLine("Error: "+ex.Message);
