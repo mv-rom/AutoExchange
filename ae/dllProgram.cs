@@ -406,8 +406,6 @@ namespace ae
 
             try
             {
-                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-
                 if (!Directory.Exists(Base.OutboxDir))
                     goto __exit;
                 var dirsList = Directory.GetDirectories(Base.OutboxDir);
@@ -415,6 +413,8 @@ namespace ae
 
                 var yesterdayDT = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
                 var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+
+                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
                 var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
                 if (ordersList == null || ordersList.Count() <= 0)
                     goto __exit;
