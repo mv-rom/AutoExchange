@@ -1,7 +1,7 @@
 # AutoExchange
 
 
-### add_net4.0_targeting_pack:
+### Add net4.0_targeting_pack through install VS 2019:
 > https://www.techspot.com/downloads/7241-visual-studio-2019.html
 
 ### Case to use V77.Application:
