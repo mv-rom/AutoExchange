@@ -10,6 +10,7 @@ using ae.lib;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using System.Xml.XPath;
+using ae.lib.classes.Base1C;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -21,8 +22,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -116,11 +117,10 @@ namespace ae
         private static List<lib.classes.Base1C.TTbyGLN_Elements> getTTbyGLNfrom1C(
             Dictionary<string, lib.classes.VchasnoEDI.Order> src)
         {
-            string gln;
             string report1cName = "EDI_tt_by_gln";
             List<lib.classes.Base1C.TTbyGLN_Elements> result = null;
 
-
+            string gln = "";
             if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
             {
                 var listTT = new List<lib.classes.Base1C.TTbyGLN_Elements>();
@@ -194,44 +194,77 @@ namespace ae
             return result;
         }
 
-        private static Dictionary<string, lib.classes.Base1C.BasePriceForTT> getProductProfilesOfTTfrom1C(
+        private static List<lib.classes.Base1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
             Dictionary<string, lib.classes.VchasnoEDI.Order> src,
             List<lib.classes.Base1C.TTbyGLN_Elements> listTT
         )
         {
-            var result = new Dictionary<string, lib.classes.Base1C.BasePriceForTT>();
+            string report1cName = "EDI_product_profiles";
+            List<lib.classes.Base1C.ProductProfiles_Group> result = null;
+
+            //var result = new Dictionary<string, lib.classes.Base1C.BasePriceForTT>();
             //var productTT = getProductTTfromOrders(src);
+/*
+            var listPP = new lib.classes.Base1C.ProductProfiles() {
+                group = new List<lib.classes.Base1C.ProductProfiles_Group>()
+            };
 
             foreach (var s in src)
             {
+                bool found = false;
+                var glnTT = s.Value.as_json.buyer_gln;
+                var glnTT_gruz = s.Value.as_json.delivery_gln;
+
                 foreach (var it in s.Value.as_json.items)
                 {
                     var title = it.title;
                     var product_code = it.product_code;
                     var measure = it.measure;
                     var supplier_code = it.supplier_code;
-                    /*
-                     * bpTT = 
-                     *    product_code
-                     *    supplier_code
-                     *    measure
-                     * */
+
+                    var groupList = listPP.group;
+                    foreach (var g in groupList)
+                    {
+                        //g.externalCodeTT
+                        //found = true;
+                    }
                 }
 
                 //result.Add(tt_gln + "@" + tt_gruz_gl + "@" + number, bpTT);
             }
 
 
+            if (listPP.group.Count() > 0)
+            {
+                var input = new lib.classes.Base1C.ProductProfiles() {
+                    group = new List<lib.classes.Base1C.ProductProfiles_Group>()
+                };
 
-            var inst1C = _1C.getInstance();
-            if (inst1C != null) {
-                string report1c_Name = "EDI_product_profiles";
-                //prepare xml input table
-                if (inst1C.runExternalReport(report1c_Name)) {
-                    //get xml output profiles table
-                } else
-                    Base.Log("Error of run 1c report: " + report1c_Name + "!");
+                var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.ProductProfiles>(report1cName, input);
+                if (output != null)
+                {
+                    var output_listPP = output.group;
+
+                    for (int i = 0; i < listPP.group.Count(); i++)
+                    {
+                        var glnTT = listPP.group[i].glnTT;
+                        var glnTT_gruz = input.group[i].glnTT_gruz;
+
+                        var item = output_listPP.
+                            Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
+                            FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
+                        if (item != null)
+                        {
+                            listPP.group[i].externalCodeTT = item.externalCodeTT;
+                        }
+                    }
+
+                    result = listPP;
+                    output_listPP = null;
+                }
             }
+            listPP = null;
+*/
             return result;
         }
 
