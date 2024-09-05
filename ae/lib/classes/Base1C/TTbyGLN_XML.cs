@@ -54,6 +54,9 @@ namespace ae.lib.classes.Base1C
         [XmlElement(ElementName = "EAN")]
         public long EAN { get; set; }
 
+        [XmlElement(ElementName = "Title")]
+        public string Title { get; set; }
+
         [XmlElement(ElementName = "ProductCode")]
         public int ProductCode { get; set; }
 

@@ -137,6 +137,7 @@ namespace ae
                         {
                             if (glnTT.Equals(l.glnTT) && glnTT_gruz.Equals(l.glnTT_gruz)) {
                                 found = true;
+                                break;
                             }
                         }
 
@@ -165,8 +166,8 @@ namespace ae
                     if (output != null) {
                         var output_listTT = output.list;
 
-                        for (int i = 0; i < listTT.Count(); i++)
-                        {
+                        int i = 0;
+                        while (i < listTT.Count()) {
                             var glnTT = listTT[i].glnTT;
                             var glnTT_gruz = input.list[i].glnTT_gruz;
 
@@ -175,6 +176,9 @@ namespace ae
                                 FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
                             if (item != null) {
                                 listTT[i].externalCodeTT = item.externalCodeTT;
+                                i++;
+                            } else {
+                                listTT.RemoveAt(i);
                             }
                         }
 
@@ -182,7 +186,6 @@ namespace ae
                         output_listTT = null;
                     }
                 }
-                listTT = null;
             }
             else {
                 Base.Log(
@@ -204,67 +207,123 @@ namespace ae
 
             //var result = new Dictionary<string, lib.classes.Base1C.BasePriceForTT>();
             //var productTT = getProductTTfromOrders(src);
-/*
-            var listPP = new lib.classes.Base1C.ProductProfiles() {
-                group = new List<lib.classes.Base1C.ProductProfiles_Group>()
-            };
 
+            var groupPP = new List<lib.classes.Base1C.ProductProfiles_Group>();
             foreach (var s in src)
             {
+                var glnTT = long.Parse(s.Value.as_json.buyer_gln);
+                var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
+
+                //search in listTT
                 bool found = false;
-                var glnTT = s.Value.as_json.buyer_gln;
-                var glnTT_gruz = s.Value.as_json.delivery_gln;
-
-                foreach (var it in s.Value.as_json.items)
+                int found_i = 0;
+                foreach (var tt in listTT)
                 {
-                    var title = it.title;
-                    var product_code = it.product_code;
-                    var measure = it.measure;
-                    var supplier_code = it.supplier_code;
-
-                    var groupList = listPP.group;
-                    foreach (var g in groupList)
-                    {
-                        //g.externalCodeTT
-                        //found = true;
+                    if (tt.glnTT == glnTT && tt.glnTT_gruz == glnTT_gruz) {
+                        found = true;
+                        break;
                     }
+                    found_i++;
                 }
 
-                //result.Add(tt_gln + "@" + tt_gruz_gl + "@" + number, bpTT);
+                if (found) {
+                    var foundTT = listTT[found_i];
+
+                    //search group in listPP
+                    bool tt_found_in_PP = false;
+                    int tt_found_in_PP_i = 0;
+                    foreach (var g in groupPP)
+                    {
+                        if (g.externalCodeTT.part1 == foundTT.externalCodeTT.part1 &&
+                            g.externalCodeTT.part2 == foundTT.externalCodeTT.part2 &&
+                            g.externalCodeTT.part3 == foundTT.externalCodeTT.part3
+                        ) {
+                            tt_found_in_PP = true;
+                            break;
+                        }
+                        tt_found_in_PP_i++;
+                    }
+
+                    ProductProfiles_Group pp_g = null;
+                    if (!tt_found_in_PP)
+                    {
+                        pp_g = new ProductProfiles_Group()
+                        {
+                            externalCodeTT = new ExternalCodeTT()
+                            {
+                                part1 = foundTT.externalCodeTT.part1,
+                                part2 = foundTT.externalCodeTT.part2,
+                                part3 = foundTT.externalCodeTT.part3
+                            },
+                            list = new List<ProductProfiles_Elements>()
+                        };
+                        groupPP.Add(pp_g);
+                    }
+                    else
+                    {
+                        pp_g = groupPP[tt_found_in_PP_i];
+                    }
+
+                    //search items in listPP.group.list
+                    var listItems = s.Value.as_json.items;
+                    foreach (var it in listItems)
+                    {
+                        var product_code = long.Parse(it.product_code);
+                        var title = it.title;
+                        //var position = int.Parse(it.position);
+                        //var buyer_code = long.Parse(it.buyer_code);
+                        //var measure = it.measure; //PCE
+                        //var supplier_code = it.supplier_code;
+                        //var tax_rate = int.Parse(it.tax_rate); //20
+                        //var quantity = float.Parse(it.quantity);
+
+                        //search in listPP
+                        bool item_found = false;
+                        foreach (var l in groupPP[tt_found_in_PP_i].list)
+                        {
+                            if (l.EAN == product_code) item_found = true;
+                        }
+
+                        if (!item_found) {
+                            pp_g.list.Add(new ProductProfiles_Elements() {
+                                EAN = product_code,
+                                Title = title
+                            });
+                        }
+                    }
+                } else {
+                    Base.Log(
+                        "Warning in getProductProfilesOfTTfrom1C: "+
+                        "not found TT with GLN ["+glnTT+","+glnTT_gruz+"]!"
+                    );
+                }
             }
 
-
-            if (listPP.group.Count() > 0)
+            if (groupPP.Count() > 0)
             {
                 var input = new lib.classes.Base1C.ProductProfiles() {
                     group = new List<lib.classes.Base1C.ProductProfiles_Group>()
                 };
 
                 var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.ProductProfiles>(report1cName, input);
-                if (output != null)
-                {
+                if (output != null) {
                     var output_listPP = output.group;
-
-                    for (int i = 0; i < listPP.group.Count(); i++)
+                    for (int i = 0; i < groupPP.Count(); i++)
                     {
-                        var glnTT = listPP.group[i].glnTT;
-                        var glnTT_gruz = input.group[i].glnTT_gruz;
+                        //var glnTT = groupPP[i].glnTT;
+                        //var glnTT_gruz = input.group[i].glnTT_gruz;
 
                         var item = output_listPP.
                             Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                             FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                        if (item != null)
-                        {
-                            listPP.group[i].externalCodeTT = item.externalCodeTT;
+                        if (item != null) {
+                            groupPP[i].externalCodeTT = item.externalCodeTT;
                         }
                     }
-
-                    result = listPP;
+                    result = groupPP;
                     output_listPP = null;
                 }
             }
-            listPP = null;
-*/
             return result;
         }
 
