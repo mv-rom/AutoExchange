@@ -130,12 +130,12 @@ namespace ae
                     var self_gln = s.Value.as_json.seller_gln;
                     if (gln.Equals(self_gln)) {
                         bool found = false;
-                        var glnTT = s.Value.as_json.buyer_gln;
-                        var glnTT_gruz = s.Value.as_json.delivery_gln;
+                        var glnTT = long.Parse(s.Value.as_json.buyer_gln);
+                        var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
 
                         foreach (var l in listTT)
                         {
-                            if (glnTT.Equals(l.glnTT) && glnTT_gruz.Equals(l.glnTT_gruz)) {
+                            if (glnTT == l.glnTT && glnTT_gruz == l.glnTT_gruz) {
                                 found = true;
                                 break;
                             }
@@ -144,8 +144,8 @@ namespace ae
                         if (!found) {
                             listTT.Add(
                                 new lib.classes.Base1C.TTbyGLN_Elements() {
-                                    glnTT = long.Parse(glnTT),
-                                    glnTT_gruz = long.Parse(glnTT_gruz),
+                                    glnTT = glnTT,
+                                    glnTT_gruz = glnTT_gruz,
                                     externalCodeTT = new lib.classes.Base1C.ExternalCodeTT() {
                                         part1 = 0,
                                         part2 = 0,
@@ -292,7 +292,7 @@ namespace ae
                         }
                     }
                 } else {
-                    Base.Log(
+                    Base.Log1(
                         "Warning in getProductProfilesOfTTfrom1C: "+
                         "not found TT with GLN ["+glnTT+","+glnTT_gruz+"]!"
                     );
@@ -312,15 +312,16 @@ namespace ae
                     {
                         //var glnTT = groupPP[i].glnTT;
                         //var glnTT_gruz = input.group[i].glnTT_gruz;
-
+/*
                         var item = output_listPP.
                             Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                             FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
                         if (item != null) {
                             groupPP[i].externalCodeTT = item.externalCodeTT;
                         }
+*/
                     }
-                    result = groupPP;
+                    //result = groupPP;
                     output_listPP = null;
                 }
             }
