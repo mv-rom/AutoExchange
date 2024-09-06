@@ -168,14 +168,14 @@ namespace ae
 
                         int i = 0;
                         while (i < listTT.Count()) {
-                            var glnTT = listTT[i].glnTT;
-                            var glnTT_gruz = input.list[i].glnTT_gruz;
+                            var glnTT =      listTT[i].glnTT;
+                            var glnTT_gruz = listTT[i].glnTT_gruz;
 
-                            var item = output_listTT.
+                            var output_item = output_listTT.
                                 Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                                 FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                            if (item != null) {
-                                listTT[i].externalCodeTT = item.externalCodeTT;
+                            if (output_item != null) {
+                                listTT[i].externalCodeTT = output_item.externalCodeTT;
                                 i++;
                             } else {
                                 listTT.RemoveAt(i);
@@ -229,7 +229,7 @@ namespace ae
                 if (found) {
                     var foundTT = listTT[found_i];
 
-                    //search group in listPP
+                    //search group in groupPP
                     bool tt_found_in_PP = false;
                     int tt_found_in_PP_i = 0;
                     foreach (var g in groupPP)
@@ -302,27 +302,43 @@ namespace ae
             if (groupPP.Count() > 0)
             {
                 var input = new lib.classes.Base1C.ProductProfiles() {
-                    group = new List<lib.classes.Base1C.ProductProfiles_Group>()
+                    group = groupPP
                 };
 
                 var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.ProductProfiles>(report1cName, input);
                 if (output != null) {
-                    var output_listPP = output.group;
-                    for (int i = 0; i < groupPP.Count(); i++)
+                    var output_groupPP = output.group;
+                    int i = 0;
+                    while (i < groupPP.Count())
                     {
-                        //var glnTT = groupPP[i].glnTT;
-                        //var glnTT_gruz = input.group[i].glnTT_gruz;
-/*
-                        var item = output_listPP.
-                            Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
-                            FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                        if (item != null) {
-                            groupPP[i].externalCodeTT = item.externalCodeTT;
+                        var g = groupPP[i];
+                        var output_item = output_groupPP.Where(x => (
+                            x.externalCodeTT.part1 == g.externalCodeTT.part1 &&
+                            x.externalCodeTT.part2 == g.externalCodeTT.part2 &&
+                            x.externalCodeTT.part3 == g.externalCodeTT.part3
+                        )).FirstOrDefault();
+                        if (output_item != null) {
+                            int j = 0;
+                            while (j < g.list.Count())
+                            {
+                                var g_el = g.list[j];
+                                var output_item_el = output_item.list.Where(x => (x.EAN == g_el.EAN)).FirstOrDefault();
+                                if (output_item_el != null) {
+                                    g_el.ProductCode = output_item_el.ProductCode;
+                                    g_el.ProductType = output_item_el.ProductType;
+                                    g_el.BasePrice = output_item_el.BasePrice;
+                                    j++;
+                                } else {
+                                    g.list.RemoveAt(j);
+                                }
+                            }
+                            i++;
+                        } else {
+                            groupPP.RemoveAt(i);
                         }
-*/
                     }
                     //result = groupPP;
-                    output_listPP = null;
+                    output_groupPP = null;
                 }
             }
             return result;
