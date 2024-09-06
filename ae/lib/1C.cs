@@ -242,10 +242,10 @@ namespace ae.lib
                             result = XML.ConvertXMLTextToClass<T>(stringOutput, Encoding.ASCII);
                         }
                     } else {
-                        Base.Log("Error of run 1c report [" + report1c_Name + "]!");
+                        Base.Log1("Error of run 1c report [" + report1c_Name + "]!");
                     }
                 } else {
-                    Base.Log("Error before run 1c report [" + report1c_Name + "]: the problem with initialization of instance 1c!");
+                    Base.Log1("Error before run 1c report [" + report1c_Name + "]: the problem with initialization of instance 1c!");
                 }
             }
 

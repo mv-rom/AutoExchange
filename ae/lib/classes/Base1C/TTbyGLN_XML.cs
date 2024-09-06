@@ -24,7 +24,7 @@ namespace ae.lib.classes.Base1C
 
     [Serializable]
     [XmlRoot(ElementName = "ITEM")]
-    public class TTbyGLN_Elements
+    public class TTbyGLN_Item
     {
         [XmlElement(ElementName = "glnTT")]
         public long glnTT { get; set; }
@@ -42,20 +42,23 @@ namespace ae.lib.classes.Base1C
     public class TTbyGLN
     {
         [XmlElement(ElementName = "ITEM")]
-        public List<TTbyGLN_Elements> list { get; set; }
+        public List<TTbyGLN_Item> list { get; set; }
     }
 
     //--------------------------------------------------------------
 
     [Serializable]
     [XmlRoot(ElementName = "ITEM")]
-    public class ProductProfiles_Elements
+    public class ProductProfiles_Item
     {
         [XmlElement(ElementName = "EAN")]
         public long EAN { get; set; }
 
         [XmlElement(ElementName = "Title")]
         public string Title { get; set; }
+
+        [XmlElement(ElementName = "ExecutionDate")]
+        public string ExecutionDate { get; set; }
 
         [XmlElement(ElementName = "ProductCode")]
         public int ProductCode { get; set; }
@@ -65,14 +68,22 @@ namespace ae.lib.classes.Base1C
 
         [XmlElement(ElementName = "BasePrice")]
         public float BasePrice { get; set; }
+
+
+        [XmlAttribute(AttributeName = "num")]
+        public int Number { get; set; }
+
     }
 
     [Serializable]
     [XmlRoot(ElementName = "GROUP")]
     public class ProductProfiles_Group
     {
+        [XmlElement(ElementName = "externalCodeTT")]
         public ExternalCodeTT externalCodeTT { get; set; }
-        public List<ProductProfiles_Elements> list { get; set; }
+
+        [XmlElement(ElementName = "ITEM")]
+        public List<ProductProfiles_Item> list { get; set; }
     }
 
     [Serializable]

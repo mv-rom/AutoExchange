@@ -114,16 +114,16 @@ namespace ae
         }
 
 
-        private static List<lib.classes.Base1C.TTbyGLN_Elements> getTTbyGLNfrom1C(
+        private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(
             Dictionary<string, lib.classes.VchasnoEDI.Order> src)
         {
             string report1cName = "EDI_tt_by_gln";
-            List<lib.classes.Base1C.TTbyGLN_Elements> result = null;
+            List<lib.classes.Base1C.TTbyGLN_Item> result = null;
 
             string gln = "";
             if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
             {
-                var listTT = new List<lib.classes.Base1C.TTbyGLN_Elements>();
+                var listTT = new List<lib.classes.Base1C.TTbyGLN_Item>();
 
                 foreach (var s in src)
                 {
@@ -143,7 +143,7 @@ namespace ae
 
                         if (!found) {
                             listTT.Add(
-                                new lib.classes.Base1C.TTbyGLN_Elements() {
+                                new lib.classes.Base1C.TTbyGLN_Item() {
                                     glnTT = glnTT,
                                     glnTT_gruz = glnTT_gruz,
                                     externalCodeTT = new lib.classes.Base1C.ExternalCodeTT() {
@@ -199,7 +199,7 @@ namespace ae
 
         private static List<lib.classes.Base1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
             Dictionary<string, lib.classes.VchasnoEDI.Order> src,
-            List<lib.classes.Base1C.TTbyGLN_Elements> listTT
+            List<lib.classes.Base1C.TTbyGLN_Item> listTT
         )
         {
             string report1cName = "EDI_product_profiles";
@@ -213,6 +213,7 @@ namespace ae
             {
                 var glnTT = long.Parse(s.Value.as_json.buyer_gln);
                 var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
+                var date_expected_delivery = s.Value.as_json.date_expected_delivery;
 
                 //search in listTT
                 bool found = false;
@@ -255,7 +256,7 @@ namespace ae
                                 part2 = foundTT.externalCodeTT.part2,
                                 part3 = foundTT.externalCodeTT.part3
                             },
-                            list = new List<ProductProfiles_Elements>()
+                            list = new List<ProductProfiles_Item>()
                         };
                         groupPP.Add(pp_g);
                     }
@@ -264,11 +265,15 @@ namespace ae
                         pp_g = groupPP[tt_found_in_PP_i];
                     }
 
-                    //search items in listPP.group.list
+                    //search items in listPP.group.items
                     var listItems = s.Value.as_json.items;
+                    int number = 0;
                     foreach (var it in listItems)
                     {
                         var product_code = long.Parse(it.product_code);
+                        //var b = Encoding.UTF8.GetBytes(it.title);
+                        //var bb = Encoding.Convert(Encoding.UTF8, Encoding.ASCII, b);
+                        //var title = Encoding.ASCII.GetString(bb);
                         var title = it.title;
                         //var position = int.Parse(it.position);
                         //var buyer_code = long.Parse(it.buyer_code);
@@ -285,10 +290,13 @@ namespace ae
                         }
 
                         if (!item_found) {
-                            pp_g.list.Add(new ProductProfiles_Elements() {
+                            pp_g.list.Add(new ProductProfiles_Item() {
                                 EAN = product_code,
-                                Title = title
+                                Title = title,
+                                ExecutionDate = date_expected_delivery,
+                                Number = number
                             });
+                            number++;
                         }
                     }
                 } else {
@@ -453,7 +461,7 @@ namespace ae
 
                     var dictBasePriceTT = getProductProfilesOfTTfrom1C(mainOrdersList, TTbyGLN_List);
                     if (dictBasePriceTT == null)
-                        throw new Exception("Result of getTTbyGLNfrom1C is null.");
+                        throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
                     if (dictBasePriceTT.Count > 0) {
                         var filePath_DevidedOrders = Path.Combine(dirPath, fileJSON_DevidedOrders);
