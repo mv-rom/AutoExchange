@@ -7,8 +7,8 @@ using System.Xml.Serialization;
 namespace ae.lib.classes.Base1C
 {
     [Serializable]
-    [XmlRoot(ElementName = "ExternalCodeTT")]
-    public class ExternalCodeTT
+    [XmlRoot(ElementName = "codeTT")]
+    public class codeTT
     {
         [XmlElement(ElementName = "part1")]
         public int part1 { get; set; }
@@ -32,8 +32,8 @@ namespace ae.lib.classes.Base1C
         [XmlElement(ElementName = "glnTT_gruz")]
         public long glnTT_gruz { get; set; }
 
-        [XmlElement(ElementName = "externalCodeTT")]
-        public ExternalCodeTT externalCodeTT { get; set; }
+        [XmlElement(ElementName = "codeTT")]
+        public codeTT codeTT { get; set; }
 
     }
 
@@ -79,8 +79,18 @@ namespace ae.lib.classes.Base1C
     [XmlRoot(ElementName = "GROUP")]
     public class ProductProfiles_Group
     {
-        [XmlElement(ElementName = "externalCodeTT")]
-        public ExternalCodeTT externalCodeTT { get; set; }
+        [XmlAttribute(AttributeName = "id")]
+        public string id { get; set; }
+
+
+        [XmlAttribute(AttributeName = "codeTT_part1")]
+        public int codeTT_part1 { get; set; }
+
+        [XmlAttribute(AttributeName = "codeTT_part2")]
+        public int codeTT_part2 { get; set; }
+
+        [XmlAttribute(AttributeName = "codeTT_part3")]
+        public int codeTT_part3 { get; set; }
 
         [XmlElement(ElementName = "ITEM")]
         public List<ProductProfiles_Item> list { get; set; }

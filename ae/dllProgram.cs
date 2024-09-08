@@ -146,7 +146,7 @@ namespace ae
                                 new lib.classes.Base1C.TTbyGLN_Item() {
                                     glnTT = glnTT,
                                     glnTT_gruz = glnTT_gruz,
-                                    externalCodeTT = new lib.classes.Base1C.ExternalCodeTT() {
+                                    codeTT = new lib.classes.Base1C.codeTT() {
                                         part1 = 0,
                                         part2 = 0,
                                         part3 = 0
@@ -175,7 +175,7 @@ namespace ae
                                 Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                                 FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
                             if (output_item != null) {
-                                listTT[i].externalCodeTT = output_item.externalCodeTT;
+                                listTT[i].codeTT = output_item.codeTT;
                                 i++;
                             } else {
                                 listTT.RemoveAt(i);
@@ -211,6 +211,7 @@ namespace ae
             var groupPP = new List<lib.classes.Base1C.ProductProfiles_Group>();
             foreach (var s in src)
             {
+                var id = s.Value.id;
                 var glnTT = long.Parse(s.Value.as_json.buyer_gln);
                 var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
                 var date_expected_delivery = s.Value.as_json.date_expected_delivery;
@@ -235,9 +236,10 @@ namespace ae
                     int tt_found_in_PP_i = 0;
                     foreach (var g in groupPP)
                     {
-                        if (g.externalCodeTT.part1 == foundTT.externalCodeTT.part1 &&
-                            g.externalCodeTT.part2 == foundTT.externalCodeTT.part2 &&
-                            g.externalCodeTT.part3 == foundTT.externalCodeTT.part3
+                        if (g.codeTT_part1 == foundTT.codeTT.part1 &&
+                            g.codeTT_part2 == foundTT.codeTT.part2 &&
+                            g.codeTT_part3 == foundTT.codeTT.part3 &&
+                            g.id == id
                         ) {
                             tt_found_in_PP = true;
                             break;
@@ -246,22 +248,16 @@ namespace ae
                     }
 
                     ProductProfiles_Group pp_g = null;
-                    if (!tt_found_in_PP)
-                    {
-                        pp_g = new ProductProfiles_Group()
-                        {
-                            externalCodeTT = new ExternalCodeTT()
-                            {
-                                part1 = foundTT.externalCodeTT.part1,
-                                part2 = foundTT.externalCodeTT.part2,
-                                part3 = foundTT.externalCodeTT.part3
-                            },
+                    if (!tt_found_in_PP) {
+                        pp_g = new ProductProfiles_Group() {
+                            id = id,
+                            codeTT_part1 = foundTT.codeTT.part1,
+                            codeTT_part2 = foundTT.codeTT.part2,
+                            codeTT_part3 = foundTT.codeTT.part3,
                             list = new List<ProductProfiles_Item>()
                         };
                         groupPP.Add(pp_g);
-                    }
-                    else
-                    {
+                    } else {
                         pp_g = groupPP[tt_found_in_PP_i];
                     }
 
@@ -320,11 +316,7 @@ namespace ae
                     while (i < groupPP.Count())
                     {
                         var g = groupPP[i];
-                        var output_item = output_groupPP.Where(x => (
-                            x.externalCodeTT.part1 == g.externalCodeTT.part1 &&
-                            x.externalCodeTT.part2 == g.externalCodeTT.part2 &&
-                            x.externalCodeTT.part3 == g.externalCodeTT.part3
-                        )).FirstOrDefault();
+                        var output_item = output_groupPP.Where(x => (x.id == g.id)).FirstOrDefault();
                         if (output_item != null) {
                             int j = 0;
                             while (j < g.list.Count())
@@ -393,9 +385,9 @@ namespace ae
             {
                 var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
                 //get all type documents
-                var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+                var yesterdayDT = DateTime.Now.AddDays(-9).ToString("yyyy-MM-dd");
+                var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                //var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
                 //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
                 //var obj1_2 = VchasnoAPI.getDocument("0fa9ee04-195e-2057-4624-9351763bae61");
