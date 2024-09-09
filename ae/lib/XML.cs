@@ -34,12 +34,12 @@ namespace ae.lib
         }
 
         public static bool ConvertClassToXMLFile(
-            string toXmlFilePath, object objectClass, System.Text.Encoding TextEncoding
+            string toXmlFilePath, object objectClass, Encoding TextEncoding
         )
         {
             bool res = false;
             if (TextEncoding == null)
-                TextEncoding = System.Text.Encoding.UTF8;
+                TextEncoding = Encoding.UTF8;
 
             try
             {
@@ -64,13 +64,10 @@ namespace ae.lib
         }
 
 
-        public static string ConvertClassToXMLText(
-            object objectClass, System.Text.Encoding TextEncoding = null
-        )
+        public static string ConvertClassToXMLText(object objectClass)
         {
             string result = "";
-            TextEncoding = TextEncoding != null ? TextEncoding : Encoding.UTF8;
-
+            Encoding TextEncoding = Encoding.Default;
             try
             {
                 Type objectType = objectClass.GetType();
@@ -88,12 +85,10 @@ namespace ae.lib
             return result;
         }
 
-        public static T ConvertXMLTextToClass<T>(
-            string objectClassXMLString, Encoding TextEncoding = null
-        )
+        public static T ConvertXMLTextToClass<T>(string objectClassXMLString)
         {
             T result = default(T);
-            TextEncoding = TextEncoding != null ? TextEncoding : Encoding.UTF8;
+            Encoding TextEncoding = Encoding.Default;
 
             if (objectClassXMLString.Length > 0) {
                 try

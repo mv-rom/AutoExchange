@@ -57,9 +57,6 @@ namespace ae.lib.classes.Base1C
         [XmlElement(ElementName = "Title")]
         public string Title { get; set; }
 
-        [XmlElement(ElementName = "ExecutionDate")]
-        public string ExecutionDate { get; set; }
-
         [XmlElement(ElementName = "ProductCode")]
         public int ProductCode { get; set; }
 
@@ -82,6 +79,9 @@ namespace ae.lib.classes.Base1C
         [XmlAttribute(AttributeName = "id")]
         public string id { get; set; }
 
+        [XmlAttribute(AttributeName = "ExecutionDate")]
+        public string ExecutionDate { get; set; }
+
 
         [XmlAttribute(AttributeName = "codeTT_part1")]
         public int codeTT_part1 { get; set; }
@@ -91,6 +91,7 @@ namespace ae.lib.classes.Base1C
 
         [XmlAttribute(AttributeName = "codeTT_part3")]
         public int codeTT_part3 { get; set; }
+
 
         [XmlElement(ElementName = "ITEM")]
         public List<ProductProfiles_Item> list { get; set; }

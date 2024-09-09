@@ -187,7 +187,7 @@ namespace ae.lib
                     if (File.Exists(InputFilePath)) {
                         File.Delete(InputFilePath);
                     }
-                    File.WriteAllText(InputFilePath, data, Encoding.ASCII);
+                    File.WriteAllText(InputFilePath, data, Encoding.GetEncoding("windows-1251"));
                     result = true;
                 }
                 catch (Exception ex)
@@ -208,7 +208,7 @@ namespace ae.lib
             try
             {
                 if (File.Exists(OutputFilePath)) {
-                    data = File.ReadAllText(OutputFilePath, Encoding.ASCII);
+                    data = File.ReadAllText(OutputFilePath, Encoding.GetEncoding("windows-1251"));
                     //File.Delete(OutputFilePath);
                     result = true;
                 } else {
@@ -234,12 +234,12 @@ namespace ae.lib
             if (inst1C != null) {
                 if (inst1C.doReportFileInput(
                     Base.InboxDir,
-                    XML.ConvertClassToXMLText(inputObjectClass, Encoding.ASCII)
+                    XML.ConvertClassToXMLText(inputObjectClass)
                 )) {
                     if (inst1C.runExternalReport(report1c_Name)) {
                         string stringOutput = "";
                         if (inst1C.doReportFileOutput(Base.InboxDir, out stringOutput)) {
-                            result = XML.ConvertXMLTextToClass<T>(stringOutput, Encoding.ASCII);
+                            result = XML.ConvertXMLTextToClass<T>(stringOutput);
                         }
                     } else {
                         Base.Log1("Error of run 1c report [" + report1c_Name + "]!");

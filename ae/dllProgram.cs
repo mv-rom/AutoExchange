@@ -251,6 +251,7 @@ namespace ae
                     if (!tt_found_in_PP) {
                         pp_g = new ProductProfiles_Group() {
                             id = id,
+                            ExecutionDate = date_expected_delivery,
                             codeTT_part1 = foundTT.codeTT.part1,
                             codeTT_part2 = foundTT.codeTT.part2,
                             codeTT_part3 = foundTT.codeTT.part3,
@@ -267,9 +268,12 @@ namespace ae
                     foreach (var it in listItems)
                     {
                         var product_code = long.Parse(it.product_code);
-                        //var b = Encoding.UTF8.GetBytes(it.title);
-                        //var bb = Encoding.Convert(Encoding.UTF8, Encoding.ASCII, b);
-                        //var title = Encoding.ASCII.GetString(bb);
+                        /*
+                        var b = Encoding.UTF8.GetBytes(it.title);
+                        var en = Encoding.GetEncoding("windows-1251");
+                        var bb = Encoding.Convert(Encoding.UTF8, en, b);
+                        var title = en.GetString(bb);
+                        */
                         var title = it.title;
                         //var position = int.Parse(it.position);
                         //var buyer_code = long.Parse(it.buyer_code);
@@ -289,7 +293,6 @@ namespace ae
                             pp_g.list.Add(new ProductProfiles_Item() {
                                 EAN = product_code,
                                 Title = title,
-                                ExecutionDate = date_expected_delivery,
                                 Number = number
                             });
                             number++;
