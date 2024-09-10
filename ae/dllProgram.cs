@@ -114,8 +114,7 @@ namespace ae
         }
 
 
-        private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(
-            Dictionary<string, lib.classes.VchasnoEDI.Order> src)
+        private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<lib.classes.VchasnoEDI.Order> source)
         {
             string report1cName = "EDI_tt_by_gln";
             List<lib.classes.Base1C.TTbyGLN_Item> result = null;
@@ -125,13 +124,13 @@ namespace ae
             {
                 var listTT = new List<lib.classes.Base1C.TTbyGLN_Item>();
 
-                foreach (var s in src)
+                foreach (var s in source)
                 {
-                    var self_gln = s.Value.as_json.seller_gln;
+                    var self_gln = s.as_json.seller_gln;
                     if (gln.Equals(self_gln)) {
                         bool found = false;
-                        var glnTT = long.Parse(s.Value.as_json.buyer_gln);
-                        var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
+                        var glnTT = long.Parse(s.as_json.buyer_gln);
+                        var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
 
                         foreach (var l in listTT)
                         {
@@ -198,23 +197,20 @@ namespace ae
         }
 
         private static List<lib.classes.Base1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
-            Dictionary<string, lib.classes.VchasnoEDI.Order> src,
+            List<lib.classes.VchasnoEDI.Order> source,
             List<lib.classes.Base1C.TTbyGLN_Item> listTT
         )
         {
             string report1cName = "EDI_product_profiles";
             List<lib.classes.Base1C.ProductProfiles_Group> result = null;
 
-            //var result = new Dictionary<string, lib.classes.Base1C.BasePriceForTT>();
-            //var productTT = getProductTTfromOrders(src);
-
             var groupPP = new List<lib.classes.Base1C.ProductProfiles_Group>();
-            foreach (var s in src)
+            foreach (var s in source)
             {
-                var id = s.Value.id;
-                var glnTT = long.Parse(s.Value.as_json.buyer_gln);
-                var glnTT_gruz = long.Parse(s.Value.as_json.delivery_gln);
-                var date_expected_delivery = s.Value.as_json.date_expected_delivery;
+                var id = s.id;
+                var glnTT = long.Parse(s.as_json.buyer_gln);
+                var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
+                var date_expected_delivery = s.as_json.date_expected_delivery;
 
                 //search in listTT
                 bool found = false;
@@ -263,17 +259,11 @@ namespace ae
                     }
 
                     //search items in listPP.group.items
-                    var listItems = s.Value.as_json.items;
+                    var listItems = s.as_json.items;
                     int number = 0;
                     foreach (var it in listItems)
                     {
                         var product_code = long.Parse(it.product_code);
-                        /*
-                        var b = Encoding.UTF8.GetBytes(it.title);
-                        var en = Encoding.GetEncoding("windows-1251");
-                        var bb = Encoding.Convert(Encoding.UTF8, en, b);
-                        var title = en.GetString(bb);
-                        */
                         var title = it.title;
                         //var position = int.Parse(it.position);
                         //var buyer_code = long.Parse(it.buyer_code);
@@ -340,7 +330,7 @@ namespace ae
                             groupPP.RemoveAt(i);
                         }
                     }
-                    //result = groupPP;
+                    result = groupPP;
                     output_groupPP = null;
                 }
             }
@@ -348,8 +338,7 @@ namespace ae
         }
 
         private static bool processingDevidedOrders(
-            Dictionary<string, lib.classes.Base1C.BasePriceForTT>  obj1,
-            Dictionary<string, lib.classes.Base1C.BasePriceForTT> obj2,
+            List<lib.classes.Base1C.ProductProfiles_Group> obj,
             ref Dictionary<string, lib.classes.AE.DevidedOrder> dest
         )
         {
@@ -388,17 +377,11 @@ namespace ae
             {
                 var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
                 //get all type documents
-                var yesterdayDT = DateTime.Now.AddDays(-9).ToString("yyyy-MM-dd");
-                var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                //var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+                var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
                 //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
-                //var obj1_2 = VchasnoAPI.getDocument("0fa9ee04-195e-2057-4624-9351763bae61");
-                //var obj2_2 = VchasnoAPI.getDocument("0fa9fea1-c97b-633b-727b-f51721eda6b6");
-
-                //var obj2 = VchasnoAPI.getDocument("0faacfd1-f9a9-cc82-dcb5-c8577937bd10");
-                ///var obj3 = VchasnoAPI.getDocument("0faacfe1-74ce-1e6f-b6ff-ae45e5a6d0e9");
-                //var obj4 = VchasnoAPI.getDocument("0faacfe1-80a3-a6ce-483d-a67422f7a510");
 
                 var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
                 if (ordersList == null || ordersList.Count() <= 0)
@@ -414,8 +397,6 @@ namespace ae
                 if (ordersListFiltered.Count() <= 0)
                     goto __exit;
 
-                //ordersListFiltered = ordersListFiltered.ConvertAll<lib.classes.VchasnoEDI.Order>(x => VchasnoAPI.getDocument(x.id));
-                
                 //Filter by deal_id (order_number)
                 int i = 0;
                 int count = ordersListFiltered.Count();
@@ -435,6 +416,7 @@ namespace ae
 
                 string jsonStr = "";
                 if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
+/*
                     var filePath = Path.Combine(dirPath, fileJSONName);
                     if (!File.Exists(filePath)) {
                         fs = File.Create(filePath);
@@ -442,23 +424,22 @@ namespace ae
                     } else {
                         jsonStr = File.ReadAllText(filePath);
                     }
-
+*/
                     //read Main Order List
-                    var mainOrdersList = JSON.fromJSON<Dictionary<string, lib.classes.VchasnoEDI.Order>>(jsonStr);
-                    jsonStr = "";
+                    //var mainOrdersList = JSON.fromJSON<Dictionary<string, lib.classes.VchasnoEDI.Order>>(jsonStr);
+                    //jsonStr = "";
                     //expand Main Order List
-                    expandDictFromList(ordersListFiltered, ref mainOrdersList);
+                    //expandDictFromList(ordersListFiltered, ref mainOrdersList);
 
-                    //processing 1C
-                    var TTbyGLN_List = getTTbyGLNfrom1C(mainOrdersList);
+                    var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                     if (TTbyGLN_List == null)
                         throw new Exception("Result of getTTbyGLNfrom1C is null.");
 
-                    var dictBasePriceTT = getProductProfilesOfTTfrom1C(mainOrdersList, TTbyGLN_List);
-                    if (dictBasePriceTT == null)
+                    var ProductProfiles = getProductProfilesOfTTfrom1C(ordersListFiltered, TTbyGLN_List);
+                    if (ProductProfiles == null)
                         throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
-                    if (dictBasePriceTT.Count > 0) {
+                    if (ProductProfiles.Count > 0) {
                         var filePath_DevidedOrders = Path.Combine(dirPath, fileJSON_DevidedOrders);
                         if (!File.Exists(filePath_DevidedOrders)) {
                             fs = File.Create(filePath_DevidedOrders);
@@ -469,7 +450,10 @@ namespace ae
 
                         //read Main Order List
                         var devidedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.DevidedOrder>>(jsonStr);
-                        //processingDevidedOrders(productTT, dictBasePriceTT, ref devidedOrders);
+                        //expandDictFromList(ordersListFiltered, ref devidedOrders);
+                        processingDevidedOrders(ProductProfiles, ref devidedOrders);
+
+                        throw new Exception("STOP");
 
                         var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                         if (AbInbevEfesAPI != null) {
@@ -488,13 +472,14 @@ namespace ae
                             File.Delete(filePath_DevidedOrders);
                         File.Move(filePath_DevidedOrders + "_temp", filePath_DevidedOrders);
                     }
-
+/*
                     //save Main Order List
                     var jsonList = JSON.toJSON(mainOrdersList);
                     File.WriteAllText(filePath + "_temp", jsonList);
                     if (File.Exists(filePath))
                         File.Delete(filePath);
                     File.Move(filePath + "_temp", filePath);
+*/
                 }
             }
             catch (Exception ex)
