@@ -247,5 +247,23 @@ namespace ae.lib
                 Console.WriteLine(@"\- сохранен.");
             }
         }
+
+        public static int initKeyN()
+        {
+            Random rnd = new Random();
+            var n = rnd.Next(9999);
+            return n;
+        }
+
+        public static string genarateKeyN(int n)
+        {
+            /*
+            var ticks = Base.getCurentUnixDateTime();
+            int whole = (int)ticks;
+            int fraction = (int)((ticks % 1) * 100000000);
+            return whole + "-" + fraction + "-" + n;
+            */
+            return Guid.NewGuid().ToString("N");
+        }
     }
 }

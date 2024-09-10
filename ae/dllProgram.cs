@@ -22,8 +22,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -63,27 +63,16 @@ namespace ae
             File.Delete(Path.Combine(Base.RunDir, "ae.log"));
         }
 
-        private static int initKeyN()
-        {
-            Random rnd = new Random();
-            var n = rnd.Next(9999);
-            return n;
-        }
 
-        private static string genarateKeyN(int n)
-        {
-            var ticks = Base.getCurentUnixDateTime();
-            int whole = (int)ticks;
-            int fraction = (int)((ticks % 1) * 100000000);
-            return whole + "-" + fraction + "-" + n;
-        }
+
+
 
         private static void expandDictFromList(
             List<lib.classes.VchasnoEDI.Order> source, 
             ref Dictionary<string, lib.classes.VchasnoEDI.Order> destination
         )
         {
-            int n = initKeyN();
+            int n = Base.initKeyN();
 
             if (destination == null) {
                 destination = new Dictionary<string, lib.classes.VchasnoEDI.Order>();
@@ -102,7 +91,7 @@ namespace ae
                 }
                 if (!isExist) {
                     n += 1;
-                    string key = genarateKeyN(n);
+                    string key = Base.genarateKeyN(n);
                     destination.Add(key, s);
                 } else {
                     if (!s.deal_status.Equals("new") && existKey.Length > 0) {
