@@ -51,6 +51,10 @@ namespace ae.lib.classes.Base1C
     [XmlRoot(ElementName = "ITEM")]
     public class ProductProfiles_Item
     {
+        [XmlAttribute(AttributeName = "num")]
+        public int Number { get; set; }
+
+
         [XmlElement(ElementName = "EAN")]
         public long EAN { get; set; }
 
@@ -65,11 +69,6 @@ namespace ae.lib.classes.Base1C
 
         [XmlElement(ElementName = "BasePrice")]
         public float BasePrice { get; set; }
-
-
-        [XmlAttribute(AttributeName = "num")]
-        public int Number { get; set; }
-
     }
 
     [Serializable]
@@ -101,7 +100,73 @@ namespace ae.lib.classes.Base1C
     [XmlRoot(ElementName = "LIST")]
     public class ProductProfiles
     {
-         [XmlElement(ElementName = "GROUP")]
+        [XmlElement(ElementName = "GROUP")]
         public List<ProductProfiles_Group> group { get; set; }
+    }
+
+
+    //--------------------------------------------------------------
+
+    [Serializable]
+    [XmlRoot(ElementName = "ITEM")]
+    public class NewOrders_Item
+    {
+        [XmlAttribute(AttributeName = "num")]
+        public int Number { get; set; }
+
+
+        [XmlElement(ElementName = "Name")]
+        public string Name { get; set; }
+
+        [XmlElement(ElementName = "codeKPK")]
+        public int codeKPK { get; set; }
+
+        [XmlElement(ElementName = "ProductType")] //0 - pivo, 1 - kega, 3 - b/a
+        public int ProductType { get; set; }
+
+        [XmlElement(ElementName = "BasePrice")]
+        public float BasePrice { get; set; }
+
+        [XmlElement(ElementName = "NDS")]
+        public bool nds { get; set; }
+
+        [XmlElement(ElementName = "Akcya")]
+        public float Akcya { get; set; }
+
+        [XmlElement(ElementName = "Quant")]
+        public int Quant { get; set; }
+    }
+
+    [Serializable]
+    [XmlRoot(ElementName = "ORDER")]
+    public class NewOrders_Order
+    {
+        [XmlAttribute(AttributeName = "SelfId")]
+        public string SelfId { get; set; }
+
+        [XmlAttribute(AttributeName = "ExecutionDate")]
+        public string ExecutionDate { get; set; }
+
+
+        [XmlAttribute(AttributeName = "codeTT_part1")]
+        public int codeTT_part1 { get; set; }
+
+        [XmlAttribute(AttributeName = "codeTT_part2")]
+        public int codeTT_part2 { get; set; }
+
+        [XmlAttribute(AttributeName = "codeTT_part3")]
+        public int codeTT_part3 { get; set; }
+
+
+        [XmlElement(ElementName = "ITEM")]
+        public List<NewOrders_Item> items { get; set; }
+    }
+
+        [Serializable]
+    [XmlRoot(ElementName = "LIST")]
+    public class NewOrders
+    {
+        [XmlElement(ElementName = "ORDER")]
+        public List<ProductProfiles_Group> orders { get; set; }
     }
 }

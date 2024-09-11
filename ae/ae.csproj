@@ -90,10 +90,10 @@
     <Compile Include="lib\classes\AbInbevEfes\API.cs" />
     <Compile Include="lib\classes\AbInbevEfes\Authorization.cs" />
     <Compile Include="lib\classes\AbInbevEfes\PreSales.cs" />
-    <Compile Include="lib\classes\AE\DevidedOrders.cs" />
+    <Compile Include="lib\classes\AE\SplittedOrdersClass.cs" />
     <Compile Include="lib\classes\Base1C\style1C.cs" />
     <Compile Include="lib\classes\AE\ConfigClass.cs" />
-    <Compile Include="lib\classes\Base1C\TTbyGLN_XML.cs" />
+    <Compile Include="lib\classes\Base1C\InputOutput_XML.cs" />
     <Compile Include="lib\classes\VchasnoEDI\API.cs" />
     <Compile Include="lib\classes\VchasnoEDI\ORDRSP_XML.cs" />
     <Compile Include="lib\classes\VchasnoEDI\DESADV_XML.cs" />

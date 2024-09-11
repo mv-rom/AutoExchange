@@ -22,8 +22,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -326,25 +326,37 @@ namespace ae
             return result;
         }
 
-        private static bool processingDevidedOrders(
-            List<lib.classes.Base1C.ProductProfiles_Group> obj,
-            ref Dictionary<string, lib.classes.AE.DevidedOrder> dest
+        private static Dictionary<string, lib.classes.AE.SplittedOrdersClass> doSplittingUpOrders(
+            List<lib.classes.VchasnoEDI.Order> source1,
+            List<lib.classes.Base1C.ProductProfiles_Group> groupPP,
+            Dictionary<string, lib.classes.AE.SplittedOrdersClass> source2
         )
         {
-            return false;
-        }
+            Dictionary<string, lib.classes.AE.SplittedOrdersClass> result = null;
 
-        private static Dictionary<string, lib.classes.Base1C.InBoxOrder> CombinePreSaleAndOrders(
-            Object src,
-            Dictionary<string,
-            lib.classes.AE.DevidedOrder> dst
-        )
-        {
-            var result = default(Dictionary<string, lib.classes.Base1C.InBoxOrder>);
+
+            var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
+
+            foreach (var g in groupPP)
+            {
+                var id = g.id;
+                var found_item = source1.Where(x => (x.id == id)).FirstOrDefault();
+                if (found_item != null)
+                {
+                    //dictSO.Add(Base.genarateKeyN(1),{ });
+                }
+            }
+            //result = dictSO;
             return result;
         }
 
-        private static bool CheckAndAddOrdersIn1C(Dictionary<string, lib.classes.Base1C.InBoxOrder> src)
+        private static void CombinePreSaleAndOrders(
+            ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
+        )
+        {
+        }
+
+        private static bool CheckAndAddOrdersIn1C(Dictionary<string, lib.classes.AE.SplittedOrdersClass> source)
         {
             return false;
         }
@@ -355,8 +367,7 @@ namespace ae
             int ResCount = 0;
             FileStream fs;
             var dirPath = Base.InboxDir;
-            var fileJSONName = "ae.json";
-            var fileJSON_DevidedOrders = "ae_devided_orders.json";
+            var fileJSON_SplittedOrders = "ae.json";
             
 
             if (!Directory.Exists(dirPath))
@@ -405,21 +416,6 @@ namespace ae
 
                 string jsonStr = "";
                 if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
-/*
-                    var filePath = Path.Combine(dirPath, fileJSONName);
-                    if (!File.Exists(filePath)) {
-                        fs = File.Create(filePath);
-                        fs.Close();
-                    } else {
-                        jsonStr = File.ReadAllText(filePath);
-                    }
-*/
-                    //read Main Order List
-                    //var mainOrdersList = JSON.fromJSON<Dictionary<string, lib.classes.VchasnoEDI.Order>>(jsonStr);
-                    //jsonStr = "";
-                    //expand Main Order List
-                    //expandDictFromList(ordersListFiltered, ref mainOrdersList);
-
                     var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                     if (TTbyGLN_List == null)
                         throw new Exception("Result of getTTbyGLNfrom1C is null.");
@@ -429,46 +425,40 @@ namespace ae
                         throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
                     if (ProductProfiles.Count > 0) {
-                        var filePath_DevidedOrders = Path.Combine(dirPath, fileJSON_DevidedOrders);
-                        if (!File.Exists(filePath_DevidedOrders)) {
-                            fs = File.Create(filePath_DevidedOrders);
+                        var filePathSO = Path.Combine(dirPath, fileJSON_SplittedOrders);
+                        if (!File.Exists(filePathSO)) {
+                            fs = File.Create(filePathSO);
                             fs.Close();
                         } else {
-                            jsonStr = File.ReadAllText(filePath_DevidedOrders);
+                            jsonStr = File.ReadAllText(filePathSO);
                         }
 
-                        //read Main Order List
-                        var devidedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.DevidedOrder>>(jsonStr);
-                        //expandDictFromList(ordersListFiltered, ref devidedOrders);
-                        processingDevidedOrders(ProductProfiles, ref devidedOrders);
+                        var savedSplittedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.SplittedOrdersClass>>(jsonStr);
+                        jsonStr = "";
+                        var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
+                        if (SplittedOrders == null)
+                            throw new Exception("Result of doSplittingUpOrders is null.");
 
                         throw new Exception("STOP");
+                        /*
+                            var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
+                            if (AbInbevEfesAPI != null) {
+                                var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(SplittedOrders);
+                                var NewOrders = CombinePreSaleAndOrders(PreSaleResult, SplittedOrders);
+                                if (CheckAndAddOrdersIn1C(NewOrders))
+                                    Base.Log("AddtoA1C is successful.");
+                                else
+                                    Base.Log("Is not add to 1C!");
+                            }
+                        */
 
-                        var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
-                        if (AbInbevEfesAPI != null) {
-                            var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(devidedOrders);
-                            var InBoxOrders = CombinePreSaleAndOrders(PreSaleResult, devidedOrders);
-                            if (CheckAndAddOrdersIn1C(InBoxOrders))
-                                Base.Log("AddtoA1C is successful.");
-                            else
-                                Base.Log("Is not add to 1C!");
-                        }
-
-                        //save Devided Order List
-                        var jsonSubList = JSON.toJSON(devidedOrders);
-                        File.WriteAllText(filePath_DevidedOrders + "_temp", jsonSubList);
-                        if (File.Exists(filePath_DevidedOrders))
-                            File.Delete(filePath_DevidedOrders);
-                        File.Move(filePath_DevidedOrders + "_temp", filePath_DevidedOrders);
+                        //save Splited Order List
+                        jsonStr = JSON.toJSON(SplittedOrders);
+                        File.WriteAllText(filePathSO + "_temp", jsonStr);
+                        if (File.Exists(filePathSO))
+                            File.Delete(filePathSO);
+                        File.Move(filePathSO + "_temp", filePathSO);
                     }
-/*
-                    //save Main Order List
-                    var jsonList = JSON.toJSON(mainOrdersList);
-                    File.WriteAllText(filePath + "_temp", jsonList);
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
-                    File.Move(filePath + "_temp", filePath);
-*/
                 }
             }
             catch (Exception ex)
