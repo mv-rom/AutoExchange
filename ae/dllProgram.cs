@@ -334,16 +334,20 @@ namespace ae
         {
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> result = null;
 
-
             var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
-
             foreach (var g in groupPP)
             {
                 var id = g.id;
-                var found_item = source1.Where(x => (x.id == id)).FirstOrDefault();
-                if (found_item != null)
-                {
-                    //dictSO.Add(Base.genarateKeyN(1),{ });
+                if (!source2.ContainsKey(id)) {
+                    var found_item = source1.Where(x => (x.id == id)).FirstOrDefault();
+                    var listItems = found_item.as_json.items;
+                    int number = 0;
+                    foreach (var it in listItems)
+                    {
+                        var product_code = long.Parse(it.product_code);
+                        var title = it.title;
+                        //dictSO.Add(Base1.genarateKeyN(1), new lib.classes.AE.SplittedOrdersClass());
+                    }
                 }
             }
             //result = dictSO;
@@ -533,7 +537,7 @@ namespace ae
                                     lib.classes.VchasnoEDI.Order _founded = null;
                                     foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER))
                                     {
-                                        _founded = item; 
+                                        _founded = item;
                                         break;
                                     }
 
