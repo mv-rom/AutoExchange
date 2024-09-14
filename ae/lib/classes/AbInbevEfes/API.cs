@@ -124,8 +124,7 @@ namespace ae.lib.classes.AbInbevEfes
                 var rawJsonString = JSON.toJSON(packetPreSale);
 
                 string data = this.RAC.POST("", "", rawJsonString);
-                if (!String.IsNullOrEmpty(data))
-                {
+                if (!String.IsNullOrEmpty(data)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
                     if ((res1 == null) || (res1.error != "invalid_request")) {
                         result = JSON.fromJSON<PreSalesAnswer>(data);

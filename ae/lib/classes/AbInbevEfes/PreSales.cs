@@ -7,6 +7,17 @@ using System.Threading.Tasks;
 namespace ae.lib.classes.AbInbevEfes
 {
     [Serializable]
+    internal class preSalesDetails
+    {
+        public int productCode { get; set; }
+        public float basePrice { get; set; }
+        public float qty { get; set; }
+        public string lotId { get; set; }
+        public int promoType { get; set; }
+        public double vat { get; set; }
+    }
+
+    [Serializable]
     internal class PreSalesRequest
     {
         public string preSaleNo { get; set; }
@@ -21,16 +32,6 @@ namespace ae.lib.classes.AbInbevEfes
         public List<preSalesDetails> preSalesDetails { get; set; }
     }
 
-    [Serializable]
-    internal class preSalesDetails
-    {
-        public int productCode { get; set; }
-        public float basePrice { get; set; }
-        public float qty { get; set; }
-        public string lotId { get; set; }
-        public int promoType { get; set; }
-        public double vat { get; set; }
-    }
 
     [Serializable]
     internal class PreSalesAnswer
@@ -46,6 +47,17 @@ namespace ae.lib.classes.AbInbevEfes
 
 
     [Serializable]
+    internal class PreSalesResponseSummary
+    {
+        public int loaded { get; set; }
+        public int inserted { get; set; }
+        public int updated { get; set; }
+        public int deleted { get; set; }
+        public int skipped { get; set; }
+        public int errors { get; set; }
+    }
+
+    [Serializable]
     internal class PreSalesResponse
     {
         public PreSalesResponseResult result { get; set; }
@@ -53,6 +65,16 @@ namespace ae.lib.classes.AbInbevEfes
         public string urlLog { get; set; }
         public string urlErrorLog { get; set; }
         public PreSalesResponseSummary summary { get; set; }
+    }
+
+    [Serializable]
+    internal class preSalesResponseDetails
+    {
+        public string productCode { get; set; }
+        public string promoType { get; set; } //null - default
+        public float qty { get; set; }
+        public float price { get; set; }
+        public float totalDiscount { get; set; }
     }
 
     [Serializable]
@@ -65,24 +87,7 @@ namespace ae.lib.classes.AbInbevEfes
         public List<preSalesResponseDetails> details { get; set; }
     }
 
-    [Serializable]
-    internal class PreSalesResponseSummary
-    {
-        public int loaded { get; set; }
-        public int inserted { get; set; }
-        public int updated { get; set; }
-        public int deleted { get; set; }
-        public int skipped { get; set; }
-        public int errors { get; set; }
-    }
 
-    [Serializable]
-    internal class preSalesResponseDetails
-    {
-        public string productCode { get; set; }
-        public string promoType { get; set; } //null - default
-        public float qty { get; set; }
-        public float price { get; set; }
-        public float totalDiscount { get; set; }
-    }
+
+
 }

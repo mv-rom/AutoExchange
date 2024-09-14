@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace ae.lib.classes.Base1C
 {
+/*
     [Serializable]
     internal class ProductPrice
     {
@@ -18,14 +19,6 @@ namespace ae.lib.classes.Base1C
         public bool akciya { get; set; }
         public bool nds { get; set; }
     }
-/*
-    [Serializable]
-    internal class BasePriceForTT
-    {
-        public string externalCodeTT { get; set; }
-        public Dictionary<string, ProductPrice> productPriceDict { get; set; } //key template: "<codeKPK>@<ean>"
-    }
-*/
 
     [Serializable]
     internal class InBoxOrderElement
@@ -51,4 +44,5 @@ namespace ae.lib.classes.Base1C
         public int CustId { get; set; }
         public List<InBoxOrderElement> InBoxOrderElements { get; set;}
     }
+*/
 }

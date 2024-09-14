@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using System.Xml.XPath;
 using ae.lib.classes.Base1C;
+using ae.lib.classes.AE;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -66,7 +67,7 @@ namespace ae
 
 
 
-
+/*
         private static void expandDictFromList(
             List<lib.classes.VchasnoEDI.Order> source, 
             ref Dictionary<string, lib.classes.VchasnoEDI.Order> destination
@@ -101,7 +102,7 @@ namespace ae
                 }
             }
         }
-
+*/
 
         private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<lib.classes.VchasnoEDI.Order> source)
         {
@@ -112,7 +113,6 @@ namespace ae
             if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
             {
                 var listTT = new List<lib.classes.Base1C.TTbyGLN_Item>();
-
                 foreach (var s in source)
                 {
                     var self_gln = s.as_json.seller_gln;
@@ -327,30 +327,66 @@ namespace ae
         }
 
         private static Dictionary<string, lib.classes.AE.SplittedOrdersClass> doSplittingUpOrders(
-            List<lib.classes.VchasnoEDI.Order> source1,
+            List<lib.classes.VchasnoEDI.Order> Orders,
             List<lib.classes.Base1C.ProductProfiles_Group> groupPP,
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> source2
         )
         {
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> result = null;
-
-            var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
-            foreach (var g in groupPP)
+            if (source2 != null)
             {
-                var id = g.id;
-                if (!source2.ContainsKey(id)) {
-                    var found_item = source1.Where(x => (x.id == id)).FirstOrDefault();
-                    var listItems = found_item.as_json.items;
-                    int number = 0;
-                    foreach (var it in listItems)
+                var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
+                foreach (var o in Orders)
+                {
+                    var id = o.id;
+                    //enumeration by type
+                    for (int type = 0; type < 4; type++)
                     {
-                        var product_code = long.Parse(it.product_code);
-                        var title = it.title;
-                        //dictSO.Add(Base1.genarateKeyN(1), new lib.classes.AE.SplittedOrdersClass());
+                        var found_key = id + "@" + type;
+                        if (!source2.ContainsKey(found_key)) {
+                            var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
+                            if (found_item != null) {
+                                var newItems = new List<SplittedOrdersClass_Order>();
+
+                                var listItems = o.as_json.items;
+                                foreach (var it in listItems)
+                                {
+                                    var ean13 = long.Parse(it.product_code);
+                                    var found_list_item = found_item.list.
+                                        Where(x => (x.EAN == ean13 && x.ProductType == type)).FirstOrDefault();
+                                    if (found_list_item != null) {
+                                        newItems.Add(new SplittedOrdersClass_Order() {
+                                            ean13 = ean13,
+                                            codeKPK = found_list_item.ProductCode,
+                                            basePrice = found_list_item.BasePrice,
+                                            totalDiscount = 0
+                                        });
+                                    }
+                                    var title = it.title;
+                                }
+
+                                //add new
+                                if (newItems.Count > 0) {
+                                    dictSO.Add(found_key, new SplittedOrdersClass()
+                                    {
+                                        id = id,
+                                        ae_id = Base.genarateKeyN(1),
+                                        orderNumber = o.number,
+                                        codeTT_part1 = found_item.codeTT_part1,
+                                        codeTT_part2 = found_item.codeTT_part2,
+                                        codeTT_part3 = found_item.codeTT_part3,
+                                        Items = newItems
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
+
+                if (dictSO.Count > 0) {
+                    result = dictSO;
+                }
             }
-            //result = dictSO;
             return result;
         }
 
@@ -381,7 +417,7 @@ namespace ae
             {
                 var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
                 //get all type documents
-                var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
                 //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
                 var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -401,7 +437,7 @@ namespace ae
                 if (ordersListFiltered.Count() <= 0)
                     goto __exit;
 
-                //Filter by deal_id (order_number)
+                //Filter by deal_id (like order_number)
                 int i = 0;
                 int count = ordersListFiltered.Count();
                 while (i < ordersListFiltered.Count)

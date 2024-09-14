@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace ae.lib.classes.AbInbevEfes
 {
-    internal class Authorization
-    {
-    }
-
     [Serializable]
     internal class AuthorizationAnswer
     {
@@ -22,6 +18,6 @@ namespace ae.lib.classes.AbInbevEfes
     [Serializable]
     internal class AuthorizationErrorAnswer
     {
-        public string error { get; set; } //"invalid_request"
+        public string error { get; set; } // ? "invalid_request"
     }
 }
