@@ -341,7 +341,9 @@ namespace ae
                 for (int type = 0; type < 4; type++)
                 {
                     var found_key = id + "@" + type;
-                    if (source2 ==null || !source2.ContainsKey(found_key)) {
+                    if (source2 != null && source2.ContainsKey(found_key)) {
+                        dictSO.Add(found_key, source2[found_key]);
+                    } else {
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
                         if (found_item != null) {
                             var newItems = new List<SplittedOrdersClass_Order>();
@@ -452,7 +454,6 @@ namespace ae
                 ordersList = null;
 
 
-                string jsonStr = "";
                 if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
                     var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                     if (TTbyGLN_List == null)
@@ -463,6 +464,7 @@ namespace ae
                         throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
                     if (ProductProfiles.Count > 0) {
+                        string jsonStr = "";
                         var filePathSO = Path.Combine(dirPath, fileJSON_SplittedOrders);
                         if (!File.Exists(filePathSO)) {
                             fs = File.Create(filePathSO);
@@ -478,17 +480,17 @@ namespace ae
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
                         //throw new Exception("STOP");
-                        /*
-                            var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
-                            if (AbInbevEfesAPI != null) {
-                                var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(SplittedOrders);
-                                var NewOrders = CombinePreSaleAndOrders(PreSaleResult, SplittedOrders);
-                                if (CheckAndAddOrdersIn1C(NewOrders))
-                                    Base.Log("AddtoA1C is successful.");
-                                else
-                                    Base.Log("Is not add to 1C!");
-                            }
-                        */
+                        var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
+                        if (AbInbevEfesAPI != null) {
+                            /*
+                                    var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(SplittedOrders);
+                                    var NewOrders = CombinePreSaleAndOrders(PreSaleResult, SplittedOrders);
+                                    if (CheckAndAddOrdersIn1C(NewOrders))
+                                        Base.Log("AddtoA1C is successful.");
+                                    else
+                                        Base.Log("Is not add to 1C!");
+                            */
+                        }
 
                         //save Splited Order List
                         jsonStr = JSON.toJSON(SplittedOrders);
