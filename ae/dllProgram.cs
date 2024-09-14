@@ -333,59 +333,57 @@ namespace ae
         )
         {
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> result = null;
-            if (source2 != null)
+            var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
+            foreach (var o in Orders)
             {
-                var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
-                foreach (var o in Orders)
+                var id = o.id;
+                //enumeration by type
+                for (int type = 0; type < 4; type++)
                 {
-                    var id = o.id;
-                    //enumeration by type
-                    for (int type = 0; type < 4; type++)
-                    {
-                        var found_key = id + "@" + type;
-                        if (!source2.ContainsKey(found_key)) {
-                            var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
-                            if (found_item != null) {
-                                var newItems = new List<SplittedOrdersClass_Order>();
+                    var found_key = id + "@" + type;
+                    if (source2 ==null || !source2.ContainsKey(found_key)) {
+                        var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
+                        if (found_item != null) {
+                            var newItems = new List<SplittedOrdersClass_Order>();
 
-                                var listItems = o.as_json.items;
-                                foreach (var it in listItems)
-                                {
-                                    var ean13 = long.Parse(it.product_code);
-                                    var found_list_item = found_item.list.
-                                        Where(x => (x.EAN == ean13 && x.ProductType == type)).FirstOrDefault();
-                                    if (found_list_item != null) {
-                                        newItems.Add(new SplittedOrdersClass_Order() {
-                                            ean13 = ean13,
-                                            codeKPK = found_list_item.ProductCode,
-                                            basePrice = found_list_item.BasePrice,
-                                            totalDiscount = 0
-                                        });
-                                    }
-                                    var title = it.title;
-                                }
-
-                                //add new
-                                if (newItems.Count > 0) {
-                                    dictSO.Add(found_key, new SplittedOrdersClass()
-                                    {
-                                        id = id,
-                                        ae_id = Base.genarateKeyN(1),
-                                        orderNumber = o.number,
-                                        codeTT_part1 = found_item.codeTT_part1,
-                                        codeTT_part2 = found_item.codeTT_part2,
-                                        codeTT_part3 = found_item.codeTT_part3,
-                                        Items = newItems
+                            var listItems = o.as_json.items;
+                            foreach (var it in listItems)
+                            {
+                                var ean13 = long.Parse(it.product_code);
+                                var found_list_item = found_item.list.
+                                    Where(x => (x.EAN == ean13 && x.ProductType == type)).FirstOrDefault();
+                                if (found_list_item != null) {
+                                    newItems.Add(new SplittedOrdersClass_Order() {
+                                        ean13 = ean13,
+                                        codeKPK = found_list_item.ProductCode,
+                                        basePrice = found_list_item.BasePrice,
+                                        totalDiscount = 0
                                     });
                                 }
+                                var title = it.title;
+                            }
+
+                            //add new
+                            if (newItems.Count > 0) {
+                                dictSO.Add(found_key, new SplittedOrdersClass()
+                                {
+                                    id = id,
+                                    ae_id = Base.genarateKeyN(1),
+                                    orderNumber = o.number,
+                                    OrderExecutionDate = DateTime.Parse(found_item.ExecutionDate),
+                                    codeTT_part1 = found_item.codeTT_part1,
+                                    codeTT_part2 = found_item.codeTT_part2,
+                                    codeTT_part3 = found_item.codeTT_part3,
+                                    Items = newItems
+                                });
                             }
                         }
                     }
                 }
+            }
 
-                if (dictSO.Count > 0) {
-                    result = dictSO;
-                }
+            if (dictSO.Count > 0) {
+                result = dictSO;
             }
             return result;
         }
@@ -479,7 +477,7 @@ namespace ae
                         if (SplittedOrders == null)
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
-                        throw new Exception("STOP");
+                        //throw new Exception("STOP");
                         /*
                             var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                             if (AbInbevEfesAPI != null) {
