@@ -54,7 +54,7 @@ namespace ae.lib
             }
 
 
-            if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad)) {
+            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad)) {
                 string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);

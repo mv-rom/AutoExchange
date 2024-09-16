@@ -24,8 +24,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -393,10 +393,64 @@ namespace ae
             return result;
         }
 
-        private static bool CheckAndAddOrdersIn1C(object source)
+        private static bool CheckAndAddOrdersIn1C(
+            Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
+        )
         {
-            return false;
+            bool result = false;
+            string report1cName = "EDI_vkachka_zayavok";
+
+
+            var newOrders = new List<NewOrders_Order>();
+            foreach (var so in source)
+            {
+                int num = 1;
+                var newItems = new List<NewOrders_Item>();
+                foreach (var it in so.Value.Items)
+                {
+                    newItems.Add(new NewOrders_Item() {
+                        Number = num,
+                        codeKPK = it.codeKPK,
+                        BasePrice = it.basePrice,
+                        Akcya = it.totalDiscount
+                    });
+                    num++;
+                }
+
+                if (newItems.Count > 0) {
+                    newOrders.Add(new NewOrders_Order()
+                    {
+                        orderNo = so.Value.resut_orderNo,
+                        outletCode = so.Value.result_outletCode,
+                        ExecutionDate = so.Value.OrderExecutionDate.ToString(),
+                        codeTT_part1 = so.Value.codeTT_part1,
+                        codeTT_part2 = so.Value.codeTT_part2,
+                        codeTT_part3 = so.Value.codeTT_part3,
+                        items = newItems
+                    });
+                }
+            }
+
+            if (newOrders.Count() > 0) {
+                var input = new lib.classes.Base1C.NewOrders(){
+                    orders = newOrders
+                };
+
+                var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.NewOrders>(report1cName, input);
+                if (output != null) {
+                    var output_Orders = output.orders;
+                    int i = 0;
+                    while (i < output_Orders.Count())
+                    {
+                        var o = output_Orders[i];
+                    }
+
+                    result = true;
+                }
+            }
+            return result;
         }
+
 
 
         public static void processInBox()
@@ -518,47 +572,10 @@ namespace ae
                                 }
                             }
 
-
-                            var newOrders = new List<NewOrders_Order>();
-                            foreach (var so in savedSplittedOrders)
-                            {
-                                int num = 1;
-                                var newItems = new List<NewOrders_Item>();
-                                foreach (var it in so.Value.Items)
-                                {
-                                    newItems.Add(new NewOrders_Item(){
-                                        Number = num,
-                                        codeKPK = it.codeKPK,
-                                        BasePrice = it.basePrice,
-                                        Akcya = it.totalDiscount
-                                    });
-                                    num++;
-                                }
-
-                                if (newItems.Count > 0) {
-                                    newOrders.Add(new NewOrders_Order() {
-                                        orderNo = so.Value.resut_orderNo,
-                                        outletCode = so.Value.result_outletCode,
-                                        ExecutionDate = so.Value.OrderExecutionDate.ToString(),
-                                        codeTT_part1 = so.Value.codeTT_part1,
-                                        codeTT_part2 = so.Value.codeTT_part2,
-                                        codeTT_part3 = so.Value.codeTT_part3,
-                                        items = newItems
-                                    });
-                                }
-                            }
-
-                            NewOrders Orders1C = null;
-                            if (newOrders.Count > 0) {
-                                Orders1C = new NewOrders() {
-                                    orders = newOrders
-                                };
-                            }
-
-                            if (CheckAndAddOrdersIn1C(Orders1C))
-                                Base.Log("Add orders to 1C is successful.");
+                            if (CheckAndAddOrdersIn1C(savedSplittedOrders))
+                                Base.Log("Processing orders in 1C is successful.");
                             else
-                                Base.Log("Is not add to 1C!");
+                                Base.Log("Some problems with processing orders in 1c!");
 
                             //throw new Exception("STOP");
 
