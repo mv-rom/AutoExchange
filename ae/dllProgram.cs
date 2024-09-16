@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using System.Xml.XPath;
 using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
+using ae.lib.classes.AbInbevEfes;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -249,7 +250,7 @@ namespace ae
 
                     //search items in listPP.group.items
                     var listItems = s.as_json.items;
-                    int number = 0;
+                    int num = 1;
                     foreach (var it in listItems)
                     {
                         var product_code = long.Parse(it.product_code);
@@ -272,9 +273,9 @@ namespace ae
                             pp_g.list.Add(new ProductProfiles_Item() {
                                 EAN = product_code,
                                 Title = title,
-                                Number = number
+                                Number = num
                             });
-                            number++;
+                            num++;
                         }
                     }
                 } else {
@@ -338,9 +339,9 @@ namespace ae
             {
                 var id = o.id;
                 //enumeration by type
-                for (int type = 0; type < 4; type++)
+                for (int type_of_product = 0; type_of_product < 4; type_of_product++)
                 {
-                    var found_key = id + "@" + type;
+                    var found_key = id + "@" + type_of_product;
                     if (source2 != null && source2.ContainsKey(found_key)) {
                         dictSO.Add(found_key, source2[found_key]);
                     } else {
@@ -353,12 +354,14 @@ namespace ae
                             {
                                 var ean13 = long.Parse(it.product_code);
                                 var found_list_item = found_item.list.
-                                    Where(x => (x.EAN == ean13 && x.ProductType == type)).FirstOrDefault();
+                                    Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
                                 if (found_list_item != null) {
                                     newItems.Add(new SplittedOrdersClass_Order() {
                                         ean13 = ean13,
                                         codeKPK = found_list_item.ProductCode,
                                         basePrice = found_list_item.BasePrice,
+                                        qty = float.Parse(it.quantity),
+                                        promoType = 0,
                                         totalDiscount = 0
                                     });
                                 }
@@ -390,13 +393,7 @@ namespace ae
             return result;
         }
 
-        private static void CombinePreSaleAndOrders(
-            ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
-        )
-        {
-        }
-
-        private static bool CheckAndAddOrdersIn1C(Dictionary<string, lib.classes.AE.SplittedOrdersClass> source)
+        private static bool CheckAndAddOrdersIn1C(object source)
         {
             return false;
         }
@@ -416,7 +413,7 @@ namespace ae
             try
             {
                 var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-                //get all type documents
+                //getting needed documents
                 var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
                 //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
                 var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
@@ -479,25 +476,99 @@ namespace ae
                         if (SplittedOrders == null)
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
-                        //throw new Exception("STOP");
                         var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                         if (AbInbevEfesAPI != null) {
-                            /*
-                                    var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(SplittedOrders);
-                                    var NewOrders = CombinePreSaleAndOrders(PreSaleResult, SplittedOrders);
-                                    if (CheckAndAddOrdersIn1C(NewOrders))
-                                        Base.Log("AddtoA1C is successful.");
-                                    else
-                                        Base.Log("Is not add to 1C!");
-                            */
-                        }
+                            foreach (var so in savedSplittedOrders)
+                            {
+                                var request = new PreSalesRequest() {
+                                    preSaleNo = so.Value.ae_id, //or so.Key
+                                    custOrderNo = so.Value.id,
+                                    outletCode =
+                                        so.Value.codeTT_part1 + "\\" +
+                                        so.Value.codeTT_part1 + "\\" +
+                                        so.Value.codeTT_part1,
+                                    preSaleType = 6, //EDI order
+                                    dateFrom = DateTime.Now.ToString(),
+                                    dateTo = so.Value.OrderExecutionDate.ToString(),
+                                    warehouseCode = Base.torg_sklad,
+                                    vatCalcMod = 1, //price with PDV
+                                    custId = int.Parse(Base.torg_sklad)
+                                };
 
-                        //save Splited Order List
-                        jsonStr = JSON.toJSON(SplittedOrders);
-                        File.WriteAllText(filePathSO + "_temp", jsonStr);
-                        if (File.Exists(filePathSO))
-                            File.Delete(filePathSO);
-                        File.Move(filePathSO + "_temp", filePathSO);
+                                var preSalesDetails = new List<preSalesDetails>();
+                                foreach (var it in so.Value.Items)
+                                {
+                                    preSalesDetails.Add(new preSalesDetails(){
+                                        productCode = it.codeKPK,
+                                        basePrice = it.basePrice,
+                                        qty = it.qty,
+                                        lotId = "-",
+                                        promoType = it.promoType, //1 - vstugnu kuputu, 0 - ni (default)
+                                        vat = 20.0F // 20.0% - PDV
+                                    });
+                                }
+
+                                if (preSalesDetails.Count > 0) {
+                                    request.preSalesDetails = preSalesDetails;
+
+                                    var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
+                                    if (PreSaleResult != null) {
+                                        //update SplittedOrders
+                                    }
+                                }
+                            }
+
+
+                            var newOrders = new List<NewOrders_Order>();
+                            foreach (var so in savedSplittedOrders)
+                            {
+                                int num = 1;
+                                var newItems = new List<NewOrders_Item>();
+                                foreach (var it in so.Value.Items)
+                                {
+                                    newItems.Add(new NewOrders_Item(){
+                                        Number = num,
+                                        codeKPK = it.codeKPK,
+                                        BasePrice = it.basePrice,
+                                        Akcya = it.totalDiscount
+                                    });
+                                    num++;
+                                }
+
+                                if (newItems.Count > 0) {
+                                    newOrders.Add(new NewOrders_Order() {
+                                        orderNo = so.Value.resut_orderNo,
+                                        outletCode = so.Value.result_outletCode,
+                                        ExecutionDate = so.Value.OrderExecutionDate.ToString(),
+                                        codeTT_part1 = so.Value.codeTT_part1,
+                                        codeTT_part2 = so.Value.codeTT_part2,
+                                        codeTT_part3 = so.Value.codeTT_part3,
+                                        items = newItems
+                                    });
+                                }
+                            }
+
+                            NewOrders Orders1C = null;
+                            if (newOrders.Count > 0) {
+                                Orders1C = new NewOrders() {
+                                    orders = newOrders
+                                };
+                            }
+
+                            if (CheckAndAddOrdersIn1C(Orders1C))
+                                Base.Log("Add orders to 1C is successful.");
+                            else
+                                Base.Log("Is not add to 1C!");
+
+                            //throw new Exception("STOP");
+
+                            //save Splited Order List
+                            jsonStr = JSON.toJSON(SplittedOrders);
+                            File.WriteAllText(filePathSO + "_temp", jsonStr);
+                            if (File.Exists(filePathSO))
+                                File.Delete(filePathSO);
+                            File.Move(filePathSO + "_temp", filePathSO);
+                        }
                     }
                 }
             }

@@ -118,7 +118,7 @@ namespace ae.lib.classes.AbInbevEfes
 
         public PreSalesAnswer getPreSaleProfile(Object packetPreSale)
         {
-            PreSalesAnswer result = default(PreSalesAnswer);
+            PreSalesAnswer result = null;
             try
             {
                 var rawJsonString = JSON.toJSON(packetPreSale);

@@ -25,10 +25,13 @@ namespace ae.lib.classes.AE
         public int codeTT_part1 { get; set; }
         public int codeTT_part2 { get; set; }
         public int codeTT_part3 { get; set; }
-        public string outletCode { get; set; }
+        //public string outletCode { get; set; }
         public DateTime OrderCreationDate { get; set; } //"2024-06-18T12:36:23.020"
         public DateTime OrderExecutionDate { get; set; } //"2024-06-19T00:00:00"
 
         public List<SplittedOrdersClass_Order> Items { get; set; }
-    }   
+
+        public string resut_orderNo { get; set; }
+        public string result_outletCode { get; set; }
+    }
 }

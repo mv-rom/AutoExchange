@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 //using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
 using log4net;
@@ -19,6 +20,7 @@ namespace ae.lib
         public static string ArchivesDir = "";
         public static string InboxDir = "";
         public static string OutboxDir = "";
+        public static string torg_sklad = "";
 
         public static Config Config = null;
         public static Scheduler Scheduler = null;
@@ -47,6 +49,13 @@ namespace ae.lib
             Config = new Config();
             if (!Config.Init()) {
                 string msg = "Error in Base.Init(): Problem with init settings of configuration!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
+
+            if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad)) {
+                string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);
             }

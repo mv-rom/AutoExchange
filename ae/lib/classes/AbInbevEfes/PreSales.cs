@@ -14,7 +14,7 @@ namespace ae.lib.classes.AbInbevEfes
         public float qty { get; set; }
         public string lotId { get; set; }
         public int promoType { get; set; }
-        public double vat { get; set; }
+        public float vat { get; set; } //20.0
     }
 
     [Serializable]
@@ -28,7 +28,7 @@ namespace ae.lib.classes.AbInbevEfes
         public string dateTo { get; set; }
         public string warehouseCode { get; set; }
         public int vatCalcMod { get; set; }
-        public string custId { get; set; } //int
+        public int custId { get; set; }
         public List<preSalesDetails> preSalesDetails { get; set; }
     }
 

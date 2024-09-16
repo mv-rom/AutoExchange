@@ -65,7 +65,7 @@ namespace ae.lib.classes.Base1C
         public int ProductCode { get; set; }
 
         [XmlElement(ElementName = "ProductType")]
-        public int ProductType { get; set; }
+        public int ProductType { get; set; }  //0 - pivo, 1 - kega, 3 - b/a
 
         [XmlElement(ElementName = "BasePrice")]
         public float BasePrice { get; set; }
@@ -114,37 +114,27 @@ namespace ae.lib.classes.Base1C
         [XmlAttribute(AttributeName = "num")]
         public int Number { get; set; }
 
-
-        [XmlElement(ElementName = "Name")]
-        public string Name { get; set; }
-
         [XmlElement(ElementName = "codeKPK")]
         public int codeKPK { get; set; }
-
-        [XmlElement(ElementName = "ProductType")] //0 - pivo, 1 - kega, 3 - b/a
-        public int ProductType { get; set; }
 
         [XmlElement(ElementName = "BasePrice")]
         public float BasePrice { get; set; }
 
-        [XmlElement(ElementName = "NDS")]
-        public bool nds { get; set; }
-
         [XmlElement(ElementName = "Akcya")]
         public float Akcya { get; set; }
-
-        [XmlElement(ElementName = "Quant")]
-        public int Quant { get; set; }
     }
 
     [Serializable]
     [XmlRoot(ElementName = "ORDER")]
     public class NewOrders_Order
     {
-        [XmlAttribute(AttributeName = "SelfId")]
-        public string SelfId { get; set; }
+        [XmlAttribute(AttributeName = "orderNo")]
+        public string orderNo { get; set; }
+        
+        [XmlAttribute(AttributeName = "outletCode")]
+        public string outletCode { get; set; }
 
-        [XmlAttribute(AttributeName = "ExecutionDate")]
+        [XmlAttribute(AttributeName = "executionDate")]
         public string ExecutionDate { get; set; }
 
 
@@ -167,6 +157,6 @@ namespace ae.lib.classes.Base1C
     public class NewOrders
     {
         [XmlElement(ElementName = "ORDER")]
-        public List<ProductProfiles_Group> orders { get; set; }
+        public List<NewOrders_Order> orders { get; set; }
     }
 }
