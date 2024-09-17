@@ -116,9 +116,9 @@ namespace ae.lib.classes.AbInbevEfes
             return result;
         }
 
-        public PreSalesAnswer getPreSaleProfile(Object packetPreSale)
+        public PreSalesResponse getPreSaleProfile(Object packetPreSale)
         {
-            PreSalesAnswer result = null;
+            PreSalesResponse result = null;
             try
             {
                 var rawJsonString = JSON.toJSON(packetPreSale);
@@ -127,7 +127,7 @@ namespace ae.lib.classes.AbInbevEfes
                 if (!String.IsNullOrEmpty(data)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
                     if ((res1 == null) || (res1.error != "invalid_request")) {
-                        result = JSON.fromJSON<PreSalesAnswer>(data);
+                        result = JSON.fromJSON<PreSalesResponse>(data);
                     }
                 }
             }

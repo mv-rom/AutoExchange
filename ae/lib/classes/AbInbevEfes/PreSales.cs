@@ -47,27 +47,6 @@ namespace ae.lib.classes.AbInbevEfes
 
 
     [Serializable]
-    internal class PreSalesResponseSummary
-    {
-        public int loaded { get; set; }
-        public int inserted { get; set; }
-        public int updated { get; set; }
-        public int deleted { get; set; }
-        public int skipped { get; set; }
-        public int errors { get; set; }
-    }
-
-    [Serializable]
-    internal class PreSalesResponse
-    {
-        public PreSalesResponseResult result { get; set; }
-        public string traceIdentifier { get; set; }
-        public string urlLog { get; set; }
-        public string urlErrorLog { get; set; }
-        public PreSalesResponseSummary summary { get; set; }
-    }
-
-    [Serializable]
     internal class preSalesResponseDetails
     {
         public string productCode { get; set; }
@@ -87,7 +66,24 @@ namespace ae.lib.classes.AbInbevEfes
         public List<preSalesResponseDetails> details { get; set; }
     }
 
+    [Serializable]
+    internal class PreSalesResponseSummary
+    {
+        public int loaded { get; set; }
+        public int inserted { get; set; }
+        public int updated { get; set; }
+        public int deleted { get; set; }
+        public int skipped { get; set; }
+        public int errors { get; set; }
+    }
 
-
-
+    [Serializable]
+    internal class PreSalesResponse
+    {
+        public PreSalesResponseResult result { get; set; }
+        public string traceIdentifier { get; set; }
+        public string urlLog { get; set; }
+        public string urlErrorLog { get; set; }
+        public PreSalesResponseSummary summary { get; set; }
+    }
 }

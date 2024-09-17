@@ -548,6 +548,13 @@ namespace ae
                                     var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
                                     if (PreSaleResult != null) {
                                         //update SplittedOrders
+
+                                        //preSaleNo
+
+                                        //orderNo
+                                        //outletId
+
+                                        //list<details>
                                     }
                                 }
                             }
