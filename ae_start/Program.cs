@@ -68,14 +68,22 @@ namespace ae_start
         {
             var asm = default(Assembly);
             var arrName = e.Name.Split(',');
-            var libName = arrName[0].Trim() + ".dll";
+            var libName = arrName[0].Trim();
             var BaseDir = ((System.AppDomain)source).BaseDirectory;
 
-            var libDirPath = Path.Combine(BaseDir, Program.libDir);
-            var libPath = Path.Combine(libDirPath, libName);
-            libPath = (File.Exists(libPath)) ? libPath : Path.Combine(libDirPath, "ru", libName);
-            if (!Regex.IsMatch(libName, @"ae\..+\.dll", RegexOptions.IgnoreCase)) {
-                //Console.WriteLine(">> "+libName);
+            var aa = AppDomain.CurrentDomain.GetAssemblies();
+
+            var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == libName).FirstOrDefault();
+            if (loadedAssembly != null) {
+                return loadedAssembly;
+            }
+
+            var libFileName = arrName[0].Trim() + ".dll";
+            if (!Regex.IsMatch(libFileName, @"ae\..+\.dll", RegexOptions.IgnoreCase)) {
+                var libDirPath = Path.Combine(BaseDir, Program.libDir);
+                var libPath = Path.Combine(libDirPath, libFileName);
+                libPath = (File.Exists(libPath)) ? libPath : Path.Combine(libDirPath, "ru", libFileName);
+                //Console.WriteLine(">> "+libFileName);
                 if (File.Exists(libPath)) {
                     try
                     {
@@ -87,16 +95,10 @@ namespace ae_start
                         Console.WriteLine("Error: on load Dll [" + libName + "] in " + libDirPath + "!");
                         Console.WriteLine("Error description: " + ex.Message);
                     }
-                }
-                else {
+                } else {
                     Console.WriteLine("Error: not found Dll [" + libName + "] in " + libDirPath + "!");
                 }
             }
-/*
-            var asms = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var a in asms)
-                Console.WriteLine(":: " + a.ToString());
-*/
             return asm;
         }
 
@@ -177,7 +179,7 @@ namespace ae_start
             var ExecFilePath = Assembly.GetExecutingAssembly().Location;
             var ExecFileName = Path.GetFileName(ExecFilePath);
 
-            Console.WriteLine("[ "+AppName+" v"+AppVersion+ ": author mv-rom, source https://github.com/mv-rom/ae ]");
+            Console.WriteLine("[ "+AppName+" v"+AppVersion+": author mv-rom, source https://github.com/mv-rom/"+AppName+" ]");
             if (args.Length > 0) {
                 var returnArg = ArgOptionStart(args, ExecFileName, AppName);
             }

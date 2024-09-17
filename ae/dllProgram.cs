@@ -24,8 +24,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -74,32 +74,10 @@ namespace ae
             ref Dictionary<string, lib.classes.VchasnoEDI.Order> destination
         )
         {
-            int n = Base.initKeyN();
-
-            if (destination == null) {
-                destination = new Dictionary<string, lib.classes.VchasnoEDI.Order>();
-            }
-
             foreach (var s in source) {
-                bool isExist = false;
-                string existKey = "";
-                foreach (KeyValuePair<string, lib.classes.VchasnoEDI.Order> d in destination)
-                {
-                    if (s.id.Equals(d.Value.id)) {
-                        isExist = true;
-                        existKey = d.Key;
-                        break;
-                    }
-                }
-                if (!isExist) {
-                    n += 1;
-                    string key = Base.genarateKeyN(n);
-                    destination.Add(key, s);
-                } else {
-                    if (!s.deal_status.Equals("new") && existKey.Length > 0) {
-                        destination[existKey].deal_status = s.deal_status;
-                        //TODO ?
-                    }
+                if (!s.deal_status.Equals("new") && existKey.Length > 0) {
+                    destination[existKey].deal_status = s.deal_status;
+                    //TODO ?
                 }
             }
         }
@@ -532,7 +510,7 @@ namespace ae
 
                         var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                         if (AbInbevEfesAPI != null) {
-                            foreach (var so in savedSplittedOrders)
+                            foreach (var so in SplittedOrders)
                             {
                                 var request = new PreSalesRequest() {
                                     preSaleNo = so.Value.ae_id, //or so.Key
@@ -565,6 +543,8 @@ namespace ae
                                 if (preSalesDetails.Count > 0) {
                                     request.preSalesDetails = preSalesDetails;
 
+                                    throw new Exception("STOP");
+
                                     var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
                                     if (PreSaleResult != null) {
                                         //update SplittedOrders
@@ -572,12 +552,11 @@ namespace ae
                                 }
                             }
 
-                            if (CheckAndAddOrdersIn1C(savedSplittedOrders))
+                            if (CheckAndAddOrdersIn1C(SplittedOrders))
                                 Base.Log("Processing orders in 1C is successful.");
                             else
                                 Base.Log("Some problems with processing orders in 1c!");
 
-                            //throw new Exception("STOP");
 
                             //save Splited Order List
                             jsonStr = JSON.toJSON(SplittedOrders);
