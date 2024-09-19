@@ -23,8 +23,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -325,23 +325,31 @@ namespace ae
                         if (found_item != null) {
                             var newItems = new List<SplittedOrdersClass_Order>();
 
-                            var listItems = o.as_json.items;
-                            foreach (var it in listItems)
+                            try
                             {
-                                var ean13 = long.Parse(it.product_code);
-                                var found_list_item = found_item.list.
-                                    Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
-                                if (found_list_item != null) {
-                                    newItems.Add(new SplittedOrdersClass_Order() {
-                                        ean13 = ean13,
-                                        codeKPK = found_list_item.ProductCode,
-                                        basePrice = found_list_item.BasePrice,
-                                        qty = float.Parse(it.quantity),
-                                        promoType = 0,
-                                        totalDiscount = 0
-                                    });
+                                var listItems = o.as_json.items;
+                                foreach (var it in listItems)
+                                {
+                                    var ean13 = long.Parse(it.product_code);
+                                    var found_list_item = found_item.list.
+                                        Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
+                                    if (found_list_item != null) {
+                                        var s_qty = (it.quantity.Contains(".")) ? it.quantity.Replace(".",",") : it.quantity;
+                                        newItems.Add(new SplittedOrdersClass_Order() {
+                                            ean13 = ean13,
+                                            codeKPK = found_list_item.ProductCode,
+                                            basePrice = found_list_item.BasePrice,
+                                            qty = float.Parse(s_qty),
+                                            promoType = 0,
+                                            totalDiscount = 0
+                                        });
+                                    }
+                                    var title = it.title;
                                 }
-                                var title = it.title;
+                            }
+                            catch(Exception ex)
+                            {
+                                Base.LogError(ex.Message, ex);
                             }
 
                             //add new

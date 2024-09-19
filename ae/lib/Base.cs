@@ -96,9 +96,15 @@ namespace ae.lib
         {
             logger.Info(msg);
         }
-        public static void LogError(string msg)
+        public static void LogError(string msg, Exception ex=null)
         {
             logger.Error(msg);
+            if (ex !=null)
+                logger.Error(
+                    "\r\n===============================================\r\n"+
+                    ex.StackTrace+
+                    "\r\n===============================================\r\n"
+                );
         }
 
         public static void Log1(string msg, string vb="")
