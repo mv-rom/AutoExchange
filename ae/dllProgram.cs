@@ -8,8 +8,6 @@ using ae.lib;
 //using System.Security.Cryptography;
 //using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
-using System.Xml.XPath;
 using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
 using ae.lib.classes.AbInbevEfes;
@@ -24,8 +22,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -371,6 +369,63 @@ namespace ae
             return result;
         }
 
+        private static bool CombineAbiePreSalesAndOrders(ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source)
+        {
+            foreach (var so in source)
+            {
+                var preSalesDetails = new List<preSalesDetails>();
+                foreach (var it in so.Value.Items)
+                {
+                    preSalesDetails.Add(new preSalesDetails() {
+                        productCode = it.codeKPK,
+                        basePrice = it.basePrice,
+                        qty = it.qty,
+                        lotId = "-",
+                        promoType = it.promoType, //1 - vstugnu kuputu, 0 - ni (default)
+                        vat = 20.0F // 20.0% - PDV
+                    });
+                }
+
+                if (preSalesDetails.Count > 0) {
+                    var request = new PreSalesRequest()
+                    {
+                        preSaleNo = so.Value.ae_id, //or so.Key
+                        custOrderNo = so.Value.id,
+                        outletCode =
+                            so.Value.codeTT_part1 + "\\" +
+                            so.Value.codeTT_part1 + "\\" +
+                            so.Value.codeTT_part1,
+                        preSaleType = 6, //EDI order
+                        dateFrom = DateTime.Now.ToString(),
+                        dateTo = so.Value.OrderExecutionDate.ToString(),
+                        warehouseCode = Base.torg_sklad,
+                        vatCalcMod = 1, //price with PDV
+                        custId = int.Parse(Base.torg_sklad),
+                        preSalesDetails = preSalesDetails
+                    };
+
+                    var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
+                    if (AbInbevEfesAPI != null) {
+                        var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
+                        if (PreSaleResult != null) {
+                            //source[so.key] = PreSaleResult[so.Key].
+                            //update SplittedOrders
+
+                            //preSaleNo
+
+                            //orderNo
+                            //outletId
+
+                            //list<details>
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+
         private static bool CheckAndAddOrdersIn1C(
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
         )
@@ -508,62 +563,11 @@ namespace ae
                         if (SplittedOrders == null)
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
-                        var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
-                        if (AbInbevEfesAPI != null) {
-                            foreach (var so in SplittedOrders)
-                            {
-                                var request = new PreSalesRequest() {
-                                    preSaleNo = so.Value.ae_id, //or so.Key
-                                    custOrderNo = so.Value.id,
-                                    outletCode =
-                                        so.Value.codeTT_part1 + "\\" +
-                                        so.Value.codeTT_part1 + "\\" +
-                                        so.Value.codeTT_part1,
-                                    preSaleType = 6, //EDI order
-                                    dateFrom = DateTime.Now.ToString(),
-                                    dateTo = so.Value.OrderExecutionDate.ToString(),
-                                    warehouseCode = Base.torg_sklad,
-                                    vatCalcMod = 1, //price with PDV
-                                    custId = int.Parse(Base.torg_sklad)
-                                };
-
-                                var preSalesDetails = new List<preSalesDetails>();
-                                foreach (var it in so.Value.Items)
-                                {
-                                    preSalesDetails.Add(new preSalesDetails(){
-                                        productCode = it.codeKPK,
-                                        basePrice = it.basePrice,
-                                        qty = it.qty,
-                                        lotId = "-",
-                                        promoType = it.promoType, //1 - vstugnu kuputu, 0 - ni (default)
-                                        vat = 20.0F // 20.0% - PDV
-                                    });
-                                }
-
-                                if (preSalesDetails.Count > 0) {
-                                    request.preSalesDetails = preSalesDetails;
-
-                                    throw new Exception("STOP");
-
-                                    var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
-                                    if (PreSaleResult != null) {
-                                        //update SplittedOrders
-
-                                        //preSaleNo
-
-                                        //orderNo
-                                        //outletId
-
-                                        //list<details>
-                                    }
-                                }
-                            }
-
+                        if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
                             if (CheckAndAddOrdersIn1C(SplittedOrders))
                                 Base.Log("Processing orders in 1C is successful.");
                             else
                                 Base.Log("Some problems with processing orders in 1c!");
-
 
                             //save Splited Order List
                             jsonStr = JSON.toJSON(SplittedOrders);
