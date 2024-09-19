@@ -378,7 +378,7 @@ namespace ae
                         basePrice = it.basePrice,
                         qty = it.qty,
                         lotId = "-",
-                        promoType = it.promoType, //1 - vstugnu kuputu, 0 - ni (default)
+                        promoType = it.promoType, //1 - vstugnu kyputu, 0 - ni (default)
                         vat = 20.0F // 20.0% - PDV
                     });
                 }
@@ -404,29 +404,23 @@ namespace ae
                     if (AbInbevEfesAPI != null) {
                         var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
                         if (PreSaleResult != null) {
-                            //source[so.Key] = 
-                            var orderNumber = PreSaleResult.result.orderNo;
+                            //updating SplittedOrders
+                            source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
+                            source[so.Key].result_outletCode = PreSaleResult.result.outletCode;
+
                             var listItems = PreSaleResult.result.details;
                             foreach(var its in listItems)
                             {
                                 var compareCodeKPK = int.Parse(its.productCode);
-                                var found_item = so.Value.Items.Where(x => (x.codeKPK == compareCodeKPK)).FirstOrDefault();
-                                if (found_item != null) {
-                                    foreach (var s_it in source[so.Key].Items)
-                                    {
-                                        if (s_it.codeKPK == 1)
+                                var qty = its.qty;
+                                for (int i = 0; i < so.Value.Items.Count; i++)
+                                {
+                                    var vit = so.Value.Items[i];
+                                    if ((vit.codeKPK == compareCodeKPK) && (vit.qty == qty)) {
+                                        source[so.Key].Items[i].totalDiscount = its.totalDiscount;
                                     }
-                                    continue;
                                 }
                             }
-                            //update SplittedOrders
-
-                            //preSaleNo
-
-                            //orderNo
-                            //outletId
-
-                            //list<details>
                             return true;
                         }
                     }
