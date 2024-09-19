@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
 using ae.lib.classes.AbInbevEfes;
+using System.Security.Cryptography;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -309,7 +310,6 @@ namespace ae
             Dictionary<string, lib.classes.AE.SplittedOrdersClass> source2
         )
         {
-            Dictionary<string, lib.classes.AE.SplittedOrdersClass> result = null;
             var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
             foreach (var o in Orders)
             {
@@ -355,18 +355,15 @@ namespace ae
                                     codeTT_part1 = found_item.codeTT_part1,
                                     codeTT_part2 = found_item.codeTT_part2,
                                     codeTT_part3 = found_item.codeTT_part3,
-                                    Items = newItems
+                                    Items = newItems,
+                                    status = 0
                                 });
                             }
                         }
                     }
                 }
             }
-
-            if (dictSO.Count > 0) {
-                result = dictSO;
-            }
-            return result;
+            return (dictSO.Count > 0) ? dictSO : null;
         }
 
         private static bool CombineAbiePreSalesAndOrders(ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source)
@@ -387,8 +384,7 @@ namespace ae
                 }
 
                 if (preSalesDetails.Count > 0) {
-                    var request = new PreSalesRequest()
-                    {
+                    var request = new PreSalesRequest() {
                         preSaleNo = so.Value.ae_id, //or so.Key
                         custOrderNo = so.Value.id,
                         outletCode =
@@ -408,7 +404,21 @@ namespace ae
                     if (AbInbevEfesAPI != null) {
                         var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
                         if (PreSaleResult != null) {
-                            //source[so.key] = PreSaleResult[so.Key].
+                            //source[so.Key] = 
+                            var orderNumber = PreSaleResult.result.orderNo;
+                            var listItems = PreSaleResult.result.details;
+                            foreach(var its in listItems)
+                            {
+                                var compareCodeKPK = int.Parse(its.productCode);
+                                var found_item = so.Value.Items.Where(x => (x.codeKPK == compareCodeKPK)).FirstOrDefault();
+                                if (found_item != null) {
+                                    foreach (var s_it in source[so.Key].Items)
+                                    {
+                                        if (s_it.codeKPK == 1)
+                                    }
+                                    continue;
+                                }
+                            }
                             //update SplittedOrders
 
                             //preSaleNo
@@ -427,12 +437,10 @@ namespace ae
 
 
         private static bool CheckAndAddOrdersIn1C(
-            Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
+            ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
         )
         {
             bool result = false;
-            string report1cName = "EDI_vkachka_zayavok";
-
 
             var newOrders = new List<NewOrders_Order>();
             foreach (var so in source)
@@ -451,8 +459,8 @@ namespace ae
                 }
 
                 if (newItems.Count > 0) {
-                    newOrders.Add(new NewOrders_Order()
-                    {
+                    newOrders.Add(new NewOrders_Order() {
+                        id = so.Key,
                         orderNo = so.Value.resut_orderNo,
                         outletCode = so.Value.result_outletCode,
                         ExecutionDate = so.Value.OrderExecutionDate.ToString(),
@@ -469,15 +477,16 @@ namespace ae
                     orders = newOrders
                 };
 
+                string report1cName = "EDI_vkachka_zayavok";
                 var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.NewOrders>(report1cName, input);
                 if (output != null) {
                     var output_Orders = output.orders;
-                    int i = 0;
-                    while (i < output_Orders.Count())
+                    foreach(var oO in output_Orders)
                     {
-                        var o = output_Orders[i];
+                        if (source.ContainsKey(oO.id)) {
+                            source[oO.id].status = oO.status;
+                        }
                     }
-
                     result = true;
                 }
             }
@@ -564,7 +573,7 @@ namespace ae
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
                         if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
-                            if (CheckAndAddOrdersIn1C(SplittedOrders))
+                            if (CheckAndAddOrdersIn1C(ref SplittedOrders))
                                 Base.Log("Processing orders in 1C is successful.");
                             else
                                 Base.Log("Some problems with processing orders in 1c!");

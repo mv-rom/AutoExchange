@@ -128,6 +128,9 @@ namespace ae.lib.classes.Base1C
     [XmlRoot(ElementName = "ORDER")]
     public class NewOrders_Order
     {
+        [XmlAttribute(AttributeName = "id")]
+        public string id { get; set; }
+
         [XmlAttribute(AttributeName = "orderNo")]
         public string orderNo { get; set; }
         
@@ -146,6 +149,10 @@ namespace ae.lib.classes.Base1C
 
         [XmlAttribute(AttributeName = "codeTT_part3")]
         public int codeTT_part3 { get; set; }
+
+
+        [XmlAttribute(AttributeName = "status")]
+        public int status { get; set; }
 
 
         [XmlElement(ElementName = "ITEM")]

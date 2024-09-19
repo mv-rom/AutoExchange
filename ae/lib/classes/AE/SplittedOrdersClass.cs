@@ -31,6 +31,8 @@ namespace ae.lib.classes.AE
 
         public List<SplittedOrdersClass_Order> Items { get; set; }
 
+        public int status { get; set; } //default 0 - not processing, 1 - processing, 2 - otmenena
+
         public string resut_orderNo { get; set; }
         public string result_outletCode { get; set; }
     }
