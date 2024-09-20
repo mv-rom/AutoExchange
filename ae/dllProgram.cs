@@ -324,7 +324,6 @@ namespace ae
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
                         if (found_item != null) {
                             var newItems = new List<SplittedOrdersClass_Order>();
-
                             try
                             {
                                 var listItems = o.as_json.items;
@@ -382,12 +381,12 @@ namespace ae
                 foreach (var it in so.Value.Items)
                 {
                     preSalesDetails.Add(new preSalesDetails() {
-                        productCode = it.codeKPK,
-                        basePrice = it.basePrice,
-                        qty = it.qty,
+                        productCode = it.codeKPK.ToString(),
+                        basePrice = it.basePrice.ToString(),
+                        qty = it.qty.ToString(),
                         lotId = "-",
-                        promoType = it.promoType, //1 - vstugnu kyputu, 0 - ni (default)
-                        vat = 20.0F // 20.0% - PDV
+                        promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
+                        vat = 20.0F.ToString() // 20.0% - PDV
                     });
                 }
 
@@ -396,15 +395,15 @@ namespace ae
                         preSaleNo = so.Value.ae_id, //or so.Key
                         custOrderNo = so.Value.id,
                         outletCode =
-                            so.Value.codeTT_part1 + "\\" +
-                            so.Value.codeTT_part1 + "\\" +
-                            so.Value.codeTT_part1,
-                        preSaleType = 6, //EDI order
+                            so.Value.codeTT_part1 + @"\" +
+                            so.Value.codeTT_part2 + @"\" +
+                            so.Value.codeTT_part3,
+                        preSaleType = "6", //EDI order
                         dateFrom = DateTime.Now.ToString(),
                         dateTo = so.Value.OrderExecutionDate.ToString(),
                         warehouseCode = Base.torg_sklad,
-                        vatCalcMod = 1, //price with PDV
-                        custId = int.Parse(Base.torg_sklad),
+                        vatCalcMod = "1", //price with PDV
+                        custId = int.Parse(Base.torg_sklad).ToString(),
                         preSalesDetails = preSalesDetails
                     };
 

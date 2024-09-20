@@ -9,12 +9,12 @@ namespace ae.lib.classes.AbInbevEfes
     [Serializable]
     internal class preSalesDetails
     {
-        public int productCode { get; set; }
-        public float basePrice { get; set; }
-        public float qty { get; set; }
+        public string productCode { get; set; }
+        public string basePrice { get; set; }
+        public string qty { get; set; }
         public string lotId { get; set; }
-        public int promoType { get; set; }
-        public float vat { get; set; } //20.0
+        public string promoType { get; set; }
+        public string vat { get; set; } //20.0
     }
 
     [Serializable]
@@ -23,26 +23,27 @@ namespace ae.lib.classes.AbInbevEfes
         public string preSaleNo { get; set; }
         public string custOrderNo { get; set; }
         public string outletCode { get; set; }
-        public int preSaleType { get; set; }
+        public string preSaleType { get; set; }
         public string dateFrom { get; set; } //"2024-03-01T11:41:57"
         public string dateTo { get; set; }
         public string warehouseCode { get; set; }
-        public int vatCalcMod { get; set; }
-        public int custId { get; set; }
+        public string vatCalcMod { get; set; }
+        public string custId { get; set; }
         public List<preSalesDetails> preSalesDetails { get; set; }
     }
 
-
+/*
     [Serializable]
     internal class PreSalesAnswer
     {
         public string result { get; set; }
     }
-
+*/
     [Serializable]
     internal class PreSalesErrorAnswer
     {
-        public string error { get; set; }
+        public string error { get; set; }  //? "invalid_request"
+        public string error_description { get; set; }
     }
 
 

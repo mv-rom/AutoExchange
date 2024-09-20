@@ -18,6 +18,7 @@ namespace ae.lib.classes.AbInbevEfes
     [Serializable]
     internal class AuthorizationErrorAnswer
     {
-        public string error { get; set; } // ? "invalid_request"
+        public string error { get; set; } // ? "invalid_grant"
+        public string error_description { get; set; }
     }
 }

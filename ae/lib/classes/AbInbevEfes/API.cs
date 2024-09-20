@@ -13,18 +13,19 @@ namespace ae.lib.classes.AbInbevEfes
         private string      Authorization_ContentType;
         private string      Authorization_Username;
         private string      Authorization_Password;
-        private string      Authorization_AccessToken;
-        private int         Authorization_AccessToken_Expires_in;
-        private DateTime    Authorization_AccessToken_StartDate;
+        private string      Authorization_Answer_AccessToken;
+        private string      Authorization_Answer_TokenType;
+        private int         Authorization_Answer_Expires_in;
+        private DateTime    Authorization_Answer_StartDate;
 
-        private string BaseUrl;
-        private string ContentType;
+        private string      Data_BaseUrl;
+        private string      Data_ContentType;
 
 
         private bool Init()
         {
             bool result = false;
-            int HttpClientTimeout = 30000;
+            int HttpClientTimeout = 30*1000;
             try
             {
                 this.Authorization_BaseUrl = "";
@@ -32,7 +33,7 @@ namespace ae.lib.classes.AbInbevEfes
                     return false;
 
                 if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_content_type", out this.Authorization_ContentType))
-                    this.Authorization_ContentType = "application/json"; // "application/json; charset=utf-8"
+                    this.Authorization_ContentType = "application/json";
 
                 this.Authorization_Username = "";
                 if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_username", out this.Authorization_Username))
@@ -41,23 +42,29 @@ namespace ae.lib.classes.AbInbevEfes
                 this.Authorization_Password = "";
                 if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_password", out this.Authorization_Password))
                     return false;
-                this.Authorization_AccessToken_Expires_in = 0;
-                this.Authorization_AccessToken_StartDate = default(DateTime);
+                this.Authorization_Answer_Expires_in = 0;
+                this.Authorization_Answer_StartDate = default(DateTime);
 
                 this.Authorization_RAC = new RestApiClient();
                 this.Authorization_RAC.Init(this.Authorization_BaseUrl, "", this.Authorization_ContentType, HttpClientTimeout);
 
 
-                this.BaseUrl = "";
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("url", out this.BaseUrl))
+                this.Data_BaseUrl = "";
+                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_base_url", out this.Data_BaseUrl))
                     return false;
 
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("content_type", out this.ContentType))
-                    this.ContentType = "application/json";
+                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_content_type", out this.Data_ContentType))
+                    this.Data_ContentType = "application/json";
 
-                this.RAC = new RestApiClient();
+                this.RAC = null;
                 if (this.getAccessToken()) {
-                    this.RAC.Init(this.BaseUrl, "Bearer " + this.Authorization_AccessToken, this.ContentType, HttpClientTimeout);
+                    this.RAC = new RestApiClient();
+                    this.RAC.Init(
+                        this.Data_BaseUrl,
+                        this.Authorization_Answer_TokenType+" "+this.Authorization_Answer_AccessToken,
+                        this.Data_ContentType,
+                        HttpClientTimeout
+                    );
                     result = true;
                     Base.Log("lib.classes.AbInbevEfes.Init() is complete!");
                 }
@@ -101,9 +108,10 @@ namespace ae.lib.classes.AbInbevEfes
                     if ((res1 == null) || (res1.error != "invalid_request")) {
                         var res2 = JSON.fromJSON<AuthorizationAnswer>(data);
                         if (res2 != null) {
-                            this.Authorization_AccessToken = res2.access_token;
-                            this.Authorization_AccessToken_Expires_in = res2.expires_in;
-                            this.Authorization_AccessToken_StartDate = DateTime.Now;
+                            this.Authorization_Answer_AccessToken = res2.access_token;
+                            this.Authorization_Answer_TokenType = res2.token_type;
+                            this.Authorization_Answer_Expires_in = res2.expires_in;
+                            this.Authorization_Answer_StartDate = DateTime.Now;
                             result = true;
                         }
                     }
@@ -123,17 +131,17 @@ namespace ae.lib.classes.AbInbevEfes
             {
                 var rawJsonString = JSON.toJSON(packetPreSale);
 
-                string data = this.RAC.POST("", "", rawJsonString);
+                string data = this.RAC.PUT("/api/PreSales", "", rawJsonString);
                 if (!String.IsNullOrEmpty(data)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
-                    if ((res1 == null) || (res1.error != "invalid_request")) {
+                    if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
                         result = JSON.fromJSON<PreSalesResponse>(data);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Base.Log("Error in " + this.GetType().Name + ".getPreSale(): " + ex.Message);
+                Base.LogError("Error in " + this.GetType().Name + ".getPreSale(): " + ex.Message, ex);
             }
             return result;
         }
