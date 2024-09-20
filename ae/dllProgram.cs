@@ -84,9 +84,6 @@ namespace ae
 
         private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<lib.classes.VchasnoEDI.Order> source)
         {
-            string report1cName = "EDI_tt_by_gln";
-            List<lib.classes.Base1C.TTbyGLN_Item> result = null;
-
             string gln = "";
             if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
             {
@@ -108,22 +105,21 @@ namespace ae
                         }
 
                         if (!found) {
-                            listTT.Add(
-                                new lib.classes.Base1C.TTbyGLN_Item() {
-                                    glnTT = glnTT,
-                                    glnTT_gruz = glnTT_gruz,
-                                    codeTT = new lib.classes.Base1C.codeTT() {
-                                        part1 = 0,
-                                        part2 = 0,
-                                        part3 = 0
-                                    }
+                            listTT.Add(new lib.classes.Base1C.TTbyGLN_Item() {
+                                glnTT = glnTT,
+                                glnTT_gruz = glnTT_gruz,
+                                codeTT = new lib.classes.Base1C.codeTT() {
+                                    part1 = 0,
+                                    part2 = 0,
+                                    part3 = 0
                                 }
-                            );
+                            });
                         }
                     }
                 }
 
                 if (listTT.Count() > 0) {
+                    string report1cName = "EDI_tt_by_gln";
                     var input = new lib.classes.Base1C.TTbyGLN() {
                         list = listTT
                     };
@@ -148,19 +144,22 @@ namespace ae
                             }
                         }
 
-                        result = listTT;
                         output_listTT = null;
+                        return listTT;
+                    } else {
+                        Base.Log(
+                            "Warning in getTTbyGLNfrom1C: "+
+                            "after do report [" + report1cName + "]!"
+                        );
                     }
                 }
-            }
-            else {
+            } else {
                 Base.Log(
-                    "Warning in getTTbyGLNfrom1C: before do report " + 
-                    "[" + report1cName + "] " +
-                    "hasn't parametr [gln] in config!"
+                    "Warning in getTTbyGLNfrom1C: "+
+                    "hasn't parameter [gln] in config!"
                 );
             }
-            return result;
+            return null;
         }
 
         private static List<lib.classes.Base1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
@@ -168,9 +167,6 @@ namespace ae
             List<lib.classes.Base1C.TTbyGLN_Item> listTT
         )
         {
-            string report1cName = "EDI_product_profiles";
-            List<lib.classes.Base1C.ProductProfiles_Group> result = null;
-
             var groupPP = new List<lib.classes.Base1C.ProductProfiles_Group>();
             foreach (var s in source)
             {
@@ -257,7 +253,7 @@ namespace ae
                     }
                 } else {
                     Base.Log1(
-                        "Warning in getProductProfilesOfTTfrom1C: "+
+                        "Warning in getProductProfilesOfTTfrom1C: " +
                         "not found TT with GLN ["+glnTT+","+glnTT_gruz+"]!"
                     );
                 }
@@ -265,6 +261,7 @@ namespace ae
 
             if (groupPP.Count() > 0)
             {
+                string report1cName = "EDI_product_profiles";
                 var input = new lib.classes.Base1C.ProductProfiles() {
                     group = groupPP
                 };
@@ -297,11 +294,16 @@ namespace ae
                             groupPP.RemoveAt(i);
                         }
                     }
-                    result = groupPP;
                     output_groupPP = null;
+                    return groupPP;
+                } else {
+                    Base.Log(
+                        "Warning in getProductProfilesOfTTfrom1C: "+
+                        "after do report [" + report1cName + "]!"
+                    );
                 }
             }
-            return result;
+            return null;
         }
 
         private static Dictionary<string, lib.classes.AE.SplittedOrdersClass> doSplittingUpOrders(
@@ -353,10 +355,9 @@ namespace ae
 
                             //add new
                             if (newItems.Count > 0) {
-                                dictSO.Add(found_key, new SplittedOrdersClass()
-                                {
+                                dictSO.Add(found_key, new SplittedOrdersClass(){
                                     id = id,
-                                    ae_id = Base.genarateKeyN(1),
+                                    ae_id = Base.genarateKey(),
                                     orderNumber = o.number,
                                     OrderExecutionDate = DateTime.Parse(found_item.ExecutionDate),
                                     codeTT_part1 = found_item.codeTT_part1,
@@ -386,7 +387,7 @@ namespace ae
                         qty = it.qty.ToString(),
                         lotId = "-",
                         promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
-                        vat = 20.0F.ToString() // 20.0% - PDV
+                        vat = "20.0" // 20.0% - PDV
                     });
                 }
 
@@ -399,8 +400,8 @@ namespace ae
                             so.Value.codeTT_part2 + @"\" +
                             so.Value.codeTT_part3,
                         preSaleType = "6", //EDI order
-                        dateFrom = DateTime.Now.ToString(),
-                        dateTo = so.Value.OrderExecutionDate.ToString(),
+                        dateFrom = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
+                        dateTo = so.Value.OrderExecutionDate.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
                         warehouseCode = Base.torg_sklad,
                         vatCalcMod = "1", //price with PDV
                         custId = int.Parse(Base.torg_sklad).ToString(),
@@ -474,11 +475,11 @@ namespace ae
             }
 
             if (newOrders.Count() > 0) {
+                string report1cName = "EDI_vkachka_zayavok";
                 var input = new lib.classes.Base1C.NewOrders(){
                     orders = newOrders
                 };
 
-                string report1cName = "EDI_vkachka_zayavok";
                 var output = ae.lib._1C.runReportProcessingData<lib.classes.Base1C.NewOrders>(report1cName, input);
                 if (output != null) {
                     var output_Orders = output.orders;
