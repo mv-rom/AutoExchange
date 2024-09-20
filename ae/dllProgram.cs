@@ -23,8 +23,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -67,20 +67,12 @@ namespace ae
 
 
 
-/*
-        private static void expandDictFromList(
-            List<lib.classes.VchasnoEDI.Order> source, 
-            ref Dictionary<string, lib.classes.VchasnoEDI.Order> destination
-        )
-        {
-            foreach (var s in source) {
-                if (!s.deal_status.Equals("new") && existKey.Length > 0) {
-                    destination[existKey].deal_status = s.deal_status;
-                    //TODO ?
-                }
+        /*
+            //TODO: ?
+            if (!s.deal_status.Equals("new") && existKey.Length > 0) {
+                destination[existKey].deal_status = s.deal_status;
             }
-        }
-*/
+        */
 
         private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<lib.classes.VchasnoEDI.Order> source)
         {
@@ -316,11 +308,14 @@ namespace ae
             foreach (var o in Orders)
             {
                 var id = o.id;
+                var deal_status = o.deal_status;
+
                 //enumeration by type
                 for (int type_of_product = 0; type_of_product < 4; type_of_product++)
                 {
                     var found_key = id + "@" + type_of_product;
                     if (source2 != null && source2.ContainsKey(found_key)) {
+                        source2[found_key].deal_status = deal_status;
                         dictSO.Add(found_key, source2[found_key]);
                     } else {
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
@@ -364,7 +359,8 @@ namespace ae
                                     codeTT_part2 = found_item.codeTT_part2,
                                     codeTT_part3 = found_item.codeTT_part3,
                                     Items = newItems,
-                                    status = 0
+                                    status = 0, //current state in 1C
+                                    deal_status = deal_status //current state in EDI
                                 });
                             }
                         }
@@ -403,7 +399,7 @@ namespace ae
                         dateFrom = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
                         dateTo = so.Value.OrderExecutionDate.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
                         warehouseCode = Base.torg_sklad,
-                        vatCalcMod = "1", //price with PDV
+                        vatCalcMod = "0", // 0 - price without PDV, 1 - with PDV
                         custId = int.Parse(Base.torg_sklad).ToString(),
                         preSalesDetails = preSalesDetails
                     };
