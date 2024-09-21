@@ -159,7 +159,7 @@ namespace ae.lib.classes.Base1C
         public List<NewOrders_Item> items { get; set; }
     }
 
-        [Serializable]
+    [Serializable]
     [XmlRoot(ElementName = "LIST")]
     public class NewOrders
     {
