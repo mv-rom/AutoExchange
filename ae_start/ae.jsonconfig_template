@@ -6,7 +6,8 @@
 		edrpou: 	"23633937",
 		gln: 		"9871000083468",
 		email: 		"orbita_edi@ukr.net",
-		sqlite_db:  "ae.sqlite"
+		warehouseCode: "100300"
+		//sqlite_db:  "ae.sqlite"
 	},
 	FtpSetting: {
 		host: "ftp.edi.vchasno.ua",

@@ -131,14 +131,14 @@ namespace ae.lib.classes.Base1C
         [XmlAttribute(AttributeName = "id")]
         public string id { get; set; }
 
-        [XmlAttribute(AttributeName = "orderNo")]
-        public string orderNo { get; set; }
+        [XmlAttribute(AttributeName = "orderNumber")]
+        public string orderNumber { get; set; }
         
         [XmlAttribute(AttributeName = "outletCode")]
         public string outletCode { get; set; }
 
         [XmlAttribute(AttributeName = "executionDate")]
-        public string ExecutionDate { get; set; }
+        public string executionDate { get; set; }
 
 
         [XmlAttribute(AttributeName = "codeTT_part1")]
@@ -151,8 +151,8 @@ namespace ae.lib.classes.Base1C
         public int codeTT_part3 { get; set; }
 
 
-        [XmlAttribute(AttributeName = "status")]
-        public int status { get; set; }
+        [XmlAttribute(AttributeName = "returnStatus")]
+        public int returnStatus { get; set; }
 
 
         [XmlElement(ElementName = "ITEM")]

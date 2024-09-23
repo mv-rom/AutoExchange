@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 //using System.Text;
 //using System.Threading.Tasks;
@@ -67,9 +68,10 @@ namespace ae.lib
                 webrequest.ContentLength = data.Length;
 
                 //add Data to Request
-                var req_s = webrequest.GetRequestStream();
-                req_s.Write(data, 0, data.Length);
-                //req_s.Flush();
+                using (var dataStream = webrequest.GetRequestStream())
+                {
+                    dataStream.Write(data, 0, data.Length);
+                }
             }
 
 

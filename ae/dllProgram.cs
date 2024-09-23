@@ -372,6 +372,12 @@ namespace ae
 
         private static bool CombineAbiePreSalesAndOrders(ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source)
         {
+            string warehouse_code = "";
+            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("warehouse_code", out warehouse_code)) {
+                Base.Log("Not found [warehouse_code] in CombineAbiePreSalesAndOrders()!");
+                return false;
+            }
+
             foreach (var so in source)
             {
                 var preSalesDetails = new List<preSalesDetails>();
@@ -396,9 +402,9 @@ namespace ae
                             so.Value.codeTT_part2 + @"\" +
                             so.Value.codeTT_part3,
                         preSaleType = "6", //EDI order
-                        dateFrom = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
-                        dateTo = so.Value.OrderExecutionDate.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss"),
-                        warehouseCode = Base.torg_sklad,
+                        dateFrom = DateTime.Now.ToString("’yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss’"),
+                        dateTo = so.Value.OrderExecutionDate.ToString("’yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss’"),
+                        warehouseCode = warehouse_code,
                         vatCalcMod = "0", // 0 - price without PDV, 1 - with PDV
                         custId = int.Parse(Base.torg_sklad).ToString(),
                         preSalesDetails = preSalesDetails
@@ -459,9 +465,9 @@ namespace ae
                 if (newItems.Count > 0) {
                     newOrders.Add(new NewOrders_Order() {
                         id = so.Key,
-                        orderNo = so.Value.resut_orderNo,
+                        orderNumber = so.Value.resut_orderNo,
                         outletCode = so.Value.result_outletCode,
-                        ExecutionDate = so.Value.OrderExecutionDate.ToString(),
+                        executionDate = so.Value.OrderExecutionDate.ToString(),
                         codeTT_part1 = so.Value.codeTT_part1,
                         codeTT_part2 = so.Value.codeTT_part2,
                         codeTT_part3 = so.Value.codeTT_part3,
@@ -482,7 +488,7 @@ namespace ae
                     foreach(var oO in output_Orders)
                     {
                         if (source.ContainsKey(oO.id)) {
-                            source[oO.id].status = oO.status;
+                            source[oO.id].status = oO.returnStatus;
                         }
                     }
                     result = true;
