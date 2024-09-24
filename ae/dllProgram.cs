@@ -439,8 +439,9 @@ namespace ae
                         }
                     }
 */
+                    nCount++;
                     source[so.Key].resut_orderNo = Base.genarateKey();
-                    source[so.Key].result_outletCode = "1111111111";
+                    source[so.Key].result_outletCode = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
                     //return true;
                 }
             }
@@ -463,6 +464,7 @@ namespace ae
                         Number = num,
                         codeKPK = it.codeKPK,
                         BasePrice = it.basePrice,
+                        qty = it.qty,
                         Akcya = it.totalDiscount
                     });
                     num++;

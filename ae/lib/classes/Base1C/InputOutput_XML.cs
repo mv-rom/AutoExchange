@@ -117,6 +117,9 @@ namespace ae.lib.classes.Base1C
         [XmlElement(ElementName = "codeKPK")]
         public int codeKPK { get; set; }
 
+        [XmlElement(ElementName = "qty")]
+        public float qty { get; set; }
+
         [XmlElement(ElementName = "BasePrice")]
         public float BasePrice { get; set; }
 
