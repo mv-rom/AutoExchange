@@ -124,9 +124,8 @@ namespace ae.lib.classes.AbInbevEfes
             return result;
         }
 
-        public PreSalesResponse getPreSaleProfile(Object packetPreSale)
+        public PreSalesResponse getPreSales(Object packetPreSale)
         {
-            PreSalesResponse result = null;
             try
             {
                 var rawJsonString = JSON.toJSON(packetPreSale);
@@ -135,15 +134,36 @@ namespace ae.lib.classes.AbInbevEfes
                 if (!String.IsNullOrEmpty(data)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
-                        result = JSON.fromJSON<PreSalesResponse>(data);
+                        return JSON.fromJSON<PreSalesResponse>(data);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Base.LogError("Error in " + this.GetType().Name + ".getPreSale(): " + ex.Message, ex);
+                Base.LogError("Error in " + this.GetType().Name + ".getPreSales(): " + ex.Message, ex);
             }
-            return result;
+            return null;
+        }
+
+        public LogsResponse getLogs(string traceIdentifier)
+        {
+            if (!String.IsNullOrEmpty(traceIdentifier)) {
+                try
+                {
+                    string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "filter=logLevel=\"error\"|logLevel=\"warning\"");
+                    if (!String.IsNullOrEmpty(data)) {
+                        var res1 = JSON.fromJSON<LogsErrorAnswer>(data);
+                        if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
+                            return JSON.fromJSON<LogsResponse>(data);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Base.LogError("Error in " + this.GetType().Name + ".getLogs(): " + ex.Message, ex);
+                }
+            }
+            return null;
         }
     }
 }

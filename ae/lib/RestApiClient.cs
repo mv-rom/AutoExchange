@@ -4,7 +4,7 @@ using System.IO;
 //using System.Text;
 //using System.Threading.Tasks;
 using System.Net;
-using System.Net.Http;
+//using System.Net.Http;
 using System.Text;
 //using System.Security.Cryptography;
 //using System.Security.Policy;
@@ -45,7 +45,7 @@ namespace ae.lib
             int rescode = 0;
 
 
-            HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create(final_url);
+            HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create(Uri.EscapeUriString(final_url));
             webrequest.Method = Method;
             webrequest.Timeout = this.Timeout;
             webrequest.Accept = @"*/*";

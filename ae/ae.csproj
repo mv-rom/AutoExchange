@@ -76,7 +76,6 @@
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web" />
     <Reference Include="System.Data" />
     <Reference Include="System.XML, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -89,6 +88,7 @@
     <Compile Include="lib\Base.cs" />
     <Compile Include="lib\classes\AbInbevEfes\API.cs" />
     <Compile Include="lib\classes\AbInbevEfes\Authorization.cs" />
+    <Compile Include="lib\classes\AbInbevEfes\Logs.cs" />
     <Compile Include="lib\classes\AbInbevEfes\PreSales.cs" />
     <Compile Include="lib\classes\AE\SplittedOrdersClass.cs" />
     <Compile Include="lib\classes\Base1C\style1C.cs" />

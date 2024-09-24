@@ -378,6 +378,8 @@ namespace ae
                 return false;
             }
 
+            int nCount = 0;
+
             foreach (var so in source)
             {
                 var preSalesDetails = new List<preSalesDetails>();
@@ -410,9 +412,10 @@ namespace ae
                         preSalesDetails = preSalesDetails
                     };
 
+/*
                     var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                     if (AbInbevEfesAPI != null) {
-                        var PreSaleResult = AbInbevEfesAPI.getPreSaleProfile(request);
+                        var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
                         if (PreSaleResult != null) {
                             //updating SplittedOrders
                             source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
@@ -431,12 +434,17 @@ namespace ae
                                     }
                                 }
                             }
+                            nCount++;
                             return true;
                         }
                     }
+*/
+                    source[so.Key].resut_orderNo = Base.genarateKey();
+                    source[so.Key].result_outletCode = "1111111111";
+                    //return true;
                 }
             }
-            return false;
+            return nCount > 0 ? true : false;
         }
 
 
@@ -444,8 +452,6 @@ namespace ae
             ref Dictionary<string, lib.classes.AE.SplittedOrdersClass> source
         )
         {
-            bool result = false;
-
             var newOrders = new List<NewOrders_Order>();
             foreach (var so in source)
             {
@@ -491,10 +497,10 @@ namespace ae
                             source[oO.id].status = oO.returnStatus;
                         }
                     }
-                    result = true;
+                    return true;
                 }
             }
-            return result;
+            return false;
         }
 
 
