@@ -85,8 +85,7 @@ namespace ae.lib.classes.AbInbevEfes
 
         public static API getInstance()
         {
-            if (API.Instance == null)
-            {
+            if (API.Instance == null) {
                 API.Instance = new API();
                 if (API.Instance.Init() != true) API.Instance.DeInit();
             }
@@ -129,12 +128,15 @@ namespace ae.lib.classes.AbInbevEfes
             try
             {
                 var rawJsonString = JSON.toJSON(packetPreSale);
+                Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(request-packetPreSale)_"+Base.NumberDateTime(DateTime.Now)+".json"), rawJsonString);
 
                 string data = this.RAC.PUT("/api/PreSales", "", rawJsonString);
                 if (!String.IsNullOrEmpty(data)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
-                        return JSON.fromJSON<PreSalesResponse>(data);
+                        var obj = JSON.fromJSON<PreSalesResponse>(data);
+                        Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(response-packetPreSale)_" + Base.NumberDateTime(DateTime.Now) + ".json"), data);
+                        return obj;
                     }
                 }
             }

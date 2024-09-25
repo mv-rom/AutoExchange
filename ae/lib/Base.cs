@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 //using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
 using log4net;
+using Newtonsoft.Json;
 
 //http ://stackify.com/log4net-guide-dotnet-logging/
 
@@ -261,6 +262,17 @@ namespace ae.lib
             if (ZIP.Create(file_path, ZipPathName, false) && File.Exists(ZipPathName)) {
                 Console.WriteLine(@"\- сохранен.");
             }
+        }
+
+        public static bool DumpToFile(string FileNamePath, string strData)
+        {
+            bool result = false;
+            using (StreamWriter file = File.CreateText(Path.GetFullPath(FileNamePath)))
+            {
+                file.WriteLine(strData);
+                result = true;
+            }
+            return result;
         }
 
         public static string genarateKey()

@@ -379,7 +379,6 @@ namespace ae
             }
 
             int nCount = 0;
-
             foreach (var so in source)
             {
                 var preSalesDetails = new List<preSalesDetails>();
@@ -404,15 +403,14 @@ namespace ae
                             so.Value.codeTT_part2 + @"\" +
                             so.Value.codeTT_part3,
                         preSaleType = "6", //EDI order
-                        dateFrom = DateTime.Now.ToString("’yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss’"),
-                        dateTo = so.Value.OrderExecutionDate.ToString("’yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss’"),
+                        dateFrom = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        dateTo = so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
                         warehouseCode = warehouse_code,
                         vatCalcMod = "0", // 0 - price without PDV, 1 - with PDV
                         custId = int.Parse(Base.torg_sklad).ToString(),
                         preSalesDetails = preSalesDetails
                     };
 
-/*
                     var AbInbevEfesAPI = lib.classes.AbInbevEfes.API.getInstance();
                     if (AbInbevEfesAPI != null) {
                         var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
@@ -438,11 +436,10 @@ namespace ae
                             return true;
                         }
                     }
-*/
-                    nCount++;
-                    source[so.Key].resut_orderNo = Base.genarateKey();
-                    source[so.Key].result_outletCode = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
-                    //return true;
+                    
+                    //nCount++;
+                    //source[so.Key].resut_orderNo = Base.genarateKey();
+                    //source[so.Key].result_outletCode = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
                 }
             }
             return nCount > 0 ? true : false;

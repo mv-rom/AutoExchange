@@ -172,7 +172,7 @@ namespace ae.lib
         {
             //ЗавершитьРаботуСистемы
             this.runInvokeMethod("ExitSystem", new object[] { 0 });
-            Base.Log1("> Выход из интерфейс. ОК.");
+            Base.Log1("> Выход из интерфейс 1C - ОК.");
         }
 
         public bool doReportFileInput(string dir, string data)
