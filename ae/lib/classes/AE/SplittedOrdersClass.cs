@@ -35,6 +35,6 @@ namespace ae.lib.classes.AE
         public string deal_status { get; set; } //default new, proccessig, reject
 
         public string resut_orderNo { get; set; }
-        public string result_outletCode { get; set; }
+        public string result_outletId { get; set; }
     }
 }

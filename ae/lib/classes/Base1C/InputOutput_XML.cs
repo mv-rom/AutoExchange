@@ -137,8 +137,8 @@ namespace ae.lib.classes.Base1C
         [XmlAttribute(AttributeName = "orderNumber")]
         public string orderNumber { get; set; }
         
-        [XmlAttribute(AttributeName = "outletCode")]
-        public string outletCode { get; set; }
+        [XmlAttribute(AttributeName = "outletId")]
+        public string outletId { get; set; }
 
         [XmlAttribute(AttributeName = "executionDate")]
         public string executionDate { get; set; }

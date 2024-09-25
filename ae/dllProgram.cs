@@ -417,7 +417,7 @@ namespace ae
                         if (PreSaleResult != null) {
                             //updating SplittedOrders
                             source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
-                            source[so.Key].result_outletCode = PreSaleResult.result.outletCode;
+                            source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
 
                             var listItems = PreSaleResult.result.details;
                             foreach(var its in listItems)
@@ -471,7 +471,7 @@ namespace ae
                     newOrders.Add(new NewOrders_Order() {
                         id = so.Key,
                         orderNumber = so.Value.resut_orderNo,
-                        outletCode = so.Value.result_outletCode,
+                        outletId = so.Value.result_outletId,
                         executionDate = so.Value.OrderExecutionDate.ToString(),
                         codeTT_part1 = so.Value.codeTT_part1,
                         codeTT_part2 = so.Value.codeTT_part2,
