@@ -12,6 +12,8 @@ using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
 using ae.lib.classes.AbInbevEfes;
 using System.Security.Cryptography;
+using System.Runtime.Remoting.Messaging;
+using System.Globalization;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -23,8 +25,8 @@ namespace ae
         {
             Base.Init();
 
-            processInBox();
-            //processOutBox();
+            //processInBox();
+            processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -386,8 +388,8 @@ namespace ae
                 {
                     preSalesDetails.Add(new preSalesDetails() {
                         productCode = it.codeKPK.ToString(),
-                        basePrice = it.basePrice.ToString(),
-                        qty = it.qty.ToString(),
+                        basePrice = it.basePrice.ToString("F4", CultureInfo.InvariantCulture),
+                        qty = it.qty.ToString("F4", CultureInfo.InvariantCulture),
                         lotId = "-",
                         promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
                         vat = "20.0" // 20.0% - PDV
@@ -415,25 +417,32 @@ namespace ae
                     if (AbInbevEfesAPI != null) {
                         var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
                         if (PreSaleResult != null) {
-                            //updating SplittedOrders
-                            source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
-                            source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
+                            if (PreSaleResult.result != null) {
+                                //updating SplittedOrders
+                                source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
+                                source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
 
-                            var listItems = PreSaleResult.result.details;
-                            foreach(var its in listItems)
-                            {
-                                var compareCodeKPK = int.Parse(its.productCode);
-                                var qty = its.qty;
-                                for (int i = 0; i < so.Value.Items.Count; i++)
+                                var listItems = PreSaleResult.result.details;
+                                foreach (var its in listItems)
                                 {
-                                    var vit = so.Value.Items[i];
-                                    if ((vit.codeKPK == compareCodeKPK) && (vit.qty == qty)) {
-                                        source[so.Key].Items[i].totalDiscount = its.totalDiscount;
+                                    var compareCodeKPK = int.Parse(its.productCode);
+                                    var qty = its.qty;
+                                    for (int i = 0; i < so.Value.Items.Count; i++)
+                                    {
+                                        var vit = so.Value.Items[i];
+                                        if ((vit.codeKPK == compareCodeKPK) && (vit.qty == qty)) {
+                                            source[so.Key].Items[i].totalDiscount = its.totalDiscount;
+                                        }
                                     }
                                 }
+                                nCount++;
+                                return true;
+                            } else {
+                                var ErrorResult = AbInbevEfesAPI.getLogs(PreSaleResult.traceIdentifier);
+                                if (ErrorResult != null) {
+                                    Base.Log(ErrorResult.message);
+                                }
                             }
-                            nCount++;
-                            return true;
                         }
                     }
                     
@@ -472,7 +481,7 @@ namespace ae
                         id = so.Key,
                         orderNumber = so.Value.resut_orderNo,
                         outletId = so.Value.result_outletId,
-                        executionDate = so.Value.OrderExecutionDate.ToString(),
+                        executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                         codeTT_part1 = so.Value.codeTT_part1,
                         codeTT_part2 = so.Value.codeTT_part2,
                         codeTT_part3 = so.Value.codeTT_part3,

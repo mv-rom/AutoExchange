@@ -132,10 +132,10 @@ namespace ae.lib.classes.AbInbevEfes
 
                 string data = this.RAC.PUT("/api/PreSales", "", rawJsonString);
                 if (!String.IsNullOrEmpty(data)) {
+                    Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(response-packetPreSale)_" + Base.NumberDateTime(DateTime.Now) + ".json"), data);
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
                         var obj = JSON.fromJSON<PreSalesResponse>(data);
-                        Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(response-packetPreSale)_" + Base.NumberDateTime(DateTime.Now) + ".json"), data);
                         return obj;
                     }
                 }
@@ -152,10 +152,10 @@ namespace ae.lib.classes.AbInbevEfes
             if (!String.IsNullOrEmpty(traceIdentifier)) {
                 try
                 {
-                    string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "filter=logLevel=\"error\"|logLevel=\"warning\"");
+                    string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "Filter=logLevel=\"error\"|logLevel=\"warning\"");
                     if (!String.IsNullOrEmpty(data)) {
                         var res1 = JSON.fromJSON<LogsErrorAnswer>(data);
-                        if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
+                        if ((res1 == null) || (res1.error == null) || (res1.error.Length <= 0)) {
                             return JSON.fromJSON<LogsResponse>(data);
                         }
                     }
