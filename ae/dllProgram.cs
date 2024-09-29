@@ -14,6 +14,7 @@ using ae.lib.classes.AbInbevEfes;
 using System.Security.Cryptography;
 using System.Runtime.Remoting.Messaging;
 using System.Globalization;
+using System.Net.NetworkInformation;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
@@ -25,8 +26,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -68,13 +69,43 @@ namespace ae
 
 
 
+        private static List<lib.classes.VchasnoEDI.Order> getOrdersFromEDI(lib.classes.VchasnoEDI.API api)
+        {
+            //getting needed documents
+            var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
+            //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
-        /*
-            //TODO: ?
-            if (!s.deal_status.Equals("new") && existKey.Length > 0) {
-                destination[existKey].deal_status = s.deal_status;
+            //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
+
+            var ordersList = api.getListDocuments(yesterdayDT, nowDT, 1);
+            if (ordersList == null || ordersList.Count() <= 0)
+                throw new Exception("ordersList = null");
+
+            //filter only Orders
+            var result = ordersList.Where(x => x.type == 1).ToList();
+
+            //Filter by deal_id (like order_number)
+            int count = result.Count();
+            if (count > 0) {
+                int i = 0;
+                while (i < count)
+                {
+                    var item = result[i];
+                    var temp1 = ordersList.FirstOrDefault(t => (t.type > 1 && t.deal_id.Equals(item.deal_id)));
+                    if (temp1 != null) {
+                        result.Remove(item);
+                        count = result.Count();
+                    } else {
+                        i++;
+                    }
+                }
+            } else {
+                result = null;
             }
-        */
+            ordersList = null;
+            return result;
+        }
 
         private static List<lib.classes.Base1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<lib.classes.VchasnoEDI.Order> source)
         {
@@ -300,6 +331,14 @@ namespace ae
             return null;
         }
 
+
+/*
+        //TODO: ?
+        if (!s.deal_status.Equals("new") && existKey.Length > 0) {
+            destination[existKey].deal_status = s.deal_status;
+        }
+*/
+
         private static Dictionary<string, lib.classes.AE.SplittedOrdersClass> doSplittingUpOrders(
             List<lib.classes.VchasnoEDI.Order> Orders,
             List<lib.classes.Base1C.ProductProfiles_Group> groupPP,
@@ -317,6 +356,7 @@ namespace ae
                 {
                     var found_key = id + "@" + type_of_product;
                     if (source2 != null && source2.ContainsKey(found_key)) {
+                        //if (!s.deal_status.Equals("new")) { }
                         source2[found_key].deal_status = deal_status;
                         dictSO.Add(found_key, source2[found_key]);
                     } else {
@@ -355,14 +395,14 @@ namespace ae
                                 dictSO.Add(found_key, new SplittedOrdersClass(){
                                     id = id,
                                     ae_id = Base.genarateKey(),
-                                    orderNumber = o.number,
+                                    orderNumber  = o.number,
                                     OrderExecutionDate = DateTime.Parse(found_item.ExecutionDate),
                                     codeTT_part1 = found_item.codeTT_part1,
                                     codeTT_part2 = found_item.codeTT_part2,
                                     codeTT_part3 = found_item.codeTT_part3,
-                                    Items = newItems,
-                                    status = 0, //current state in 1C
-                                    deal_status = deal_status //current state in EDI
+                                    Items        = newItems,
+                                    status       = 0, //current state in 1C
+                                    deal_status  = deal_status //current state in EDI
                                 });
                             }
                         }
@@ -388,28 +428,28 @@ namespace ae
                 {
                     preSalesDetails.Add(new preSalesDetails() {
                         productCode = it.codeKPK.ToString(),
-                        basePrice = it.basePrice.ToString("F4", CultureInfo.InvariantCulture),
-                        qty = it.qty.ToString("F4", CultureInfo.InvariantCulture),
-                        lotId = "-",
-                        promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
-                        vat = "20.0" // 20.0% - PDV
+                        basePrice   = it.basePrice.ToString("F4", CultureInfo.InvariantCulture),
+                        qty         = it.qty.ToString("F4", CultureInfo.InvariantCulture),
+                        lotId       = "-",
+                        promoType   = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
+                        vat         = "20.0" // 20.0% - PDV
                     });
                 }
 
                 if (preSalesDetails.Count > 0) {
-                    var request = new PreSalesRequest() {
-                        preSaleNo = so.Value.ae_id, //or so.Key
-                        custOrderNo = so.Value.id,
-                        outletCode =
+                    var request         = new PreSalesRequest() {
+                        preSaleNo       = so.Value.ae_id, //or so.Key
+                        custOrderNo     = so.Value.id,
+                        outletCode      =
                             so.Value.codeTT_part1 + @"\" +
                             so.Value.codeTT_part2 + @"\" +
                             so.Value.codeTT_part3,
-                        preSaleType = "6", //EDI order
-                        dateFrom = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        dateTo = so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        warehouseCode = warehouse_code,
-                        vatCalcMod = "0", // 0 - price without PDV, 1 - with PDV
-                        custId = int.Parse(Base.torg_sklad).ToString(),
+                        preSaleType     = "6", //EDI order
+                        dateFrom        = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        dateTo          = so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        warehouseCode   = warehouse_code,
+                        vatCalcMod      = "0", // 0 - price without PDV, 1 - with PDV
+                        custId          = int.Parse(Base.torg_sklad).ToString(),
                         preSalesDetails = preSalesDetails
                     };
 
@@ -462,31 +502,37 @@ namespace ae
             var newOrders = new List<NewOrders_Order>();
             foreach (var so in source)
             {
-                int num = 1;
-                var newItems = new List<NewOrders_Item>();
-                foreach (var it in so.Value.Items)
+                if (so.Value.status == 0)
                 {
-                    newItems.Add(new NewOrders_Item() {
-                        Number = num,
-                        codeKPK = it.codeKPK,
-                        BasePrice = it.basePrice,
-                        qty = it.qty,
-                        Akcya = it.totalDiscount
-                    });
-                    num++;
-                }
+                    int num = 1;
+                    var newItems = new List<NewOrders_Item>();
+                    foreach (var it in so.Value.Items)
+                    {
+                        newItems.Add(new NewOrders_Item()
+                        {
+                            Number    = num,
+                            codeKPK   = it.codeKPK,
+                            BasePrice = it.basePrice,
+                            qty       = it.qty,
+                            Akcya     = it.totalDiscount
+                        });
+                        num++;
+                    }
 
-                if (newItems.Count > 0) {
-                    newOrders.Add(new NewOrders_Order() {
-                        id = so.Key,
-                        orderNumber = so.Value.resut_orderNo,
-                        outletId = so.Value.result_outletId,
-                        executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
-                        codeTT_part1 = so.Value.codeTT_part1,
-                        codeTT_part2 = so.Value.codeTT_part2,
-                        codeTT_part3 = so.Value.codeTT_part3,
-                        items = newItems
-                    });
+                    if (newItems.Count > 0)
+                    {
+                        newOrders.Add(new NewOrders_Order()
+                        {
+                            id            = so.Key,
+                            orderNumber   = so.Value.resut_orderNo,
+                            outletId      = so.Value.result_outletId,
+                            executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
+                            codeTT_part1  = so.Value.codeTT_part1,
+                            codeTT_part2  = so.Value.codeTT_part2,
+                            codeTT_part3  = so.Value.codeTT_part3,
+                            items         = newItems
+                        });
+                    }
                 }
             }
 
@@ -516,110 +562,66 @@ namespace ae
         public static void processInBox()
         {
             int ResCount = 0;
-            FileStream fs;
             var dirPath = Base.InboxDir;
-            var fileJSON_SplittedOrders = "ae.json";
-            
+            var fileJSON = "ae.json";
 
-            if (!Directory.Exists(dirPath))
-                goto __exit;
-
-            try
-            {
-                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-                //getting needed documents
-                var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
-                //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
-
-                //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
-
-                var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
-                if (ordersList == null || ordersList.Count() <= 0)
-                    throw new Exception("ordersList = null");
-
-                //filter only Orders
-                var ordersListFiltered = new List<lib.classes.VchasnoEDI.Order>();
-                foreach (var item in ordersList.Where(x => x.type == 1))
+            if (Directory.Exists(dirPath)) {
+                try
                 {
-                    ordersListFiltered.Add(item);
-                }
+                    var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
 
-                if (ordersListFiltered.Count() <= 0)
-                    goto __exit;
+                    var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
+                    if (ordersListFiltered != null && ordersListFiltered.Count > 0)
+                    {
+                        var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
+                        if (TTbyGLN_List == null)
+                            throw new Exception("Result of getTTbyGLNfrom1C is null.");
 
-                //Filter by deal_id (like order_number)
-                int i = 0;
-                int count = ordersListFiltered.Count();
-                while (i < ordersListFiltered.Count)
-                {
-                    var item = ordersListFiltered[i];
-                    var temp1 = ordersList.FirstOrDefault(t => (t.type > 1 && t.deal_id.Equals(item.deal_id)));
-                    if (temp1 != null) {
-                        ordersListFiltered.Remove(item);
-                        count = ordersListFiltered.Count();
-                    } else {
-                        i++;
-                    }
-                }
-                ordersList = null;
+                        var ProductProfiles = getProductProfilesOfTTfrom1C(ordersListFiltered, TTbyGLN_List);
+                        if (ProductProfiles == null)
+                            throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
+                        if (ProductProfiles.Count > 0)
+                        {
+                            string jsonStr = "";
+                            var filePathSO = Path.Combine(dirPath, fileJSON);
+                            if (File.Exists(filePathSO)) {
+                                jsonStr = File.ReadAllText(filePathSO);
+                            }
 
-                if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
-                    var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
-                    if (TTbyGLN_List == null)
-                        throw new Exception("Result of getTTbyGLNfrom1C is null.");
+                            var savedSplittedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.SplittedOrdersClass>>(jsonStr);
+                            var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
+                            if (SplittedOrders == null)
+                                throw new Exception("Result of doSplittingUpOrders is null.");
 
-                    var ProductProfiles = getProductProfilesOfTTfrom1C(ordersListFiltered, TTbyGLN_List);
-                    if (ProductProfiles == null)
-                        throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
+                            if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
+                                if (CheckAndAddOrdersIn1C(ref SplittedOrders))
+                                    Base.Log("Processing orders in 1C is successful.");
+                                else
+                                    Base.Log("Some problems with processing orders in 1c!");
 
-                    if (ProductProfiles.Count > 0) {
-                        string jsonStr = "";
-                        var filePathSO = Path.Combine(dirPath, fileJSON_SplittedOrders);
-                        if (!File.Exists(filePathSO)) {
-                            fs = File.Create(filePathSO);
-                            fs.Close();
-                        } else {
-                            jsonStr = File.ReadAllText(filePathSO);
-                        }
-
-                        var savedSplittedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.SplittedOrdersClass>>(jsonStr);
-                        jsonStr = "";
-                        var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
-                        if (SplittedOrders == null)
-                            throw new Exception("Result of doSplittingUpOrders is null.");
-
-                        if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
-                            if (CheckAndAddOrdersIn1C(ref SplittedOrders))
-                                Base.Log("Processing orders in 1C is successful.");
-                            else
-                                Base.Log("Some problems with processing orders in 1c!");
-
-                            //save Splited Order List
-                            jsonStr = JSON.toJSON(SplittedOrders);
-                            File.WriteAllText(filePathSO + "_temp", jsonStr);
-                            if (File.Exists(filePathSO))
-                                File.Delete(filePathSO);
-                            File.Move(filePathSO + "_temp", filePathSO);
+                                //save Splited Order List
+                                jsonStr = JSON.toJSON(SplittedOrders);
+                                File.WriteAllText(filePathSO + "_temp", jsonStr);
+                                if (File.Exists(filePathSO))
+                                    File.Delete(filePathSO);
+                                File.Move(filePathSO + "_temp", filePathSO);
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Base.Log("Error in processInBox(): " + ex.Message);
-            }
-            finally
-            {
-                if (_1C.Instance != null)
-                    _1C.Instance.runExit();
+                catch (Exception ex)
+                {
+                    Base.Log("Error in processInBox(): " + ex.Message);
+                }
+                finally
+                {
+                    if (_1C.Instance != null)
+                        _1C.Instance.runExit();
+                }
             }
 
-        __exit:
-            {
-                Base.Log("ResCount: " + ResCount);
-            }
+            Base.Log("ResCount: " + ResCount);
         }
 
         public static void processOutBox()
