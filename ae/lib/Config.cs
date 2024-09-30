@@ -11,31 +11,30 @@ namespace ae.lib
         private string FilePath = "";
         public ConfigClass ConfigSettings = null;
 
+        public Config()
+        {
+            FilePath = Path.Combine(Base.RunDir, FileName);
+        }
+
         public bool Init()
         {
-            bool result = false;
             if (File.Exists(this.FilePath)) {
                 string buff = File.ReadAllText(this.FilePath);
                 try {
                     this.ConfigSettings = JSON.fromJSON<ConfigClass>(buff);
-                    result = true;
+                    return true;
                 }
                 catch (Exception ex) {
                     Base.LogError("Error in Config.Init(): " + ex.Message);
                 }
             }
-            return result;
+            return false;
         }
 
         public void Save(object Obj)
         {
             File.WriteAllText(this.FilePath+"__save", JSON.toJSON(Obj));
         }
-        public Config()
-        {
-            this.FilePath = Path.Combine(Base.RunDir, FileName);
-        }
-
 
 /*
         public static object GetValName(object obj, string variableName)
