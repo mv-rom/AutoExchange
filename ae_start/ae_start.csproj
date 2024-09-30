@@ -97,4 +97,8 @@
   <PropertyGroup>
     <PostBuildEvent>call $(SolutionDir)postbuild.bat $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+	<!-- other property settings -->
+	<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+  </PropertyGroup>
 </Project>
