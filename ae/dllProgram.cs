@@ -11,10 +11,10 @@ using System.Text.RegularExpressions;
 using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
 using ae.lib.classes.AbInbevEfes;
-using System.Security.Cryptography;
-using System.Runtime.Remoting.Messaging;
+//using System.Security.Cryptography;
+//using System.Runtime.Remoting.Messaging;
 using System.Globalization;
-using System.Net.NetworkInformation;
+//using System.Net.NetworkInformation;
 //using Newtonsoft.Json.Linq;
 
 namespace ae
