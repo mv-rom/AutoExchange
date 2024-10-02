@@ -1,8 +1,18 @@
 # AutoExchange
 
+### Add net4.0 ReferenceAssemblies like install package:
+> https://www.nuget.org/packages/microsoft.netframework.referenceassemblies.net40
+```
+dotnet add package Microsoft.NETFramework.ReferenceAssemblies.net40 --version 1.0.3
+```
+> or using NuGet:
+```
+NuGet\Install-Package Microsoft.NETFramework.ReferenceAssemblies.net40 -Version 1.0.3
+```
 
-### Add net4.0_targeting_pack through install VS 2019:
+### or Add net4.0 ReferenceAssemblies (net4.0_targeting_pack) through install VS 2019:
 > https://www.techspot.com/downloads/7241-visual-studio-2019.html
+
 
 ### Case to use V77.Application:
 ```

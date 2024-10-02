@@ -12,6 +12,6 @@ rem https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-
 rem http://docwiki.embarcadero.com/RADStudio/Alexandria/en/Building_a_Project_Using_an_MSBuild_Command
 
 
-%DotnetPath%\MSBuild.exe %ProjectName%.sln /nologo /t:Rebuild /p:Configuration=Release;FrameworkPathOverride=%RefAssemPath%
+%DotnetPath%\MSBuild.exe %ProjectName%.sln /nologo /m /target:Rebuild /p:Configuration=Release;FrameworkPathOverride=%DotnetPath%
 
 pause

@@ -30,12 +30,14 @@ namespace ae.lib
             }
             return false;
         }
+    }
 
-        public void Save(object Obj)
+/*        
+       public void Save(object Obj)
         {
             File.WriteAllText(this.FilePath+"__save", JSON.toJSON(Obj));
         }
-
+*/
 /*
         public static object GetValName(object obj, string variableName)
         {
@@ -63,7 +65,5 @@ namespace ae.lib
             }
         }
 */
-    }
-
 
 }
