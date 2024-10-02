@@ -25,5 +25,5 @@ regsvr32 "C:\Program Files (x86)\1Cv77\BIN\zlibeng.dll"
 ```
 git clone https://github.com/mv-rom/AutoExchange.git
 cd AutoExchange
-start compile4.0.bat
+start compile.bat
 ```
