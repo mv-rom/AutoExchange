@@ -524,8 +524,8 @@ namespace ae
                         newOrders.Add(new NewOrders_Order()
                         {
                             id            = so.Key,
-                            orderNumber   = so.Value.resut_orderNo,
-                            outletId      = so.Value.result_outletId,
+                            orderNumber   = string.IsNullOrEmpty(so.Value.resut_orderNo) ? "" : so.Value.resut_orderNo,
+                            outletId      = string.IsNullOrEmpty(so.Value.result_outletId) ? "" : so.Value.result_outletId,
                             executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                             codeTT_part1  = so.Value.codeTT_part1,
                             codeTT_part2  = so.Value.codeTT_part2,
@@ -627,111 +627,110 @@ namespace ae
         public static void processOutBox()
         {
             int ResCount = 0;
-
-            try
-            {
-                if (!Directory.Exists(Base.OutboxDir))
-                    goto __exit;
-                var dirsList = Directory.GetDirectories(Base.OutboxDir);
-
-
-                var yesterdayDT = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
-                var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
-
-                var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-                var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
-                if (ordersList == null || ordersList.Count() <= 0)
-                    goto __exit;
-
-                //filter only Orders
-                var ordersListFiltered = new List<lib.classes.VchasnoEDI.Order>();
-                foreach (var item in ordersList.Where(x => x.type == 1))
+            if (Directory.Exists(Base.OutboxDir)) {
+                try
                 {
-                    ordersListFiltered.Add(item);
-                }
-                ordersList = null;
-                if (ordersListFiltered.Count() <= 0)
-                    goto __exit;
-                
-                //var ordersListFilteredMaped = ordersListFiltered.ConvertAll<lib.classes.VchasnoEDI.Order>(x => VchasnoAPI.getDocument(x.id));
-                //ordersListFiltered = null;
+                    var yesterdayDT = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+                    var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
-                string pattern1 = @"^.+_DESADV_.+\.xml$";
-                //processing in OutboxDir
-                foreach (var dirPath in dirsList)
-                {
-                    if (Directory.Exists(dirPath)) {
-                        var DirName = new DirectoryInfo(dirPath).Name;
+                    var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
+                    var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
+                    if (ordersList == null || ordersList.Count() <= 0)
+                        goto __exit;
 
-                        //filter by company gln
-                        var Company = Base.Config.ConfigSettings.Companies.FirstOrDefault(x => x.erdpou == DirName);
-                        if (Company != null) {
-                            var gln = Company.gln;
-                        }
-                        //var ORDRSP = 1;
+                    //filter only Orders
+                    var ordersListFiltered = new List<lib.classes.VchasnoEDI.Order>();
+                    foreach (var item in ordersList.Where(x => x.type == 1))
+                    {
+                        ordersListFiltered.Add(item);
+                    }
+                    ordersList = null;
+                    if (ordersListFiltered.Count() <= 0)
+                        goto __exit;
 
-                        var xmlFilesList = Directory.GetFiles(dirPath);
-                        foreach (var file in xmlFilesList)
+                    //var ordersListFilteredMaped = ordersListFiltered.ConvertAll<lib.classes.VchasnoEDI.Order>(x => VchasnoAPI.getDocument(x.id));
+                    //ordersListFiltered = null;
+
+                    //processing in OutboxDir
+                    string pattern1 = @"^.+_DESADV_.+\.xml$";
+                    var dirsList = Directory.GetDirectories(Base.OutboxDir);
+                    foreach (var dirPath in dirsList)
+                    {
+                        if (Directory.Exists(dirPath))
                         {
-                            //parse *_DESADV_*.xml:
-                            if (Regex.IsMatch(file, pattern1) && File.Exists(file)) {
-                                var desadvClass = XML.ConvertXMLFileToClass<lib.classes.VchasnoEDI.DESADV>(file);
-                                if (desadvClass != null) {
-                                    lib.classes.VchasnoEDI.Order _founded = null;
-                                    foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER))
-                                    {
-                                        _founded = item;
-                                        break;
-                                    }
+                            var DirName = new DirectoryInfo(dirPath).Name;
 
-                                    if (_founded != null) {
-                                        var posList = desadvClass.HEAD.PACKINGSEQUENCE.POSITION;
-                                        for (int i = 0; i < posList.Count(); i++)
+                            //filter by company gln
+                            var Company = Base.Config.ConfigSettings.Companies.FirstOrDefault(x => x.erdpou == DirName);
+                            if (Company != null) {
+                                var gln = Company.gln;
+                            }
+                            //var ORDRSP = 1;
+
+                            var xmlFilesList = Directory.GetFiles(dirPath);
+                            foreach (var file in xmlFilesList)
+                            {
+                                //parse *_DESADV_*.xml:
+                                if (Regex.IsMatch(file, pattern1) && File.Exists(file))
+                                {
+                                    var desadvClass = XML.ConvertXMLFileToClass<lib.classes.VchasnoEDI.DESADV>(file);
+                                    if (desadvClass != null)
+                                    {
+                                        lib.classes.VchasnoEDI.Order _founded = null;
+                                        foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER))
                                         {
-                                            var item = _founded.as_json.items.FirstOrDefault<lib.classes.VchasnoEDI.OrderDataItem>(
-                                                x => x.product_code == posList[i].PRODUCT
-                                            );
-                                            if (item != null) {
-                                                posList[i].PRODUCTIDBUYER = "" + (item.buyer_code != null ? item.buyer_code : "0");
+                                            _founded = item;
+                                            break;
+                                        }
+
+                                        if (_founded != null) {
+                                            var posList = desadvClass.HEAD.PACKINGSEQUENCE.POSITION;
+                                            for (int i = 0; i < posList.Count(); i++)
+                                            {
+                                                var item = _founded.as_json.items.FirstOrDefault<lib.classes.VchasnoEDI.OrderDataItem>(
+                                                    x => x.product_code == posList[i].PRODUCT
+                                                );
+                                                if (item != null) {
+                                                    posList[i].PRODUCTIDBUYER = "" + (string.IsNullOrEmpty(item.buyer_code) ? "0" : item.buyer_code);
+                                                }
                                             }
                                         }
-                                    }
 
-                                    //Base.Log(desadvClass.HEAD.BUYER);
-                                    string newFilepath = file; //file + "_"
-                                    if (File.Exists(newFilepath))
-                                        File.Delete(newFilepath);
+                                        //Base.Log(desadvClass.HEAD.BUYER);
+                                        string newFilepath = file; //file + "_"
+                                        if (File.Exists(newFilepath)) File.Delete(newFilepath);
 
-                                    if (XML.ConvertClassToXMLFile(newFilepath, desadvClass, null))
-                                        ResCount++;
-/*
-                                    if (Company != null) {
-                                        //add to orrsp array
-                                        var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
-                                        newFilepath = file+"_ordrsp";
-                                        if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) { 
-                                        }
+                                        if (XML.ConvertClassToXMLFile(newFilepath, desadvClass, null)) ResCount++;
+                                        /*
+                                            if (Company != null) {
+                                                //add to orrsp array
+                                                var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
+                                                newFilepath = file+"_ordrsp";
+                                                if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) { 
+                                                }
+                                            }
+                                        */
+                                    } else {
+                                        if (File.Exists(file)) File.Delete(file);
                                     }
-*/
-                                } else {
-                                    if (File.Exists(file)) File.Delete(file);
                                 }
                             }
-                        }
 
-                        if (Company != null) {
-                            //ORDRSP
+                            if (Company != null)
+                            {
+                                //ORDRSP
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Base.Log("Error in processOutBox(): " + ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                Base.Log("Error in processOutBox(): " + ex.Message);
-            }
-
+            
             __exit:
-                Base.Log("ResCount: "+ ResCount);
+                Base.Log("ResCount: " + ResCount);
         }
     }
 

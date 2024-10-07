@@ -4,6 +4,8 @@ using System.IO;
 //using System.Text;
 //using System.Threading.Tasks;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 //using System.Net.Http;
 using System.Text;
 //using System.Security.Cryptography;
@@ -30,6 +32,11 @@ namespace ae.lib
             this.Timeout = Timeout;
         }
 
+        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
+
         private string HTTPClient(string Method, string SubUrl, string Arguments, string rawData="")
         {
             var final_url = this.BaseUrl;
@@ -44,6 +51,10 @@ namespace ae.lib
             string rawResponse = string.Empty;
             int rescode = 0;
 
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+            //ServicePointManager.ServerCertificateValidationCallback += 
+            //    new System.Net.Security.RemoteCertificateValidationCallback(this.ValidateServerCertificate);
+
 
             HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create(Uri.EscapeUriString(final_url));
             webrequest.Method = Method;
@@ -54,6 +65,8 @@ namespace ae.lib
             webrequest.CachePolicy = new System.Net.Cache.RequestCachePolicy(
                 System.Net.Cache.RequestCacheLevel.NoCacheNoStore
             );
+            webrequest.Proxy = null;
+            webrequest.Credentials = CredentialCache.DefaultCredentials;
             webrequest.ContentType = this.ContentType + "; charset=utf-8";
 
             // Set some reasonable limits on resources used by this request
@@ -91,8 +104,8 @@ namespace ae.lib
             }
             catch (WebException ex)
             {
-                Base.LogError("ResponseError in " + this.GetType().Name + ".HTTPClient(): " + ex.Message);
                 if (ex.Status == WebExceptionStatus.ProtocolError) {
+                    Base.LogError("ResponseError in " + this.GetType().Name + ".HTTPClient(): " + ex.Message);
                     Base.LogError("ResponseError Status: " + (int)((HttpWebResponse)ex.Response).StatusCode);
                     var s = ((HttpWebResponse)ex.Response).GetResponseStream();
                     using (var reader = new StreamReader(s))
@@ -100,6 +113,8 @@ namespace ae.lib
                         Base.LogError("ResponseError Data: " + reader.ReadToEnd());
                         reader.Close();
                     }
+                } else {
+                    Base.LogError("ResponseError in " + this.GetType().Name + ".HTTPClient(): " + ex.Message, ex);
                 }
             }
             catch (Exception ex)
