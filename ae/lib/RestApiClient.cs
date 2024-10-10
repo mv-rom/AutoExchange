@@ -59,14 +59,15 @@ namespace ae.lib
             HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create(Uri.EscapeUriString(final_url));
             webrequest.Method = Method;
             webrequest.Timeout = this.Timeout;
+            webrequest.KeepAlive = false;
             webrequest.Accept = @"*/*";
-            webrequest.Headers["UserAgent"] = "AutoExchange";
+            webrequest.UserAgent = "AutoExchange";
             webrequest.Headers["Cache-Control"] = "no-cache";
+            webrequest.Credentials = CredentialCache.DefaultCredentials;
             webrequest.CachePolicy = new System.Net.Cache.RequestCachePolicy(
                 System.Net.Cache.RequestCacheLevel.NoCacheNoStore
             );
             webrequest.Proxy = null;
-            webrequest.Credentials = CredentialCache.DefaultCredentials;
             webrequest.ContentType = this.ContentType + "; charset=utf-8";
 
             // Set some reasonable limits on resources used by this request
@@ -93,6 +94,7 @@ namespace ae.lib
             try
             {
                 webresponse = (HttpWebResponse)webrequest.GetResponse();
+                //if (webresponse.StatusCode == HttpStatusCode.OK) { }
                 var responseStream = webresponse.GetResponseStream();
                 if (responseStream != null) {
                     using (var reader = new StreamReader(responseStream))

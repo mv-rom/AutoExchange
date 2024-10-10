@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "action_library", "action_library\action_library.csproj", "{F19C5F1A-E6C4-4FA5-9CFD-534B6F3E1451}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "action", "action_library\action.csproj", "{F19C5F1A-E6C4-4FA5-9CFD-534B6F3E1451}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4F5D98A5-D5CE-4824-BB82-1CDCE161224F} = {4F5D98A5-D5CE-4824-BB82-1CDCE161224F}
 		{98764295-8032-410A-B34F-AB5DA1B4CC76} = {98764295-8032-410A-B34F-AB5DA1B4CC76}

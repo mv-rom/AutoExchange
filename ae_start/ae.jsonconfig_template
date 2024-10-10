@@ -7,7 +7,6 @@
 		gln: 		"9871000083468",
 		email: 		"orbita_edi@ukr.net",
 		warehouseCode: "100300"
-		//sqlite_db:  "ae.sqlite"
 	},
 	FtpSetting: {
 		host: "ftp.edi.vchasno.ua",
@@ -22,8 +21,8 @@
 		authorization_content_type: "application/x-www-form-urlencoded",
 		authorization_username: "login123", //Орбіта Суми - 28, для Орбіта Чернігів - 153
 		authorization_password: "pass123",
-		url: "https://swe-app.abie.app/SWE_API_20240201",
-		content_type: "application/json"
+		data_base_url: "https://swe-app.abie.app/SWE_API_20240201",
+		data_content_type: "application/json"
 	},
 	VchasnoEDI_ApiSetting: {
 		url: "https://edi.vchasno.ua/api/",

@@ -26,8 +26,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -269,9 +269,9 @@ namespace ae
 
                         if (!item_found) {
                             pp_g.list.Add(new ProductProfiles_Item() {
-                                EAN = product_code,
-                                Title = title,
-                                Number = num
+                                EAN     = product_code,
+                                Title   = title,
+                                Number  = num
                             });
                             num++;
                         }
@@ -356,7 +356,7 @@ namespace ae
                 {
                     var found_key = id + "@" + type_of_product;
                     if (source2 != null && source2.ContainsKey(found_key)) {
-                        //if (!s.deal_status.Equals("new")) { }
+                        //TODO: if (!s.deal_status.Equals("new")) { }
                         source2[found_key].deal_status = deal_status;
                         dictSO.Add(found_key, source2[found_key]);
                     } else {
@@ -374,12 +374,12 @@ namespace ae
                                     if (found_list_item != null) {
                                         var s_qty = (it.quantity.Contains(".")) ? it.quantity.Replace(".",",") : it.quantity;
                                         newItems.Add(new SplittedOrdersClass_Order() {
-                                            ean13 = ean13,
-                                            codeKPK = found_list_item.ProductCode,
-                                            basePrice = found_list_item.BasePrice,
-                                            qty = float.Parse(s_qty),
-                                            promoType = 0,
-                                            totalDiscount = 0
+                                            ean13           = ean13,
+                                            codeKPK         = found_list_item.ProductCode,
+                                            basePrice       = found_list_item.BasePrice,
+                                            qty             = float.Parse(s_qty),
+                                            promoType       = 0,
+                                            totalDiscount   = 0
                                         });
                                     }
                                     var title = it.title;
@@ -393,10 +393,11 @@ namespace ae
                             //add new
                             if (newItems.Count > 0) {
                                 dictSO.Add(found_key, new SplittedOrdersClass(){
-                                    id = id,
-                                    ae_id = Base.genarateKey(),
+                                    id           = id,
+                                    ae_id        = Base.genarateKey(),
                                     orderNumber  = o.number,
-                                    OrderExecutionDate = DateTime.Parse(found_item.ExecutionDate),
+                                    OrderDate    = DateTime.Parse(o.as_json.date),
+                                    OrderExecutionDate = DateTime.Parse(o.as_json.date_expected_delivery),
                                     codeTT_part1 = found_item.codeTT_part1,
                                     codeTT_part2 = found_item.codeTT_part2,
                                     codeTT_part3 = found_item.codeTT_part3,
@@ -405,6 +406,8 @@ namespace ae
                                     deal_status  = deal_status //current state in EDI
                                 });
                             }
+                        } else {
+                            Base.Log("Not found order with id ["+id+"] of ProductProfiles_Group in dllProgram.doSplittingUpOrders()!");
                         }
                     }
                 }
@@ -445,7 +448,7 @@ namespace ae
                             so.Value.codeTT_part2 + @"\" +
                             so.Value.codeTT_part3,
                         preSaleType     = "6", //EDI order
-                        dateFrom        = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        dateFrom        = so.Value.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
                         dateTo          = so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
                         warehouseCode   = warehouse_code,
                         vatCalcMod      = "0", // 0 - price without PDV, 1 - with PDV
@@ -485,10 +488,10 @@ namespace ae
                             }
                         }
                     }
-                    
+
                     //nCount++;
                     //source[so.Key].resut_orderNo = Base.genarateKey();
-                    //source[so.Key].result_outletCode = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
+                    //source[so.Key].result_outletId = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
                 }
             }
             return nCount > 0 ? true : false;
@@ -521,11 +524,21 @@ namespace ae
 
                     if (newItems.Count > 0)
                     {
-                        newOrders.Add(new NewOrders_Order()
-                        {
+                        if (string.IsNullOrEmpty(so.Value.resut_orderNo)) {
+                            Base.Log(string.Format("The order with id [{0}] have resut_orderNo that is empty!", so.Key));
+                            newItems = null;
+                            continue;
+                        }
+                        if (string.IsNullOrEmpty(so.Value.result_outletId)) {
+                            Base.Log(string.Format("The order with id [{0}] have result_outletId that is empty!", so.Key));
+                            newItems = null;
+                            continue;
+                        }
+
+                        newOrders.Add(new NewOrders_Order() {
                             id            = so.Key,
-                            orderNumber   = string.IsNullOrEmpty(so.Value.resut_orderNo) ? "" : so.Value.resut_orderNo,
-                            outletId      = string.IsNullOrEmpty(so.Value.result_outletId) ? "" : so.Value.result_outletId,
+                            orderNumber   = so.Value.resut_orderNo,
+                            outletId      = so.Value.result_outletId,
                             executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                             codeTT_part1  = so.Value.codeTT_part1,
                             codeTT_part2  = so.Value.codeTT_part2,
@@ -569,10 +582,17 @@ namespace ae
                 try
                 {
                     var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-
                     var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
                     if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
+                        var fp = Path.Combine(dirPath, "orders_" + fileJSON);
+                        //if (!File.Exists(fp)) {
+                        //    throw new Exception("STOP");
+                        //}
+                        //var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
+                        JSON.DumpToFile(ordersListFiltered, fp);
+                        //throw new Exception("STOP");
+
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                         if (TTbyGLN_List == null)
                             throw new Exception("Result of getTTbyGLNfrom1C is null.");

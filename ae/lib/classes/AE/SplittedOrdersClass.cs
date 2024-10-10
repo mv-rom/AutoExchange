@@ -26,7 +26,7 @@ namespace ae.lib.classes.AE
         public int codeTT_part2 { get; set; }
         public int codeTT_part3 { get; set; }
         //public string outletCode { get; set; }
-        public DateTime OrderCreationDate { get; set; } //"2024-06-18T12:36:23.020"
+        public DateTime OrderDate { get; set; } //"2024-06-18T12:36:23.020"
         public DateTime OrderExecutionDate { get; set; } //"2024-06-19T00:00:00"
 
         public List<SplittedOrdersClass_Order> Items { get; set; }
