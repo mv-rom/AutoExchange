@@ -2,20 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using System.Text;
-//using System.Threading.Tasks;
-using ae.lib;
-//using System.Security.Cryptography;
-//using static System.Net.Mime.MediaTypeNames;
 using System.Text.RegularExpressions;
+using System.Globalization;
+using ae.lib;
 using ae.lib.classes.Base1C;
 using ae.lib.classes.AE;
 using ae.lib.classes.AbInbevEfes;
-//using System.Security.Cryptography;
-//using System.Runtime.Remoting.Messaging;
-using System.Globalization;
-//using System.Net.NetworkInformation;
-//using Newtonsoft.Json.Linq;
+
+
 
 namespace ae
 {
@@ -80,7 +74,7 @@ namespace ae
 
             var ordersList = api.getListDocuments(yesterdayDT, nowDT, 1);
             if (ordersList == null || ordersList.Count() <= 0)
-                throw new Exception("ordersList = null");
+                return null;
 
             //filter only Orders
             var result = ordersList.Where(x => x.type == 1).ToList();
@@ -103,7 +97,6 @@ namespace ae
             } else {
                 result = null;
             }
-            ordersList = null;
             return result;
         }
 
@@ -168,20 +161,16 @@ namespace ae
                                 listTT.RemoveAt(i);
                             }
                         }
-
-                        output_listTT = null;
                         return listTT;
                     } else {
                         Base.Log(
-                            "Warning in getTTbyGLNfrom1C: "+
-                            "after do report [" + report1cName + "]!"
+                            "Warning in getTTbyGLNfrom1C(): after do report ["+report1cName+"]!"
                         );
                     }
                 }
             } else {
                 Base.Log(
-                    "Warning in getTTbyGLNfrom1C: "+
-                    "hasn't parameter [gln] in config!"
+                    "Warning in getTTbyGLNfrom1C(): hasn't parameter [gln] in config!"
                 );
             }
             return null;
@@ -199,6 +188,7 @@ namespace ae
                 var glnTT = long.Parse(s.as_json.buyer_gln);
                 var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
                 var date_expected_delivery = s.as_json.date_expected_delivery;
+                var delivery_address = s.as_json.delivery_address;
 
                 //search in listTT
                 bool found = false;
@@ -278,8 +268,8 @@ namespace ae
                     }
                 } else {
                     Base.Log1(
-                        "Warning in getProductProfilesOfTTfrom1C: " +
-                        "not found TT with GLN ["+glnTT+","+glnTT_gruz+"]!"
+                        "Warning in getProductProfilesOfTTfrom1C(): " +
+                        "not found TT with GLN ["+glnTT+", "+glnTT_gruz+"("+delivery_address+")]!"
                     );
                 }
             }
@@ -323,8 +313,7 @@ namespace ae
                     return groupPP;
                 } else {
                     Base.Log(
-                        "Warning in getProductProfilesOfTTfrom1C: "+
-                        "after do report [" + report1cName + "]!"
+                        "Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName+"]!"
                     );
                 }
             }
@@ -342,7 +331,7 @@ namespace ae
         private static Dictionary<string, lib.classes.AE.SplittedOrdersClass> doSplittingUpOrders(
             List<lib.classes.VchasnoEDI.Order> Orders,
             List<lib.classes.Base1C.ProductProfiles_Group> groupPP,
-            Dictionary<string, lib.classes.AE.SplittedOrdersClass> source2
+            Dictionary<string, lib.classes.AE.SplittedOrdersClass> splittedOrders
         )
         {
             var dictSO = new Dictionary<string, lib.classes.AE.SplittedOrdersClass>();
@@ -355,10 +344,10 @@ namespace ae
                 for (int type_of_product = 0; type_of_product < 4; type_of_product++)
                 {
                     var found_key = id + "@" + type_of_product;
-                    if (source2 != null && source2.ContainsKey(found_key)) {
+                    if (splittedOrders != null && splittedOrders.ContainsKey(found_key)) {
                         //TODO: if (!s.deal_status.Equals("new")) { }
-                        source2[found_key].deal_status = deal_status;
-                        dictSO.Add(found_key, source2[found_key]);
+                        splittedOrders[found_key].deal_status = deal_status;
+                        dictSO.Add(found_key, splittedOrders[found_key]);
                     } else {
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
                         if (found_item != null) {
@@ -407,7 +396,7 @@ namespace ae
                                 });
                             }
                         } else {
-                            Base.Log("Not found order with id ["+id+"] of ProductProfiles_Group in dllProgram.doSplittingUpOrders()!");
+                            Base.Log("Warning in doSplittingUpOrders(): not found order with id [" + id+"] in ProductProfiles_Group!");
                         }
                     }
                 }
@@ -419,7 +408,7 @@ namespace ae
         {
             string warehouse_code = "";
             if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("warehouse_code", out warehouse_code)) {
-                Base.Log("Not found [warehouse_code] in CombineAbiePreSalesAndOrders()!");
+                Base.Log("Warning in CombineAbiePreSalesAndOrders(): not found [warehouse_code]!");
                 return false;
             }
 
@@ -441,7 +430,7 @@ namespace ae
 
                 if (preSalesDetails.Count > 0) {
                     var request         = new PreSalesRequest() {
-                        preSaleNo       = so.Value.ae_id, //or so.Key
+                        preSaleNo       = so.Key,
                         custOrderNo     = so.Value.id,
                         outletCode      =
                             so.Value.codeTT_part1 + @"\" +
@@ -479,7 +468,6 @@ namespace ae
                                     }
                                 }
                                 nCount++;
-                                return true;
                             } else {
                                 var ErrorResult = AbInbevEfesAPI.getLogs(PreSaleResult.traceIdentifier);
                                 if (ErrorResult != null) {
@@ -525,12 +513,12 @@ namespace ae
                     if (newItems.Count > 0)
                     {
                         if (string.IsNullOrEmpty(so.Value.resut_orderNo)) {
-                            Base.Log(string.Format("The order with id [{0}] have resut_orderNo that is empty!", so.Key));
+                            Base.Log("Warning in CheckAndAddOrdersIn1C(): order with id ["+so.Key+"] have resut_orderNo that is empty!");
                             newItems = null;
                             continue;
                         }
                         if (string.IsNullOrEmpty(so.Value.result_outletId)) {
-                            Base.Log(string.Format("The order with id [{0}] have result_outletId that is empty!", so.Key));
+                            Base.Log("Warning in CheckAndAddOrdersIn1C(): order with id ["+so.Key+"] have result_outletId that is empty!");
                             newItems = null;
                             continue;
                         }
@@ -539,7 +527,7 @@ namespace ae
                             id            = so.Key,
                             orderNumber   = so.Value.resut_orderNo,
                             outletId      = so.Value.result_outletId,
-                            executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
+                            executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                             codeTT_part1  = so.Value.codeTT_part1,
                             codeTT_part2  = so.Value.codeTT_part2,
                             codeTT_part3  = so.Value.codeTT_part3,
@@ -581,16 +569,16 @@ namespace ae
             if (Directory.Exists(dirPath)) {
                 try
                 {
-                    var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-                    var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
-                    if (ordersListFiltered != null && ordersListFiltered.Count > 0)
+                    //var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
+                    //var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
+                    //if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
                         var fp = Path.Combine(dirPath, "orders_" + fileJSON);
-                        //if (!File.Exists(fp)) {
-                        //    throw new Exception("STOP");
-                        //}
-                        //var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
-                        JSON.DumpToFile(ordersListFiltered, fp);
+                        if (!File.Exists(fp)) {
+                            throw new Exception("STOP");
+                        }
+                        var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
+                        //JSON.DumpToFile(ordersListFiltered, fp);
                         //throw new Exception("STOP");
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
@@ -598,35 +586,32 @@ namespace ae
                             throw new Exception("Result of getTTbyGLNfrom1C is null.");
 
                         var ProductProfiles = getProductProfilesOfTTfrom1C(ordersListFiltered, TTbyGLN_List);
-                        if (ProductProfiles == null)
+                        if (ProductProfiles == null || ProductProfiles.Count <= 0)
                             throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
-                        if (ProductProfiles.Count > 0)
-                        {
-                            string jsonStr = "";
-                            var filePathSO = Path.Combine(dirPath, fileJSON);
-                            if (File.Exists(filePathSO)) {
-                                jsonStr = File.ReadAllText(filePathSO);
-                            }
+                        string jsonStr = "";
+                        var filePathSO = Path.Combine(dirPath, fileJSON);
+                        if (File.Exists(filePathSO)) {
+                            jsonStr = File.ReadAllText(filePathSO);
+                        }
+                        var savedSplittedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.SplittedOrdersClass>>(jsonStr);
 
-                            var savedSplittedOrders = JSON.fromJSON<Dictionary<string, lib.classes.AE.SplittedOrdersClass>>(jsonStr);
-                            var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
-                            if (SplittedOrders == null)
-                                throw new Exception("Result of doSplittingUpOrders is null.");
+                        var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
+                        if (SplittedOrders == null)
+                            throw new Exception("Result of doSplittingUpOrders is null.");
 
-                            if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
-                                if (CheckAndAddOrdersIn1C(ref SplittedOrders))
-                                    Base.Log("Processing orders in 1C is successful.");
-                                else
-                                    Base.Log("Some problems with processing orders in 1c!");
+                        if (CombineAbiePreSalesAndOrders(ref SplittedOrders)) {
+                            if (CheckAndAddOrdersIn1C(ref SplittedOrders))
+                                Base.Log("Processing orders in 1C is successful.");
+                            else
+                                Base.Log("Some problems with processing orders in 1c!");
 
-                                //save Splited Order List
-                                jsonStr = JSON.toJSON(SplittedOrders);
-                                File.WriteAllText(filePathSO + "_temp", jsonStr);
-                                if (File.Exists(filePathSO))
-                                    File.Delete(filePathSO);
-                                File.Move(filePathSO + "_temp", filePathSO);
-                            }
+                            //save Splited Order List
+                            jsonStr = JSON.toJSON(SplittedOrders);
+                            File.WriteAllText(filePathSO + "_temp", jsonStr);
+                            if (File.Exists(filePathSO))
+                                File.Delete(filePathSO);
+                            File.Move(filePathSO + "_temp", filePathSO);
                         }
                     }
                 }
@@ -650,7 +635,9 @@ namespace ae
             if (Directory.Exists(Base.OutboxDir)) {
                 try
                 {
-                    var yesterdayDT = DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+                    //var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                    //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                    var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
                     var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();

@@ -5,7 +5,6 @@ using System.Reflection;
 //using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
 using log4net;
-//using Newtonsoft.Json;
 
 //http ://stackify.com/log4net-guide-dotnet-logging/
 
@@ -26,6 +25,9 @@ namespace ae.lib
         public static Config Config = null;
         public static Scheduler Scheduler = null;
         //public static SQLiteDB SQLiteDB = null;
+
+        public static long OrderNumIndex = 611128000000000;
+
 
         public static void Init(string Logo="")
         {

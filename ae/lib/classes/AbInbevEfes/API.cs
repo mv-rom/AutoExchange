@@ -1,4 +1,8 @@
 ﻿using System;
+using System.IO;
+//using System.Collections.Generic;
+//using System.Globalization;
+//using System.Runtime.InteropServices.ComTypes;
 
 
 namespace ae.lib.classes.AbInbevEfes
@@ -25,7 +29,7 @@ namespace ae.lib.classes.AbInbevEfes
         private bool Init()
         {
             bool result = false;
-            int HttpClientTimeout = 30*1000;
+            int HttpClientTimeout = 2*60*1000;
             try
             {
                 this.Authorization_BaseUrl = "";
@@ -123,20 +127,49 @@ namespace ae.lib.classes.AbInbevEfes
             return result;
         }
 
+
+        public string PUTfromDump(string requestString) {
+            var dirPath = Base.BaseDir;
+
+            if (!string.IsNullOrEmpty(requestString) && Directory.Exists(dirPath)) {
+                var preSaleNo = JSON.fromJSON<PreSalesRequest>(requestString).preSaleNo;
+                string[] search = Directory.GetFiles(dirPath, "dump(response-packetPreSale)_*.json");
+
+                foreach (string filePath in search)
+                {
+                    using (StreamReader stream = new StreamReader(filePath))
+                    {
+                        string responseData = stream.ReadToEnd();
+                        var response = JSON.fromJSON<PreSalesResponse>(responseData);
+                        if (response.result != null &&
+                            !string.IsNullOrEmpty(preSaleNo) &&
+                            !string.IsNullOrEmpty(response.result.preSaleNo) &&
+                            string.Equals(preSaleNo, response.result.preSaleNo))
+                        {
+                            Base.OrderNumIndex++;
+                            response.result.orderNo = Base.OrderNumIndex;
+                            return JSON.toJSON(response);
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public PreSalesResponse getPreSales(Object packetPreSale)
         {
             try
             {
-                var rawJsonString = JSON.toJSON(packetPreSale);
-                Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(request-packetPreSale)_"+Base.NumberDateTime(DateTime.Now)+".json"), rawJsonString);
+                var requestString = JSON.toJSON(packetPreSale);
+                //Base.DumpToFile(Path.Combine(Base.BaseDir, "dump(request-getPreSales)_" + Base.NumberDateTime(DateTime.Now)+".json"), requestString);
 
-                string data = this.RAC.PUT("/api/PreSales", "", rawJsonString);
-                if (!String.IsNullOrEmpty(data)) {
-                    Base.DumpToFile(System.IO.Path.Combine(Base.BaseDir, "dump(response-packetPreSale)_" + Base.NumberDateTime(DateTime.Now) + ".json"), data);
-                    var res1 = JSON.fromJSON<PreSalesErrorAnswer>(data);
+                string responseString = this.PUTfromDump(requestString);
+                //string responseString = this.RAC.PUT("/api/PreSales", "", requestString);
+                //Base.DumpToFile(Path.Combine(Base.BaseDir, "dump(response-getPreSales)_" + Base.NumberDateTime(DateTime.Now) + ".json"), responseString);
+                if (!String.IsNullOrEmpty(responseString)) {
+                    var res1 = JSON.fromJSON<PreSalesErrorAnswer>(responseString);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
-                        var obj = JSON.fromJSON<PreSalesResponse>(data);
-                        return obj;
+                        return JSON.fromJSON<PreSalesResponse>(responseString);
                     }
                 }
             }

@@ -2,27 +2,27 @@
 using System.IO;
 using System.Text;
 //using System.Runtime.Remoting.Messaging;
-using System.Xml;
+//using System.Xml;
 using System.Xml.Serialization;
 
-//http s://www.newtonsoft.com/json/help/html/convertingjsonandxml.htm
-// convert xml to c# class - http s://xmltocsharp.azurewebsites.net/
-// http s://qna.habr.com/q/477557
+// https://www.newtonsoft.com/json/help/html/convertingjsonandxml.htm
+// convert xml to c# class - https://xmltocsharp.azurewebsites.net/
+// https://qna.habr.com/q/477557
 
 namespace ae.lib
 {
     internal class XML
     {
-        public static T ConvertXMLFileToClass<T>(string fromXmlFilePath)
+        public static T ConvertXMLFileToClass<T>(string filePath)
         {
             T res = default(T);
             try
             {
-                if (File.Exists(fromXmlFilePath)) {
+                if (File.Exists(filePath)) {
                     XmlSerializer formatter = new XmlSerializer(typeof(T));
-                    using (FileStream fs = new FileStream(fromXmlFilePath, FileMode.Open))
+                    using (FileStream reader = new FileStream(filePath, FileMode.Open))
                     {
-                        res = (T)formatter.Deserialize(fs);
+                        res = (T)formatter.Deserialize(reader);
                     }
                 }
             }
