@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Newtonsoft.Json;
 //using Newtonsoft.Json.Linq;
 //using Newtonsoft.Json.Schema;
@@ -17,10 +18,13 @@ namespace ae.lib
 {
     internal class JSON
     {
-        public static bool DumpToFile(object SourceObj, string FileNamePath)
+        public static bool DumpToFile(string dirPath, string fileName, object SourceObj)
         {
             bool result = false;
-            using (StreamWriter file = File.CreateText(Path.GetFullPath(FileNamePath)))
+            var index = Base.dumpIndex++;
+            var path =  Path.Combine(dirPath, "dump" + index + "_" + Base.NumberDateTime(DateTime.Now) + "_" + fileName);
+
+            using (StreamWriter file = File.CreateText(Path.GetFullPath(path)))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, SourceObj);

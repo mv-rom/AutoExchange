@@ -71,9 +71,8 @@ namespace ae_start
             var libName = arrName[0].Trim();
             var BaseDir = ((System.AppDomain)source).BaseDirectory;
 
-            var aa = AppDomain.CurrentDomain.GetAssemblies();
-
-            var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == libName).FirstOrDefault();
+            var CDas = AppDomain.CurrentDomain.GetAssemblies();
+            var loadedAssembly = CDas.Where(a => a.FullName == libName).FirstOrDefault();
             if (loadedAssembly != null) {
                 return loadedAssembly;
             }

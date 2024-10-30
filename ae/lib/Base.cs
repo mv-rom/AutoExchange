@@ -26,7 +26,7 @@ namespace ae.lib
         public static Scheduler Scheduler = null;
         //public static SQLiteDB SQLiteDB = null;
 
-        public static long OrderNumIndex = 611128000000000;
+        public static int dumpIndex = 0;
 
 
         public static void Init(string Logo="")
@@ -266,10 +266,13 @@ namespace ae.lib
             }
         }
 
-        public static bool DumpToFile(string FileNamePath, string strData)
+        public static bool DumpToFile(string dirPath, string fileName, string strData)
         {
             bool result = false;
-            using (StreamWriter file = File.CreateText(Path.GetFullPath(FileNamePath)))
+            var index = Base.dumpIndex++;
+            var path =  Path.Combine(dirPath, "dump"+index+"_"+ Base.NumberDateTime(DateTime.Now) +"_" + fileName);
+
+            using (StreamWriter file = File.CreateText(Path.GetFullPath(path)))
             {
                 file.WriteLine(strData);
                 result = true;

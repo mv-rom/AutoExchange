@@ -130,6 +130,7 @@ namespace ae.lib.classes.AbInbevEfes
 
         public string PUTfromDump(string requestString) {
             var dirPath = Base.BaseDir;
+            //long OrderNumIndex = 611128000000000;
 
             if (!string.IsNullOrEmpty(requestString) && Directory.Exists(dirPath)) {
                 var preSaleNo = JSON.fromJSON<PreSalesRequest>(requestString).preSaleNo;
@@ -146,8 +147,9 @@ namespace ae.lib.classes.AbInbevEfes
                             !string.IsNullOrEmpty(response.result.preSaleNo) &&
                             string.Equals(preSaleNo, response.result.preSaleNo))
                         {
-                            Base.OrderNumIndex++;
-                            response.result.orderNo = Base.OrderNumIndex;
+
+                            //OrderNumIndex++;
+                            //response.result.orderNo = OrderNumIndex;
                             return JSON.toJSON(response);
                         }
                     }
@@ -161,11 +163,12 @@ namespace ae.lib.classes.AbInbevEfes
             try
             {
                 var requestString = JSON.toJSON(packetPreSale);
-                //Base.DumpToFile(Path.Combine(Base.BaseDir, "dump(request-getPreSales)_" + Base.NumberDateTime(DateTime.Now)+".json"), requestString);
+                //Base.DumpToFile(Base.BaseDir, "(request-getPreSales).json", requestString);
 
                 string responseString = this.PUTfromDump(requestString);
                 //string responseString = this.RAC.PUT("/api/PreSales", "", requestString);
-                //Base.DumpToFile(Path.Combine(Base.BaseDir, "dump(response-getPreSales)_" + Base.NumberDateTime(DateTime.Now) + ".json"), responseString);
+                //Base.DumpToFile(Base.BaseDir, "(response-getPreSales).json", responseString);
+
                 if (!String.IsNullOrEmpty(responseString)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(responseString);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
