@@ -24,6 +24,6 @@ regsvr32 "C:\Program Files (x86)\1Cv77\BIN\zlibeng.dll"
 ### Follow these instructions to install the development code:
 ```
 git clone https://github.com/mv-rom/AutoExchange.git
-cd AutoExchange
+cd AutoExchange/src
 start compile.bat
 ```
