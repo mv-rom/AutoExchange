@@ -18,6 +18,7 @@ namespace ae.lib
         public static string RunDir = "";
         public static string BaseDir = "";
         public static string ArchivesDir = "";
+        public static string ServicesDir = "";
         public static string InboxDir = "";
         public static string OutboxDir = "";
         public static string torg_sklad = "";
@@ -63,10 +64,19 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
+            ServicesDir = Path.Combine(BaseDir, @"Services");
+            Log("ServicesDir: " + ServicesDir);
+            if (!MakeFolder(ServicesDir)) {
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchiServicesDirvesDir + "]";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
             ArchivesDir = Path.Combine(BaseDir, @"Archives");
             Log("ArchivesDir: " + ArchivesDir);
-            if (!MakeFolder(ArchivesDir)) {
-                string msg = "Error in Base.Init(): Проблема создания рабочих папок: [" + ArchivesDir + "]";
+            if (!MakeFolder(ArchivesDir))
+            {
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -77,7 +87,7 @@ namespace ae.lib
             Log("OutboxDir: " + OutboxDir);
 
             if (!MakeFolder(InboxDir) || !MakeFolder(OutboxDir)) {
-                string msg = "Error in Base.Init(): Проблема создания рабочих папок: [" + InboxDir + " | " + OutboxDir + "]";
+                string msg = "Error in Base.Init(): cann't create the folders: [" + InboxDir + " | " + OutboxDir + "]";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -222,7 +232,7 @@ namespace ae.lib
         public static void RotateArchives(string Dir, string Pattern, int Period)
         {
             Log("");
-            Log("Ротация файлов (шаблон: " + Pattern + ") в архивной папке [" + Dir + "]:");
+            Log("Rotatin of files (template: " + Pattern + ") in archives folder [" + Dir + "]:");
 
             if (Directory.Exists(Dir)) {
                 foreach (string f in Directory.GetFiles(Dir, Pattern))
