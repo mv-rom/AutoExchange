@@ -67,7 +67,7 @@ namespace ae.lib
             ServicesDir = Path.Combine(BaseDir, @"Services");
             Log("ServicesDir: " + ServicesDir);
             if (!MakeFolder(ServicesDir)) {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchiServicesDirvesDir + "]";
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ServicesDir + "]";
                 LogError(msg);
                 throw new Exception(msg);
             }

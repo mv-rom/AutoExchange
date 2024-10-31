@@ -17,6 +17,7 @@ Run/
 Archives/
 Inbox/
 OutBox/
+Services/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
