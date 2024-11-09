@@ -22,9 +22,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "reports1c", "reports1c\repo
 		{98764295-8032-410A-B34F-AB5DA1B4CC76} = {98764295-8032-410A-B34F-AB5DA1B4CC76}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{9B45CB62-FC8A-41B2-B9EE-088D4667836C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServiceReleases", "ServiceReleases", "{9B45CB62-FC8A-41B2-B9EE-088D4667836C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "services\Test\Test.csproj", "{9CD557AF-4A86-4B7E-96C1-9032FE33E978}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "service_releases\Test\Test.csproj", "{9CD557AF-4A86-4B7E-96C1-9032FE33E978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
