@@ -43,7 +43,6 @@
 		{ gln: "9864229616241", erdpou: "38316777", enable_order_response: 1, comment: "Alians Market" }
 	],
 	SchedulerSetting: {
-		data_file: "ae.scheduler",
 		tasks: [
 			{
 				start:		 "21:00, 22:00",

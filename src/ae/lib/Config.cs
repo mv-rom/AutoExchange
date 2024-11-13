@@ -5,7 +5,7 @@ using ae.lib.classes.AE;
 
 namespace ae.lib
 {
-    internal class Config
+    public class Config
     {
         private string FileName = "ae.jsonconfig";
         private string FilePath = "";

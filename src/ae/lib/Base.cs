@@ -11,7 +11,7 @@ using log4net;
 
 namespace ae.lib
 {
-    internal class Base
+    public class Base
     {
         public static ILog logger;
 
@@ -24,7 +24,7 @@ namespace ae.lib
         public static string torg_sklad = "";
 
         public static Config Config = null;
-        public static Scheduler Scheduler = null;
+        //private static Scheduler Scheduler = null;
         //public static SQLiteDB SQLiteDB = null;
 
         public static int dumpIndex = 0;

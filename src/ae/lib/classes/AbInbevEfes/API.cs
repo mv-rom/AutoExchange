@@ -163,11 +163,11 @@ namespace ae.lib.classes.AbInbevEfes
             try
             {
                 var requestString = JSON.toJSON(packetPreSale);
-                //Base.DumpToFile(Base.BaseDir, "(request-getPreSales).json", requestString);
+                Base.DumpToFile(Base.BaseDir, "(request-getPreSales).json", requestString);
 
-                string responseString = this.PUTfromDump(requestString);
-                //string responseString = this.RAC.PUT("/api/PreSales", "", requestString);
-                //Base.DumpToFile(Base.BaseDir, "(response-getPreSales).json", responseString);
+                //string responseString = this.PUTfromDump(requestString);
+                string responseString = this.RAC.PUT("/api/PreSales", "", requestString);
+                Base.DumpToFile(Base.BaseDir, "(response-getPreSales).json", responseString);
 
                 if (!String.IsNullOrEmpty(responseString)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(responseString);

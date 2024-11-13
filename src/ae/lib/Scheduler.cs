@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ae.lib
 {
-    internal class Scheduler
+    public class Scheduler
     {
         private static Scheduler Instance = null;
         private string DataFilePath = "";
@@ -209,13 +209,13 @@ namespace ae.lib
         }
     }
 
-    internal class SchedulerData
+    public class SchedulerData
     {
         public string Name { get; set; }
         public int lastRunTime { get; set; }
         public byte lastStatus { get; set; }
     }
-    internal class SchedulerTaskData
+    public class SchedulerTaskData
     {
         public string Start { get; set; }
         public string Name { get; set; }

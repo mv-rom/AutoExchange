@@ -232,13 +232,17 @@ namespace ae.lib
 
             var inst1C = _1C.getInstance();
             if (inst1C != null) {
+                var stringInput = XML.ConvertClassToXMLText(inputObjectClass);
                 if (inst1C.doReportFileInput(
                     Base.InboxDir,
-                    XML.ConvertClassToXMLText(inputObjectClass)
+                    stringInput
                 )) {
+                    Base.DumpToFile(Base.BaseDir, "(input-1C).xml", stringInput);
+
                     if (inst1C.runExternalReport(report1c_Name)) {
                         string stringOutput = "";
                         if (inst1C.doReportFileOutput(Base.InboxDir, out stringOutput)) {
+                            Base.DumpToFile(Base.BaseDir, "(output-1C).xml", stringOutput);
                             result = XML.ConvertXMLTextToClass<T>(stringOutput);
                         }
                     } else {

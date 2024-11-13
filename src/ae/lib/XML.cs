@@ -40,7 +40,6 @@ namespace ae.lib
             bool res = false;
             if (TextEncoding == null)
                 TextEncoding = Encoding.UTF8;
-
             try
             {
                 if (File.Exists(toXmlFilePath)) {
@@ -67,7 +66,7 @@ namespace ae.lib
         public static string ConvertClassToXMLText(object objectClass)
         {
             string result = "";
-            Encoding TextEncoding = Encoding.Default;
+            Encoding TextEncoding = Encoding.UTF8; //Encoding.Default;
             try
             {
                 Type objectType = objectClass.GetType();
@@ -88,8 +87,7 @@ namespace ae.lib
         public static T ConvertXMLTextToClass<T>(string objectClassXMLString)
         {
             T result = default(T);
-            Encoding TextEncoding = Encoding.Default;
-
+            Encoding TextEncoding = Encoding.UTF8; //Encoding.Default;
             if (objectClassXMLString.Length > 0) {
                 try
                 {

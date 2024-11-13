@@ -6,7 +6,7 @@ namespace ae.lib.classes.AE
 {
 #pragma warning disable CS0649
     [Serializable]
-    internal class ConfigClass
+    public class ConfigClass
     {
         public Dictionary<string, string> BaseSetting { get; set; }
         public Dictionary<string, string> FtpSetting { get; set; }
@@ -18,13 +18,13 @@ namespace ae.lib.classes.AE
     }
 
     [Serializable]
-    internal class SS
+    public class SS
     {
         public string data_file { get; set; }
         public List<SchedulerTaskData> tasks { get; set; }
     }
 
-    internal class CompaniesClass
+    public class CompaniesClass
     {
         public string gln  { get; set; }
         public string erdpou { get; set; }

@@ -21,9 +21,15 @@ regsvr32 "C:\Program Files (x86)\1Cv77\BIN\v7chart.dll"
 regsvr32 "C:\Program Files (x86)\1Cv77\BIN\zlibeng.dll"
 ```
 
-### Follow these instructions to install the development code:
+### Follow these instructions to compile the code:
 ```
 git clone https://github.com/mv-rom/AutoExchange.git
 cd AutoExchange/src
 start compile.bat
+```
+
+### Follow these instructions to run the code:
+```
+cd AutoExchange/Run
+ae_start.exe
 ```

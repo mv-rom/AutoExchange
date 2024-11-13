@@ -20,8 +20,8 @@ namespace ae
         {
             Base.Init();
 
-            //processInBox();
-            processOutBox();
+            processInBox();
+            //processOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();
@@ -567,21 +567,21 @@ namespace ae
         {
             int ResCount = 0;
             var dirPath = Base.InboxDir;
-            var fileJSON = "ae.json";
+            var fileJSON = "orders.json";
 
             if (Directory.Exists(dirPath)) {
                 try
                 {
-                    //var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
-                    //var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
-                    //if (ordersListFiltered != null && ordersListFiltered.Count > 0)
+                    var VchasnoAPI = lib.classes.VchasnoEDI.API.getInstance();
+                    var ordersListFiltered = getOrdersFromEDI(VchasnoAPI);
+                    if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
-                        var fp = Path.Combine(dirPath, "orders_" + fileJSON);
-                        if (!File.Exists(fp)) {
-                            throw new Exception("STOP");
-                        }
-                        var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
-                        //JSON.DumpToFile(dirPath, "orders_" + fileJSON, ordersListFiltered);
+                        var fp = Path.Combine(dirPath, fileJSON);
+                        //if (!File.Exists(fp)) {
+                        //    throw new Exception("STOP");
+                        //}
+                        //var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
+                        JSON.DumpToFile(dirPath, fileJSON, ordersListFiltered);
                         //throw new Exception("STOP");
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
@@ -593,7 +593,7 @@ namespace ae
                             throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
                         string jsonStr = "";
-                        var filePathSO = Path.Combine(dirPath, fileJSON);
+                        var filePathSO = Path.Combine(dirPath, "splitted_"+fileJSON);
                         if (File.Exists(filePathSO)) {
                             jsonStr = File.ReadAllText(filePathSO);
                         }
