@@ -99,12 +99,12 @@ namespace ae.lib
                                 lastStatus = (byte)RunAction(t.Action);
                             else
                                 Base.Log1("\\__ не выполнена! Поле action - не найдено!");
-
+/*
                             if (lastStatus == 1 && t.PosAction.Length > 0)
                                 lastStatus = (byte)RunAction(t.PosAction);
                             else
                                 Base.Log1("\\__ не выполнена! Поле post_action - не найдено!");
-
+*/
                             this.setData(t.Name, lastRunTime, lastStatus);
                         }
                         else

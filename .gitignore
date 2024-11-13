@@ -15,9 +15,10 @@
 ae.jsonconfig
 Run/
 Archives/
-Inbox/
-OutBox/
+Inbox/*
+OutBox/*
 Services/
+dump*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

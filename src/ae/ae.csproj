@@ -88,18 +88,20 @@
     <Compile Include="lib\Action.cs" />
     <Compile Include="lib\Arguments.cs" />
     <Compile Include="lib\Base.cs" />
-    <Compile Include="lib\classes\AbInbevEfes\API.cs" />
-    <Compile Include="lib\classes\AbInbevEfes\Authorization.cs" />
-    <Compile Include="lib\classes\AbInbevEfes\Logs.cs" />
-    <Compile Include="lib\classes\AbInbevEfes\PreSales.cs" />
-    <Compile Include="lib\classes\AE\SplittedOrdersClass.cs" />
-    <Compile Include="lib\classes\Base1C\style1C.cs" />
-    <Compile Include="lib\classes\AE\ConfigClass.cs" />
-    <Compile Include="lib\classes\Base1C\InputOutput_XML.cs" />
-    <Compile Include="lib\classes\VchasnoEDI\API.cs" />
-    <Compile Include="lib\classes\VchasnoEDI\ORDRSP_XML.cs" />
-    <Compile Include="lib\classes\VchasnoEDI\DESADV_XML.cs" />
-    <Compile Include="lib\classes\VchasnoEDI\Order.cs" />
+    <Compile Include="lib\Service.cs" />
+    <Compile Include="services\EDI\structure\ConfigClass.cs" />
+    <Compile Include="services\EDI\tools\AbInbevEfes\API.cs" />
+    <Compile Include="services\EDI\tools\AbInbevEfes\structure\Authorization.cs" />
+    <Compile Include="services\EDI\tools\AbInbevEfes\structure\Logs.cs" />
+    <Compile Include="services\EDI\tools\AbInbevEfes\structure\PreSales.cs" />
+    <Compile Include="services\EDI\structure\SplittedOrdersClass.cs" />
+    <Compile Include="services\EDI\structure\_1C\style1C.cs" />
+    <Compile Include="lib\structure\ConfigClass.cs" />
+    <Compile Include="services\EDI\structure\_1C\InputOutput_XML.cs" />
+    <Compile Include="services\EDI\tools\VchasnoEDI\API.cs" />
+    <Compile Include="services\EDI\tools\VchasnoEDI\structure\ORDRSP_XML.cs" />
+    <Compile Include="services\EDI\tools\VchasnoEDI\structure\DESADV_XML.cs" />
+    <Compile Include="services\EDI\tools\VchasnoEDI\structure\Order.cs" />
     <Compile Include="lib\Config.cs" />
     <Compile Include="lib\JSON.cs" />
     <Compile Include="lib\RestApiClient.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="lib\ZIP.cs" />
     <Compile Include="dllProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="services\EDI\EDI.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -119,9 +122,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <!-- other property settings -->
