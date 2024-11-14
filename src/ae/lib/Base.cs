@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+
 //using System.Runtime.CompilerServices;
 //using System.Text.RegularExpressions;
 //using System.Threading.Tasks;
@@ -18,6 +21,7 @@ namespace ae.lib
 
         public static string RunDir = "";
         public static string BaseDir = "";
+        public static string ServicesDir = "";
         public static string ArchivesDir = "";
         public static string torg_sklad = "";
 
@@ -49,7 +53,35 @@ namespace ae.lib
             Log("BaseDir: " + BaseDir);
             Directory.SetCurrentDirectory(RunDir);
 
+            ArchivesDir = Path.Combine(BaseDir, @"Archives");
+            Log("ArchivesDir: " + ArchivesDir);
+            if (!MakeFolder(ArchivesDir)) {
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
+            ServicesDir = Path.Combine(BaseDir, @"Services");
+            if (!Base.MakeFolder(ServicesDir)) {
+                string msg = "Error in Service.Init(): cann't create a folder: [" + ServicesDir + "]";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+            Base.Log("ServicesDir: " + ServicesDir);
+
             //Load Services list from namespace
+            string searchPatten = @"ae\.services\.(\w+)\..*";
+            Regex r = new Regex(searchPatten, RegexOptions.IgnoreCase);
+
+            var asmList = AppDomain.CurrentDomain.GetAssemblies();
+            var asm = asmList.SingleOrDefault(assembly => assembly.GetName().Name == "ae.services");
+            foreach(var t in asm.GetTypes()) {
+                var m = r.Match(t.Namespace);
+                if (m.Success) {
+                    var theServiceName = m.Groups[1].Value;
+                    Services[theServiceName] = new Service(theServiceName, t.Namespace);
+                }
+            }
 
             Config = new Config();
             //Add Services ConfigClass to Config
@@ -65,14 +97,7 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
-            ArchivesDir = Path.Combine(BaseDir, @"Archives");
-            Log("ArchivesDir: " + ArchivesDir);
-            if (!MakeFolder(ArchivesDir))
-            {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]";
-                LogError(msg);
-                throw new Exception(msg);
-            }
+
 
             //SQLiteDB = SQLiteDB.getInstance();
             Log("Base.Init() is complete with success.");

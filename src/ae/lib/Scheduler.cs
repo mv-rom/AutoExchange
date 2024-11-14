@@ -39,7 +39,9 @@ namespace ae.lib
             this.data = new List<SchedulerData>();
             foreach (var t in Base.Config.ConfigSettings.SchedulerSetting.tasks)
             {
-                this.tasks.Add(t);
+                if (t.Service.Length>0 && t.Action.Length > 0) {
+                    this.tasks.Add(t);
+                }
             }
 
             return result;
@@ -85,29 +87,30 @@ namespace ae.lib
                 this.loadData();
                 foreach(var t in this.tasks)
                 {
-                    Base.Log1("|--> задача [" + t.Name + "]:");
-                    SchedulerData taskData = this.getData(t.Name);
+                    string Name = t.Service + "_" + t.Action;
+                    Base.Log1("|--> задача [" + Name + "]:");
+
+                    SchedulerData taskData = this.getData(Name);
                     if (taskData != null) {
                         int lastRunTime = taskData.lastRunTime;
                         byte lastStatus = taskData.lastStatus;
 
                         var stc = new SchedulerTask();
-                        if (lastStatus == 0 || stc.checkStartTime(t.Start, lastRunTime)) {
+                        if (lastStatus == 0 || stc.checkStartTime(t.StartTime, lastRunTime)) {
                             lastRunTime = (int)Base.getCurentUnixDateTime();
 
                             if (t.Action.Length > 0)
                                 lastStatus = (byte)RunAction(t.Action);
                             else
                                 Base.Log1("\\__ не выполнена! Поле action - не найдено!");
-/*
-                            if (lastStatus == 1 && t.PosAction.Length > 0)
-                                lastStatus = (byte)RunAction(t.PosAction);
-                            else
-                                Base.Log1("\\__ не выполнена! Поле post_action - не найдено!");
-*/
-                            this.setData(t.Name, lastRunTime, lastStatus);
-                        }
-                        else
+                            /*
+                                                        if (lastStatus == 1 && t.PosAction.Length > 0)
+                                                            lastStatus = (byte)RunAction(t.PosAction);
+                                                        else
+                                                            Base.Log1("\\__ не выполнена! Поле post_action - не найдено!");
+                            */
+                            this.setData(Name, lastRunTime, lastStatus);
+                        } else
                             Base.Log1("\\__ пропущена..");
                         Base.Log1("");
                     }

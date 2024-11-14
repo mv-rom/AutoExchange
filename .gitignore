@@ -17,7 +17,7 @@ Run/
 Archives/
 Inbox/*
 OutBox/*
-Services/
+/Services/
 dump*
 
 # User-specific files (MonoDevelop/Xamarin Studio)

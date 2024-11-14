@@ -28,7 +28,7 @@ namespace ae.lib
 
         private object instance1C = null;
         private Type   type1C = null;
-        private string WorkDir = "";
+        //private string WorkDir = "";
         private string ReportDirPath = "";
         private string LogFileName = "log_1c.txt";
         private string LogFilePath = "";
@@ -39,13 +39,13 @@ namespace ae.lib
         {
             this.type1C = null;
             this.instance1C = null;
-            this.WorkDir = Base.InboxDir;
+            //this.WorkDir = Base.InboxDir;
 
             if (!Base.Config.ConfigSettings.App1cSetting.TryGetValue("report_dir", out this.ReportDirPath)) {
                 this.ReportDirPath = @"reports1c\";
             }
             this.ReportDirPath = Path.Combine(Base.RunDir, this.ReportDirPath);
-            this.LogFilePath = Path.Combine(this.WorkDir, this.LogFileName);
+            //this.LogFilePath = Path.Combine(this.WorkDir, this.LogFileName);
         }
 
         public static _1C getInstance()
@@ -137,7 +137,7 @@ namespace ae.lib
             return this.runInvokeMethod("EvalExpr", new object[] { valString });
         }
 
-        public bool runExternalReport(string Name)
+        public bool runExternalReport(string workDir, string Name)
         {
             bool result = false;
 
@@ -147,7 +147,7 @@ namespace ae.lib
 
             var param = new object[] {
                 @"Отчет",
-                this.torg_sklad + ";" + this.WorkDir,
+                this.torg_sklad + ";" + workDir,
                 Path.Combine(this.ReportDirPath, Name+".ert")
             };
             Base.Log1("| Параметры запуска отчета:");
@@ -226,7 +226,7 @@ namespace ae.lib
             return result;
         }
 
-        public static T runReportProcessingData<T>(string report1c_Name, T inputObjectClass)
+        public static T runReportProcessingData<T>(string workDir, string report1c_Name, T inputObjectClass)
         {
             var result = default(T);
 
@@ -234,14 +234,14 @@ namespace ae.lib
             if (inst1C != null) {
                 var stringInput = XML.ConvertClassToXMLText(inputObjectClass);
                 if (inst1C.doReportFileInput(
-                    Base.InboxDir,
+                    workDir,
                     stringInput
                 )) {
                     Base.DumpToFile(Base.BaseDir, "(input-1C).xml", stringInput);
 
-                    if (inst1C.runExternalReport(report1c_Name)) {
+                    if (inst1C.runExternalReport(workDir, report1c_Name)) {
                         string stringOutput = "";
-                        if (inst1C.doReportFileOutput(Base.InboxDir, out stringOutput)) {
+                        if (inst1C.doReportFileOutput(workDir, out stringOutput)) {
                             Base.DumpToFile(Base.BaseDir, "(output-1C).xml", stringOutput);
                             result = XML.ConvertXMLTextToClass<T>(stringOutput);
                         }

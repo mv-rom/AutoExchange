@@ -2,7 +2,7 @@
 
 rem set name=%~n0
 set ProjectDirPath=%~dp0
-set ProjectName=AE
+set ProjectName=AutoExchange
 set DotnetPath=C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319
 set RefAssemPath=%ProjectDirPath%\libframework
 
