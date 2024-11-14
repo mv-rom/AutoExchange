@@ -217,11 +217,11 @@ namespace ae.lib
     }
     public class SchedulerTaskData
     {
-        public string Start { get; set; }
-        public string Name { get; set; }
-        public string Report { get; set; }
+        public string StartTime { get; set; }
+        public string StartNumDayOfWeek { get; set; }
+        public string Service { get; set; }
         public string Action { get; set; }
-        public string PosAction { get; set; }
+        public string Extra { get; set; }
     }
 
 

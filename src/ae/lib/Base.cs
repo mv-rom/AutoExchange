@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 //using System.Runtime.CompilerServices;
@@ -18,12 +19,10 @@ namespace ae.lib
         public static string RunDir = "";
         public static string BaseDir = "";
         public static string ArchivesDir = "";
-        public static string ServicesDir = "";
-        public static string InboxDir = "";
-        public static string OutboxDir = "";
         public static string torg_sklad = "";
 
         public static Config Config = null;
+        public static Dictionary<string, Service> Services;
         //private static Scheduler Scheduler = null;
         //public static SQLiteDB SQLiteDB = null;
 
@@ -46,28 +45,22 @@ namespace ae.lib
             //RunDir =  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             BaseDir = Path.Combine(RunDir, @"..\");
             Log("----------------------------");
-            Log("RunDir: " + RunDir);
+            Log("RunDir: " +  RunDir);
             Log("BaseDir: " + BaseDir);
             Directory.SetCurrentDirectory(RunDir);
 
+            //Load Services list from namespace
+
             Config = new Config();
+            //Add Services ConfigClass to Config
             if (!Config.Init()) {
                 string msg = "Error in Base.Init(): Problem with init settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);
             }
 
-
             if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad)) {
                 string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
-                LogError(msg);
-                throw new Exception(msg);
-            }
-
-            ServicesDir = Path.Combine(BaseDir, @"Services");
-            Log("ServicesDir: " + ServicesDir);
-            if (!MakeFolder(ServicesDir)) {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ServicesDir + "]";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -77,17 +70,6 @@ namespace ae.lib
             if (!MakeFolder(ArchivesDir))
             {
                 string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]";
-                LogError(msg);
-                throw new Exception(msg);
-            }
-
-            InboxDir = Path.Combine(BaseDir, @"InboxDir");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
-            OutboxDir = Path.Combine(BaseDir, @"OutboxDir"); ; // Config.base_setting.OutboxDir;
-            Log("InboxDir: " + InboxDir);
-            Log("OutboxDir: " + OutboxDir);
-
-            if (!MakeFolder(InboxDir) || !MakeFolder(OutboxDir)) {
-                string msg = "Error in Base.Init(): cann't create the folders: [" + InboxDir + " | " + OutboxDir + "]";
                 LogError(msg);
                 throw new Exception(msg);
             }

@@ -6,14 +6,18 @@ using ae.lib.structure;
 
 namespace ae.lib
 {
-    internal class Service
+    public class Service
     {
         private static Service Instance = null;
-        private string DirName = "Service";
+        private string DirName = "Services";
         private string DirPath = "";
+
+        public static string InboxDir = "";
+        public static string OutboxDir = "";
 
         public Service() {
             DirPath = Path.Combine(Base.BaseDir, DirName);
+
         }
 
         public static Service getInstance()
@@ -29,12 +33,25 @@ namespace ae.lib
         public bool Init()
         {
             bool result = false;
-            if (Base.MakeFolder(DirPath)) {
-                Base.Log("Service directory - [" + this.DirPath + "].");
-                result = true;
-            } else
-                Base.Log("Service directory isn't found!");
-            return result;
+            if (!Base.MakeFolder(DirPath)) {
+                string msg = "Error in Service.Init(): cann't create a folder: [" + DirPath + "]";
+                Base.LogError(msg);
+                return false;
+            }
+            Base.Log("ServicesDir: " + this.DirPath);
+
+            InboxDir = Path.Combine(Base.BaseDir, @"InboxDir");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
+            OutboxDir = Path.Combine(Base.BaseDir, @"OutboxDir"); ; // Config.base_setting.OutboxDir;
+            Base.Log("InboxDir: " + InboxDir);
+            Base.Log("OutboxDir: " + OutboxDir);
+
+            if (!Base.MakeFolder(InboxDir) || !Base.MakeFolder(OutboxDir)) {
+                string msg = "Error in Base.Init(): cann't create the folders: [" + InboxDir + " | " + OutboxDir + "]";
+                Base.LogError(msg);
+                throw new Exception(msg);
+            }
+
+            return true;
         }
 
         public void DeInit()
