@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using ae.lib;
-using ae.services.EDI;
 
 
 
@@ -14,8 +13,9 @@ namespace ae
         {
             Base.Init();
 
-            //EDI.actionInBox();
-            //EDI.actionOutBox();
+            var edi = (services.EDI.EDI)Base.Services["EDI"];
+            edi?.actionInBox();
+            //edi?.actionOutBox();
 
             /*
                 Base.Scheduler = Scheduler.getInstance();

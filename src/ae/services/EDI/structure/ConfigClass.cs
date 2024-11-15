@@ -1,5 +1,4 @@
-﻿using ae.lib.structure;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 
@@ -23,7 +22,7 @@ namespace ae.services.EDI.structure
 
 
     [Serializable]
-    public class ConfigClass : BasicConfigClass
+    public class ConfigClass
     {
         public Dictionary<string, string> FtpSetting { get; set; }
         public Dictionary<string, string> AbInbevEfes_ApiSetting { get; set; }

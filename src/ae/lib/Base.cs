@@ -4,11 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-
 //using System.Runtime.CompilerServices;
 using log4net;
-
 //http ://stackify.com/log4net-guide-dotnet-logging/
+
 
 
 namespace ae.lib
@@ -56,6 +55,20 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
+            Base.Config = new Config();
+            if (!Base.Config.Init()) {
+                string msg = "Error in Base.Init(): Problem with init settings of configuration!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
+            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad))
+            {
+                string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
             ServicesDir = Path.Combine(BaseDir, @"Services");
             Log("ServicesDir: " + ServicesDir);
             if (!Base.MakeFolder(ServicesDir)) {
@@ -87,19 +100,6 @@ namespace ae.lib
                 }
             }
 
-            Base.Config = new Config();
-            //TODO: Add Services ConfigClass to Config
-            if (!Base.Config.Init()) {
-                string msg = "Error in Base.Init(): Problem with init settings of configuration!";
-                LogError(msg);
-                throw new Exception(msg);
-            }
-
-            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad)) {
-                string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
-                LogError(msg);
-                throw new Exception(msg);
-            }
             Log("Base.Init() is complete with success.");
         }
 

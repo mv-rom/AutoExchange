@@ -5,17 +5,19 @@ using System.Collections.Generic;
 
 namespace ae.lib.structure
 {
-    public class BasicConfigClass {
-        //Used to determine belonging to basic config class
+    [Serializable]
+    public class ServicesList
+    {
+        public services.EDI.structure.ConfigClass EDI { get; set; }
     }
 
-    //#pragma warning disable CS0649
+//#pragma warning disable CS0649
     [Serializable]
-    public class ConfigClass : BasicConfigClass
+    public class ConfigClass
     {
         public Dictionary<string, string> BaseSetting { get; set; }
         public Dictionary<string, string> App1cSetting { get; set; }
-        public Dictionary<string, string> Services { get; set; }
+        public ServicesList Services { get; set; }
         public SS SchedulerSetting { get; set; }
     }
 

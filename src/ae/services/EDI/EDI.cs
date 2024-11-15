@@ -19,7 +19,7 @@ namespace ae.services.EDI
         {
         }
 
-        private static List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
+        private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
             var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
@@ -59,7 +59,7 @@ namespace ae.services.EDI
             return result;
         }
 
-        private static List<structure._1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<tools.VchasnoEDI.structure.Order> source)
+        private List<structure._1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<tools.VchasnoEDI.structure.Order> source)
         {
             string gln = "";
             if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
@@ -151,7 +151,7 @@ namespace ae.services.EDI
             return null;
         }
 
-        private static List<structure._1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
+        private List<structure._1C.ProductProfiles_Group> getProductProfilesOfTTfrom1C(
             List<tools.VchasnoEDI.structure.Order> source,
             List<structure._1C.TTbyGLN_Item> listTT
         )
@@ -316,7 +316,7 @@ namespace ae.services.EDI
             return null;
         }
 
-        private static Dictionary<string, structure.SplittedOrdersClass> doSplittingUpOrders(
+        private Dictionary<string, structure.SplittedOrdersClass> doSplittingUpOrders(
             List<tools.VchasnoEDI.structure.Order> Orders,
             List<structure._1C.ProductProfiles_Group> groupPP,
             Dictionary<string, structure.SplittedOrdersClass> splittedOrders
@@ -403,7 +403,7 @@ namespace ae.services.EDI
             return (dictSO.Count > 0) ? dictSO : null;
         }
 
-        private static bool CombineAbiePreSalesAndOrders(ref Dictionary<string, structure.SplittedOrdersClass> source)
+        private bool CombineAbiePreSalesAndOrders(ref Dictionary<string, structure.SplittedOrdersClass> source)
         {
             string warehouse_code = "";
             if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("warehouse_code", out warehouse_code))
@@ -498,7 +498,7 @@ namespace ae.services.EDI
         }
 
 
-        private static bool CheckAndAddOrdersIn1C(
+        private bool CheckAndAddOrdersIn1C(
             ref Dictionary<string, structure.SplittedOrdersClass> source
         )
         {
@@ -579,7 +579,7 @@ namespace ae.services.EDI
 
 
 
-        public static void actionInBox()
+        public void actionInBox()
         {
             int ResCount = 0;
             var fileJSON = "orders.json";
@@ -653,7 +653,7 @@ namespace ae.services.EDI
             Base.Log("ResCount: " + ResCount);
         }
 
-        public static void actionOutBox()
+        public void actionOutBox()
         {
             int ResCount = 0;
             var dirPath = Path.Combine(Base.ServicesDir, "EDI/OutBox");
