@@ -23,15 +23,15 @@ namespace ae.services.EDI.tools.VchasnoEDI
             try
             {
                 BaseUrl = "";
-                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("url", out BaseUrl))
-                    return false;
+//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("url", out BaseUrl))
+//                    return false;
 
                 Authorization = "";
-                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("authorization", out Authorization))
-                    return false;
+//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("authorization", out Authorization))
+//                    return false;
 
-                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("content_type", out ContentType))
-                    ContentType = "application/json";
+//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("content_type", out ContentType))
+//                    ContentType = "application/json";
 
                 this.RAC = new RestApiClient();
                 this.RAC.Init(BaseUrl, Authorization, ContentType);

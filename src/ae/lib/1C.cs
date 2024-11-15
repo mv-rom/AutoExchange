@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml.XPath;
 
 //https://forum.infostart.ru/forum9/topic83477/
 //https://forum.infostart.ru/forum9/topic148614/

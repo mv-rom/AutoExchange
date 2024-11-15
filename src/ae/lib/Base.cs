@@ -6,8 +6,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 //using System.Runtime.CompilerServices;
-//using System.Text.RegularExpressions;
-//using System.Threading.Tasks;
 using log4net;
 
 //http ://stackify.com/log4net-guide-dotnet-logging/
@@ -27,9 +25,6 @@ namespace ae.lib
 
         public static Config Config = null;
         public static Dictionary<string, Service> Services;
-        //private static Scheduler Scheduler = null;
-        //public static SQLiteDB SQLiteDB = null;
-
         public static int dumpIndex = 0;
 
 
@@ -56,36 +51,45 @@ namespace ae.lib
             ArchivesDir = Path.Combine(BaseDir, @"Archives");
             Log("ArchivesDir: " + ArchivesDir);
             if (!MakeFolder(ArchivesDir)) {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]";
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]!";
                 LogError(msg);
                 throw new Exception(msg);
             }
 
             ServicesDir = Path.Combine(BaseDir, @"Services");
+            Log("ServicesDir: " + ServicesDir);
             if (!Base.MakeFolder(ServicesDir)) {
-                string msg = "Error in Service.Init(): cann't create a folder: [" + ServicesDir + "]";
+                string msg = "Error in Base.Init(): cann't create a folder: [" + ServicesDir + "]!";
                 LogError(msg);
                 throw new Exception(msg);
             }
-            Base.Log("ServicesDir: " + ServicesDir);
 
-            //Load Services list from namespace
-            string searchPatten = @"ae\.services\.(\w+)\..*";
+            //Load Services usig Namespace of CurrentDomain
+            string searchPatten = @"ae\.services\.(\w+)";
             Regex r = new Regex(searchPatten, RegexOptions.IgnoreCase);
 
             var asmList = AppDomain.CurrentDomain.GetAssemblies();
-            var asm = asmList.SingleOrDefault(assembly => assembly.GetName().Name == "ae.services");
-            foreach(var t in asm.GetTypes()) {
+            var asm = asmList.SingleOrDefault(assembly => assembly.GetName().Name == "ae");
+            if (asm == null) {
+                string msg = "Error in Base.Init(): cann't found [ae] assembly!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
+            Services = new Dictionary<string, Service>();
+            foreach (var t in asm.GetTypes()) {
                 var m = r.Match(t.Namespace);
-                if (m.Success) {
+                if (m.Success && t.BaseType == typeof(Service) && t.GetConstructors().Length>0) {
                     var theServiceName = m.Groups[1].Value;
-                    Services[theServiceName] = new Service(theServiceName, t.Namespace);
+                    var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
+                    serviceInstance.Init();
+                    Services[theServiceName] = serviceInstance;
                 }
             }
 
-            Config = new Config();
-            //Add Services ConfigClass to Config
-            if (!Config.Init()) {
+            Base.Config = new Config();
+            //TODO: Add Services ConfigClass to Config
+            if (!Base.Config.Init()) {
                 string msg = "Error in Base.Init(): Problem with init settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);
@@ -96,19 +100,10 @@ namespace ae.lib
                 LogError(msg);
                 throw new Exception(msg);
             }
-
-
-
-            //SQLiteDB = SQLiteDB.getInstance();
             Log("Base.Init() is complete with success.");
         }
 
         public static void deInit() {
-            /*
-            if (SQLiteDB != null) {
-                SQLiteDB.DeInit();
-            }
-            */
             Base.logger.Logger.Repository.Shutdown();
         }
 

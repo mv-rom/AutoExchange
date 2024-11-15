@@ -15,7 +15,7 @@ namespace ae.services.EDI
         private static string WorkDir = "";
         public structure.ConfigClass config;
 
-        public EDI(string theServiceName, string theServiceNamespace) : base(theServiceName, theServiceNamespace)
+        public EDI(string theServiceName) : base(theServiceName)
         {
         }
 
@@ -695,11 +695,11 @@ namespace ae.services.EDI
                             var DirName = new DirectoryInfo(dPath).Name;
 
                             //filter by company gln
-                            var Company = this.config.Companies.FirstOrDefault(x => x.erdpou == DirName);
+/*                            var Company = this.config.Companies.FirstOrDefault(x => x.erdpou == DirName);
                             if (Company != null) {
                                 var gln = Company.gln;
                             }
-                            //var ORDRSP = 1;
+ */                           //var ORDRSP = 1;
 
                             var xmlFilesList = Directory.GetFiles(dPath);
                             foreach (var file in xmlFilesList)
@@ -754,11 +754,11 @@ namespace ae.services.EDI
                                 }
                             }
 
-                            if (Company != null)
+/*                            if (Company != null)
                             {
                                 //ORDRSP
                             }
-                        }
+*/                        }
                     }
                 }
                 catch (Exception ex)

@@ -33,19 +33,19 @@ namespace ae.services.EDI.tools.AbInbevEfes
             try
             {
                 this.Authorization_BaseUrl = "";
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_url", out this.Authorization_BaseUrl))
-                    return false;
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_url", out this.Authorization_BaseUrl))
+//                    return false;
 
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_content_type", out this.Authorization_ContentType))
-                    this.Authorization_ContentType = "application/json";
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_content_type", out this.Authorization_ContentType))
+//                    this.Authorization_ContentType = "application/json";
 
                 this.Authorization_Username = "";
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_username", out this.Authorization_Username))
-                    return false;
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_username", out this.Authorization_Username))
+//                    return false;
 
                 this.Authorization_Password = "";
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_password", out this.Authorization_Password))
-                    return false;
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("authorization_password", out this.Authorization_Password))
+//                    return false;
                 this.Authorization_Answer_Expires_in = 0;
                 this.Authorization_Answer_StartDate = default(DateTime);
 
@@ -54,11 +54,11 @@ namespace ae.services.EDI.tools.AbInbevEfes
 
 
                 this.Data_BaseUrl = "";
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_base_url", out this.Data_BaseUrl))
-                    return false;
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_base_url", out this.Data_BaseUrl))
+//                    return false;
 
-                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_content_type", out this.Data_ContentType))
-                    this.Data_ContentType = "application/json";
+//                if (!Base.Config.ConfigSettings.AbInbevEfes_ApiSetting.TryGetValue("data_content_type", out this.Data_ContentType))
+//                    this.Data_ContentType = "application/json";
 
                 this.RAC = null;
                 if (this.getAccessToken()) {

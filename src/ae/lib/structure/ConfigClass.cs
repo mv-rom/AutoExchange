@@ -5,9 +5,13 @@ using System.Collections.Generic;
 
 namespace ae.lib.structure
 {
-#pragma warning disable CS0649
+    public class BasicConfigClass {
+        //Used to determine belonging to basic config class
+    }
+
+    //#pragma warning disable CS0649
     [Serializable]
-    public class ConfigClass
+    public class ConfigClass : BasicConfigClass
     {
         public Dictionary<string, string> BaseSetting { get; set; }
         public Dictionary<string, string> App1cSetting { get; set; }
@@ -21,5 +25,5 @@ namespace ae.lib.structure
         public string data_file { get; set; }
         public List<SchedulerTaskData> tasks { get; set; }
     }
-#pragma warning restore CS0649
+//#pragma warning restore CS0649
 }

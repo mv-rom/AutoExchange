@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using ae.lib.structure;
 
 
 
@@ -11,19 +10,24 @@ namespace ae.lib
     {
         private string ServiceName = "";
         private string ServiceDirPath = "";
-        private string ServiceNamepsace = "";
         public string InboxDir = "";
         public string OutboxDir = "";
 
-        public Service(string theServiceName, string theServiceNamespace) {
+        public Service(string theServiceName) {
             this.ServiceName = theServiceName;
-            this.ServiceNamepsace = theServiceNamespace;
             this.ServiceDirPath = Path.Combine(Base.ServicesDir, theServiceName);
         }
 
         public bool Init()
         {
-            //var n = new AssemblyName(this.ServiceNamepsace);
+
+            Base.Log("Init service ["+ this.ServiceName + "] with directory " + this.ServiceDirPath);
+            if (!Base.MakeFolder(this.ServiceDirPath))
+            {
+                string msg = "Error in Service.Init(): cann't create a folder: [" + this.ServiceDirPath + "]!";
+                Base.LogError(msg);
+                throw new Exception(msg);
+            }
 
             this.InboxDir = Path.Combine(this.ServiceDirPath, @"InboxDir");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
             this.OutboxDir = Path.Combine(this.ServiceDirPath, @"OutboxDir"); ; // Config.base_setting.OutboxDir;
