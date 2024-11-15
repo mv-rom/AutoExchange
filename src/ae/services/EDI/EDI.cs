@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,11 +13,12 @@ namespace ae.services.EDI
 {
     public class EDI : ae.lib.Service
     {
-        private static string WorkDir = "";
+        private string WorkDir = "";
         public structure.ConfigClass config;
 
         public EDI(string theServiceName) : base(theServiceName)
         {
+            this.config = Base.Config.ConfigSettings.Services.EDI;
         }
 
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
@@ -586,7 +588,7 @@ namespace ae.services.EDI
             var dirPath = Path.Combine(Base.ServicesDir, "EDI/InBox");
             if (Directory.Exists(dirPath))
             {
-                WorkDir = dirPath;
+                this.WorkDir = dirPath;
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance();
@@ -659,7 +661,7 @@ namespace ae.services.EDI
             var dirPath = Path.Combine(Base.ServicesDir, "EDI/OutBox");
             if (Directory.Exists(dirPath))
             {
-                WorkDir = dirPath;
+                this.WorkDir = dirPath;
                 try
                 {
                     var yesterdayDT = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd");
@@ -667,7 +669,7 @@ namespace ae.services.EDI
                     //var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
-                    var VchasnoAPI = tools.VchasnoEDI.API.getInstance();
+                    var VchasnoAPI = tools.VchasnoEDI.API.getInstance(); //this.config.VchasnoEDI_ApiSetting
                     var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
                     if (ordersList == null || ordersList.Count() <= 0)
                         goto __exit;

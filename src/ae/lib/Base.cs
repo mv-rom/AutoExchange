@@ -94,9 +94,13 @@ namespace ae.lib
                 var m = r.Match(t.Namespace);
                 if (m.Success && t.BaseType == typeof(Service) && t.GetConstructors().Length>0) {
                     var theServiceName = m.Groups[1].Value;
-                    var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
-                    serviceInstance.Init();
-                    Services[theServiceName] = serviceInstance;
+                    var cServs = Config.ConfigSettings.Services;
+                    var cc = cServs.GetType().GetMembers().Where(mem => (mem.Name == theServiceName)).ToList();
+                    if (cc.Count > 0) {
+                        var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
+                        serviceInstance.Init();
+                        Services[theServiceName] = serviceInstance;
+                    }
                 }
             }
 
