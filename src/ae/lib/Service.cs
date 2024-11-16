@@ -24,18 +24,18 @@ namespace ae.lib
             Base.Log("Init service ["+ this.ServiceName + "] with directory " + this.ServiceDirPath);
             if (!Base.MakeFolder(this.ServiceDirPath))
             {
-                string msg = "Error in Service.Init(): cann't create a folder: [" + this.ServiceDirPath + "]!";
+                string msg = "Error in Service.Init(): cann't create a directory: [" + this.ServiceDirPath + "]!";
                 Base.LogError(msg);
                 throw new Exception(msg);
             }
 
-            this.InboxDir = Path.Combine(this.ServiceDirPath, @"InboxDir");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
-            this.OutboxDir = Path.Combine(this.ServiceDirPath, @"OutboxDir"); ; // Config.base_setting.OutboxDir;
-            Base.Log("InboxDir: " + this.InboxDir);
-            Base.Log("OutboxDir: " + this.OutboxDir);
+            this.InboxDir = Path.Combine(this.ServiceDirPath, @"Inbox");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
+            this.OutboxDir = Path.Combine(this.ServiceDirPath, @"Outbox"); ; // Config.base_setting.OutboxDir;
+            Base.Log("Inbox dir: " + this.InboxDir);
+            Base.Log("Outbox dir: " + this.OutboxDir);
 
             if (!Base.MakeFolder(this.InboxDir) || !Base.MakeFolder(this.OutboxDir)) {
-                string msg = "Error in Base.Init(): cann't create the folders: [" + this.InboxDir + " or " + this.OutboxDir + "]";
+                string msg = "Error in Service.Init(): cann't create the folders: [" + this.InboxDir + " or " + this.OutboxDir + "]";
                 Base.LogError(msg);
                 return false;
             }

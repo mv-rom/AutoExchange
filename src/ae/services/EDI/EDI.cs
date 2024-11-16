@@ -59,8 +59,8 @@ namespace ae.services.EDI
 
         private List<structure._1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<tools.VchasnoEDI.structure.Order> source)
         {
-            string gln = "";
-            if (Base.Config.ConfigSettings.BaseSetting.TryGetValue("gln", out gln))
+            string gln = this.config.gln;
+            if (gln.Length > 0)
             {
                 var listTT = new List<structure._1C.TTbyGLN_Item>();
                 foreach (var s in source)
@@ -569,7 +569,7 @@ namespace ae.services.EDI
         {
             int ResCount = 0;
             var fileJSON = "orders.json";
-            var dirPath = Path.Combine(Base.ServicesDir, "EDI/InBox");
+            var dirPath = Path.GetFullPath(Path.Combine(Base.ServicesDir, "EDI", "InBox"));
             if (Directory.Exists(dirPath))
             {
                 this.WorkDir = dirPath;
@@ -642,7 +642,7 @@ namespace ae.services.EDI
         public void actionOutBox()
         {
             int ResCount = 0;
-            var dirPath = Path.Combine(Base.ServicesDir, "EDI/OutBox");
+            var dirPath = Path.Combine(Base.ServicesDir, "EDI", "OutBox");
             if (Directory.Exists(dirPath))
             {
                 this.WorkDir = dirPath;
