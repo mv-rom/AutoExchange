@@ -167,18 +167,17 @@ namespace ae.lib
 
         public void runExit()
         {
-            //ЗавершитьРаботуСистемы
             this.runInvokeMethod("ExitSystem", new object[] { 0 });
             Base.Log1("> Выход из интерфейс 1C - ОК.");
         }
 
-        public bool doReportFileInput(string dir, string data)
+        public bool doReportFileInput(string workDir, string data)
         {
             bool result = false;
             string className = this.GetType().Name;
 
             if (data.Length > 0) {
-                var InputFilePath = Path.Combine(dir, "1CInput.xml");
+                var InputFilePath = Path.Combine(workDir, "1CInput.xml");
                 try
                 {
                     if (File.Exists(InputFilePath)) {
@@ -195,13 +194,13 @@ namespace ae.lib
             return result;
         }
 
-        public bool doReportFileOutput(string dir, out string data)
+        public bool doReportFileOutput(string workDir, out string data)
         {
             bool result = false;
             string className = this.GetType().Name;
             data = "";
 
-            var OutputFilePath = Path.Combine(dir, "1COutput.xml");
+            var OutputFilePath = Path.Combine(workDir, "1COutput.xml");
             try
             {
                 if (File.Exists(OutputFilePath)) {
@@ -209,7 +208,7 @@ namespace ae.lib
                     //File.Delete(OutputFilePath);
                     result = true;
                 } else {
-//                    var ErrorFilePath = Path.Combine(dir, "1CError.xml");
+//                    var ErrorFilePath = Path.Combine(workDir, "1CError.xml");
 //                    if (File.Exists(ErrorFilePath)) {
 //                        data = File.ReadAllText(ErrorFilePath, Encoding.ASCII);
 //                        File.Delete(ErrorFilePath);
@@ -234,12 +233,12 @@ namespace ae.lib
                     workDir,
                     stringInput
                 )) {
-                    Base.DumpToFile(Base.BaseDir, "(input-1C).xml", stringInput);
+                    Base.DumpToFile(workDir, "(input-1C).xml", stringInput);
 
                     if (inst1C.runExternalReport(workDir, report1c_Name)) {
                         string stringOutput = "";
                         if (inst1C.doReportFileOutput(workDir, out stringOutput)) {
-                            Base.DumpToFile(Base.BaseDir, "(output-1C).xml", stringOutput);
+                            Base.DumpToFile(workDir, "(output-1C).xml", stringOutput);
                             result = XML.ConvertXMLTextToClass<T>(stringOutput);
                         }
                     } else {

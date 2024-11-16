@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ae.lib;
+using ae.services.EDI.structure;
 using ae.services.EDI.tools.VchasnoEDI.structure;
 
 
@@ -17,21 +18,21 @@ namespace ae.services.EDI.tools.VchasnoEDI
         private string ContentType;
 
 
-        private bool Init()
+        private bool Init(ConfigClass config)
         {
             bool result = false;
             try
             {
                 BaseUrl = "";
-//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("url", out BaseUrl))
-//                    return false;
+                if (!config.VchasnoEDI_ApiSetting.TryGetValue("url", out BaseUrl))
+                    return false;
 
                 Authorization = "";
-//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("authorization", out Authorization))
-//                    return false;
+                if (!config.VchasnoEDI_ApiSetting.TryGetValue("authorization", out Authorization))
+                    return false;
 
-//                if (!Base.Config.ConfigSettings.VchasnoEDI_ApiSetting.TryGetValue("content_type", out ContentType))
-//                    ContentType = "application/json";
+                if (!config.VchasnoEDI_ApiSetting.TryGetValue("content_type", out ContentType))
+                    ContentType = "application/json";
 
                 this.RAC = new RestApiClient();
                 this.RAC.Init(BaseUrl, Authorization, ContentType);
@@ -51,12 +52,12 @@ namespace ae.services.EDI.tools.VchasnoEDI
             this.RAC = null;
         }
 
-        public static API getInstance()
+        public static API getInstance(ConfigClass config)
         {
             if (API.Instance == null)
             {
                 API.Instance = new API();
-                if (API.Instance.Init() != true) API.Instance.DeInit();
+                if (API.Instance.Init(config) != true) API.Instance.DeInit();
             }
             return API.Instance;
         }

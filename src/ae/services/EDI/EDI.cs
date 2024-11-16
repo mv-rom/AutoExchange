@@ -11,7 +11,7 @@ using ae.lib;
 
 namespace ae.services.EDI
 {
-    public class EDI : ae.lib.Service
+    public class EDI : Service
     {
         private string WorkDir = "";
         public structure.ConfigClass config;
@@ -44,14 +44,10 @@ namespace ae.services.EDI
                 while (i < count)
                 {
                     var item = result[i];
-                    var temp1 = ordersList.FirstOrDefault(t => (t.type > 1 && t.deal_id.Equals(item.deal_id)));
-                    if (temp1 != null)
-                    {
+                    if (ordersList.FirstOrDefault(t => t.type > 1 && t.deal_id.Equals(item.deal_id)) != null) {
                         result.Remove(item);
                         count = result.Count();
-                    }
-                    else
-                    {
+                    } else {
                         i++;
                     }
                 }
@@ -172,8 +168,7 @@ namespace ae.services.EDI
                 int found_i = 0;
                 foreach (var tt in listTT)
                 {
-                    if (tt.glnTT == glnTT && tt.glnTT_gruz == glnTT_gruz)
-                    {
+                    if (tt.glnTT == glnTT && tt.glnTT_gruz == glnTT_gruz) {
                         found = true;
                         break;
                     }
@@ -193,8 +188,7 @@ namespace ae.services.EDI
                             g.codeTT_part2 == foundTT.codeTT.part2 &&
                             g.codeTT_part3 == foundTT.codeTT.part3 &&
                             g.id == id
-                        )
-                        {
+                        ) {
                             tt_found_in_PP = true;
                             break;
                         }
@@ -202,8 +196,7 @@ namespace ae.services.EDI
                     }
 
                     structure._1C.ProductProfiles_Group pp_g = null;
-                    if (!tt_found_in_PP)
-                    {
+                    if (!tt_found_in_PP) {
                         pp_g = new structure._1C.ProductProfiles_Group()
                         {
                             id = id,
@@ -214,9 +207,7 @@ namespace ae.services.EDI
                             list = new List<structure._1C.ProductProfiles_Item>()
                         };
                         groupPP.Add(pp_g);
-                    }
-                    else
-                    {
+                    } else {
                         pp_g = groupPP[tt_found_in_PP_i];
                     }
 
@@ -241,8 +232,7 @@ namespace ae.services.EDI
                             if (l.EAN == product_code) item_found = true;
                         }
 
-                        if (!item_found)
-                        {
+                        if (!item_found) {
                             pp_g.list.Add(new structure._1C.ProductProfiles_Item()
                             {
                                 EAN = product_code,
@@ -265,8 +255,7 @@ namespace ae.services.EDI
             if (groupPP.Count() > 0)
             {
                 string report1cName = "EDI_product_profiles";
-                var input = new structure._1C.ProductProfiles()
-                {
+                var input = new structure._1C.ProductProfiles() {
                     group = groupPP
                 };
 
@@ -299,17 +288,13 @@ namespace ae.services.EDI
                                 }
                             }
                             i++;
-                        }
-                        else
-                        {
+                        } else {
                             groupPP.RemoveAt(i);
                         }
                     }
                     output_groupPP = null;
                     return groupPP;
-                }
-                else
-                {
+                } else {
                     Base.Log(
                         "Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!"
                     );
@@ -408,8 +393,7 @@ namespace ae.services.EDI
         private bool CombineAbiePreSalesAndOrders(ref Dictionary<string, structure.SplittedOrdersClass> source)
         {
             string warehouse_code = "";
-            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("warehouse_code", out warehouse_code))
-            {
+            if (!this.config.AbInbevEfes_ApiSetting.TryGetValue("warehouse_code", out warehouse_code)) {
                 Base.Log("Warning in CombineAbiePreSalesAndOrders(): not found [warehouse_code]!");
                 return false;
             }
@@ -450,7 +434,7 @@ namespace ae.services.EDI
                         preSalesDetails = preSalesDetails
                     };
 
-                    var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance();
+                    var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance(this.config);
                     if (AbInbevEfesAPI != null)
                     {
                         var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
@@ -562,7 +546,7 @@ namespace ae.services.EDI
                     orders = newOrders
                 };
 
-                var output = ae.lib._1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, report1cName, input);
+                var output = _1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, report1cName, input);
                 if (output != null)
                 {
                     var output_Orders = output.orders;
@@ -591,7 +575,7 @@ namespace ae.services.EDI
                 this.WorkDir = dirPath;
                 try
                 {
-                    var instVchasnoAPI = tools.VchasnoEDI.API.getInstance();
+                    var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
                     var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
                     if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
@@ -669,7 +653,7 @@ namespace ae.services.EDI
                     //var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
-                    var VchasnoAPI = tools.VchasnoEDI.API.getInstance(); //this.config.VchasnoEDI_ApiSetting
+                    var VchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config); //this.config.VchasnoEDI_ApiSetting
                     var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
                     if (ordersList == null || ordersList.Count() <= 0)
                         goto __exit;
