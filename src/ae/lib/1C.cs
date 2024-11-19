@@ -183,7 +183,7 @@ namespace ae.lib
                     if (File.Exists(InputFilePath)) {
                         File.Delete(InputFilePath);
                     }
-                    File.WriteAllText(InputFilePath, data, Encoding.GetEncoding("windows-1251"));
+                    File.WriteAllText(InputFilePath, data, Encoding.ASCII); //Encoding.GetEncoding("windows-1251"));
                     result = true;
                 }
                 catch (Exception ex)

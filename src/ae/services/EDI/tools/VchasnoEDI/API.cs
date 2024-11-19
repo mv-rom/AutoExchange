@@ -36,14 +36,12 @@ namespace ae.services.EDI.tools.VchasnoEDI
 
                 this.RAC = new RestApiClient();
                 this.RAC.Init(BaseUrl, Authorization, ContentType);
-
                 result = true;
             }
-            catch (Exception ex)
-            {
-                Base.LogError("Error in "+this.GetType().Name+".Init(): " + ex.Message);
+            catch (Exception ex) {
+                Base.LogError("Error in "+this.ToString()+"->Init(): "+ex.Message);
             }
-            Base.Log("lib.classes.VchasnoEDI.Init() is complete!");
+            Base.Log(this.ToString()+"->Init() is complete!");
             return result;
         }
 
@@ -54,8 +52,7 @@ namespace ae.services.EDI.tools.VchasnoEDI
 
         public static API getInstance(ConfigClass config)
         {
-            if (API.Instance == null)
-            {
+            if (API.Instance == null) {
                 API.Instance = new API();
                 if (API.Instance.Init(config) != true) API.Instance.DeInit();
             }
@@ -90,9 +87,8 @@ namespace ae.services.EDI.tools.VchasnoEDI
                     result = JSON.fromJSON<List<Order>>(data);
                 }
             }
-            catch (Exception ex)
-            {
-                Base.Log("Error in " + this.GetType().Name + ".getDocument(): " + ex.Message);
+            catch (Exception ex) {
+                Base.Log("Error in "+this.GetType().Name+"->getDocument(): "+ex.Message);
             }
             return result;
         }
@@ -107,16 +103,15 @@ namespace ae.services.EDI.tools.VchasnoEDI
                     result = JSON.fromJSON<Order>(data);
                 }
             }
-            catch (Exception ex)
-            {
-                Base.Log("Error in "+this.GetType().Name+ ".getDocument(): " + ex.Message);
+            catch (Exception ex) {
+                Base.Log("Error in "+this.ToString()+ "->getDocument(): "+ex.Message);
             }
             return result;
         }
 
         public PostAnswer rejectDocument(string ids, string deal_ids)
         {
-            //https://edi.vchasno.ua/api/deals/0f91f8f6-ffa0-ef12-30d3-466243f2b2f7/rejections?deal_id=0f91f8f6-fd63-7e4d-ee8d-f9453f2c9a3a
+            //example: https://edi.vchasno.ua/api/deals/0f91f8f6-ffa0-ef12-30d3-466243f2b2f7/rejections?deal_id=0f91f8f6-fd63-7e4d-ee8d-f9453f2c9a3a
             PostAnswer result = null;
             PostData raw_data = new PostData() { ids = ids };
             string data = String.Empty;
@@ -130,9 +125,8 @@ namespace ae.services.EDI.tools.VchasnoEDI
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Base.Log("Error in " + this.GetType().Name + ".rejectDocument(): " + ex.Message);
+            catch (Exception ex) {
+                Base.Log("Error in "+this.ToString()+"->rejectDocument(): "+ex.Message);
             }
             return result;
         }
@@ -151,7 +145,7 @@ namespace ae.services.EDI.tools.VchasnoEDI
             }
             catch (Exception ex)
             {
-                Base.Log("Error in "+this.GetType().Name+".Mark_DocumentProcessed(): " + ex.Message);
+                Base.Log("Error in "+this.ToString()+"->Mark_DocumentProcessed(): "+ex.Message);
             }
             return result;
         }

@@ -20,10 +20,8 @@ namespace ae.lib
 
         public bool Init()
         {
-
-            Base.Log("Init service ["+ this.ServiceName + "] with directory " + this.ServiceDirPath);
-            if (!Base.MakeFolder(this.ServiceDirPath))
-            {
+            Base.Log("Init service ["+ this.ServiceName +"] with directory " +this.ServiceDirPath);
+            if (!Base.MakeFolder(this.ServiceDirPath)) {
                 string msg = "Error in Service.Init(): cann't create a directory: [" + this.ServiceDirPath + "]!";
                 Base.LogError(msg);
                 throw new Exception(msg);

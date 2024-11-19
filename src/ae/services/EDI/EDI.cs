@@ -597,8 +597,7 @@ namespace ae.services.EDI
 
                         string jsonStr = "";
                         var filePathSO = Path.Combine(dirPath, "splitted_" + fileJSON);
-                        if (File.Exists(filePathSO))
-                        {
+                        if (File.Exists(filePathSO)) {
                             jsonStr = File.ReadAllText(filePathSO);
                         }
                         var savedSplittedOrders = JSON.fromJSON<Dictionary<string, structure.SplittedOrdersClass>>(jsonStr);
@@ -615,8 +614,7 @@ namespace ae.services.EDI
                         else
                             Base.Log("Some problems with processing orders in 1c!");
 
-                        if (combineStatus || checkStatus1c)
-                        {
+                        if (combineStatus || checkStatus1c) {
                             //save Splited Order List
                             jsonStr = JSON.toJSON(SplittedOrders);
                             File.WriteAllText(filePathSO + "_temp", jsonStr);
@@ -749,7 +747,7 @@ namespace ae.services.EDI
                 }
                 catch (Exception ex)
                 {
-                    Base.Log("Error in processOutBox(): " + ex.Message);
+                    Base.Log("Error in "+this.ToString()+"->actionOutBox(): " + ex.Message);
                 }
             }
 
