@@ -632,6 +632,7 @@ namespace ae.services.EDI
                 {
                     if (_1C.Instance != null)
                         _1C.Instance.runExit();
+                    _1C.Instance = null;
                 }
             }
             Base.Log("ResCount: " + ResCount);
@@ -646,7 +647,7 @@ namespace ae.services.EDI
                 this.WorkDir = dirPath;
                 try
                 {
-                    var yesterdayDT = DateTime.Now.AddDays(-2).ToString("yyyy-MM-dd");
+                    var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
                     //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
                     //var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
