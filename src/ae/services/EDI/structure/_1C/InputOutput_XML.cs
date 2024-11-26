@@ -114,16 +114,16 @@ namespace ae.services.EDI.structure._1C
         [XmlAttribute(AttributeName = "num")]
         public int Number { get; set; }
 
-        [XmlElement(ElementName = "codeKPK")]
+        [XmlAttribute(AttributeName = "codeKPK")]
         public int codeKPK { get; set; }
 
-        [XmlElement(ElementName = "qty")]
+        [XmlAttribute(AttributeName = "qty")]
         public float qty { get; set; }
 
-        [XmlElement(ElementName = "BasePrice")]
+        [XmlAttribute(AttributeName = "BasePrice")]
         public float BasePrice { get; set; }
 
-        [XmlElement(ElementName = "Akcya")]
+        [XmlAttribute(AttributeName = "Akcya")]
         public float Akcya { get; set; }
     }
 

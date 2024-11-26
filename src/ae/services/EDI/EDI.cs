@@ -541,19 +541,16 @@ namespace ae.services.EDI
             if (newOrders.Count() > 0)
             {
                 string report1cName = "EDI_vkachka_zayavok";
-                var input = new structure._1C.NewOrders()
-                {
+                var input = new structure._1C.NewOrders() {
                     orders = newOrders
                 };
 
                 var output = _1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, report1cName, input);
-                if (output != null)
-                {
+                if (output != null) {
                     var output_Orders = output.orders;
                     foreach (var oO in output_Orders)
                     {
-                        if (source.ContainsKey(oO.id))
-                        {
+                        if (source.ContainsKey(oO.id)) {
                             source[oO.id].status = oO.returnStatus;
                         }
                     }
