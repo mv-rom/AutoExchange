@@ -32,11 +32,6 @@ namespace ae.lib
             this.Timeout = Timeout;
         }
 
-        private bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
-        }
-
         private string HTTPClient(string Method, string SubUrl, string Arguments, string rawData="")
         {
             var final_url = this.BaseUrl;
@@ -52,9 +47,6 @@ namespace ae.lib
             int rescode = 0;
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-            //ServicePointManager.ServerCertificateValidationCallback += 
-            //    new System.Net.Security.RemoteCertificateValidationCallback(this.ValidateServerCertificate);
-
 
             HttpWebRequest webrequest = (HttpWebRequest)WebRequest.Create(Uri.EscapeUriString(final_url));
             webrequest.Method = Method;
@@ -67,7 +59,25 @@ namespace ae.lib
             webrequest.CachePolicy = new System.Net.Cache.RequestCachePolicy(
                 System.Net.Cache.RequestCacheLevel.NoCacheNoStore
             );
-            webrequest.Proxy = null;
+
+            // used proxy like: https://github.com/jthomperoo/simple-proxy/
+            string proxyHost = "127.0.0.1";
+            string proxyPort = "8888";
+            var proxy = new WebProxy {
+                Address = new Uri($"http://{proxyHost}:{proxyPort}"),
+                BypassProxyOnLocal = false,
+                UseDefaultCredentials = true
+/*
+                UseDefaultCredentials = false,
+                // These creds are given to the proxy server, not the web server ***
+                Credentials = new NetworkCredential(
+                    userName: proxyUserName,
+                    password: proxyPassword
+                )
+*/
+            };
+            //webrequest.Proxy = null;
+            webrequest.Proxy = proxy;
             webrequest.ContentType = this.ContentType + "; charset=utf-8";
 
             // Set some reasonable limits on resources used by this request
@@ -88,6 +98,8 @@ namespace ae.lib
                 }
             }
 
+
+            //var b = webrequest.
 
             //receive response
             HttpWebResponse webresponse = null;
