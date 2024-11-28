@@ -60,15 +60,7 @@ namespace ae.lib
 
             try
             {
-                Action act = new Action(ActionName);
-                if (act.Init()) {
-                    if (act.Run()) {
-                        Base.Log1("\\ активность выполнена.");
-                        result = 1;
-                    }
-                    else
-                        Base.Log1("\\ проблема с виполнением активности!");
-                }
+                //Run ActionName
             }
             catch (Exception ex)
             {

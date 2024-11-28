@@ -89,21 +89,24 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
+            var cServs = Config.ConfigSettings.Services;
+            var cServsMembers = cServs.GetType().GetMembers();
+            if (cServsMembers.Length <= 0) {
+                string msg = "Error in Base.Init(): No one service is configured!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
             Services = new Dictionary<string, Service>();
             foreach (var t in asm.GetTypes()) {
                 var m = r.Match(t.Namespace);
                 if (m.Success && t.BaseType == typeof(Service) && t.GetConstructors().Length>0) {
                     var theServiceName = m.Groups[1].Value;
-                    var cServs = Config.ConfigSettings.Services;
-                    var cc = cServs.GetType().GetMembers().Where(mem => (mem.Name == theServiceName)).ToList();
-                    if (cc.Count > 0) {
+                    var cSM = cServsMembers.Where(mem => (mem.Name == theServiceName)).ToList();
+                    if (cSM.Count > 0) {
                         var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
                         serviceInstance.Init();
                         Services[theServiceName] = serviceInstance;
-                    } else {
-                        string msg = "Error in Base.Init(): No one service is configured!";
-                        LogError(msg);
-                        throw new Exception(msg);
                     }
                 }
             }
