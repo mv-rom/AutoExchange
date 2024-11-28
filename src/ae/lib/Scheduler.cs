@@ -56,15 +56,15 @@ namespace ae.lib
         {
             int result = 0;
             t = (t.Length > 0) ? t : "\t:: ";
-            Base.Log1(" > Запуск активности - файл [" + ActionName + "]:", t);
+            Base.Log1(" > Run action [" + ActionName + "]:", t);
 
             try
             {
-                //Run ActionName
+                //Run ActionName in Service
             }
             catch (Exception ex)
             {
-                string msg = "Error in Scheduler.RunAction(): Активность выполнилась не успешно!";
+                string msg = "Error in Scheduler.RunAction(): execution is unsuccessful!";
                 msg = msg + "> " + ex.Message;
                 Base.LogError(msg);
             }
@@ -74,13 +74,13 @@ namespace ae.lib
         public void Run()
         {
             var tb = "|> ";
-            Base.Log1("Запуск задач:", tb);
+            Base.Log1("Run task:", tb);
             if (this.tasks.Count > 0) {
                 this.loadData();
                 foreach(var t in this.tasks)
                 {
                     string Name = t.Service + "_" + t.Action;
-                    Base.Log1("|--> задача [" + Name + "]:");
+                    Base.Log1("|--> task [" + Name + "]:");
 
                     SchedulerData taskData = this.getData(Name);
                     if (taskData != null) {
@@ -94,23 +94,18 @@ namespace ae.lib
                             if (t.Action.Length > 0)
                                 lastStatus = (byte)RunAction(t.Action);
                             else
-                                Base.Log1("\\__ не выполнена! Поле action - не найдено!");
-                            /*
-                                                        if (lastStatus == 1 && t.PosAction.Length > 0)
-                                                            lastStatus = (byte)RunAction(t.PosAction);
-                                                        else
-                                                            Base.Log1("\\__ не выполнена! Поле post_action - не найдено!");
-                            */
+                                Base.Log1("\\__ isn't executed! Field of action wasn't found.");
+
                             this.setData(Name, lastRunTime, lastStatus);
                         } else
-                            Base.Log1("\\__ пропущена..");
+                            Base.Log1("\\__ passed..");
                         Base.Log1("");
                     }
                 }
                 this.saveData();
             }
             else {
-                Base.Log1(@"\_ нет ни одной задачи на выполнение!", tb);
+                Base.Log1(@"\_ There is no one task to execution.", tb);
             }
         }
 

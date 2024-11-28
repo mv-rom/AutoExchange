@@ -60,24 +60,20 @@ namespace ae.lib
                 System.Net.Cache.RequestCacheLevel.NoCacheNoStore
             );
 
-            // used proxy like: https://github.com/jthomperoo/simple-proxy/
-            string proxyHost = "127.0.0.1";
-            string proxyPort = "8888";
-            var proxy = new WebProxy {
-                Address = new Uri($"http://{proxyHost}:{proxyPort}"),
-                BypassProxyOnLocal = false,
-                UseDefaultCredentials = true
-/*
-                UseDefaultCredentials = false,
-                // These creds are given to the proxy server, not the web server ***
-                Credentials = new NetworkCredential(
-                    userName: proxyUserName,
-                    password: proxyPassword
-                )
-*/
-            };
-            //webrequest.Proxy = null;
-            webrequest.Proxy = proxy;
+            /*
+                // used proxy like: https://github.com/jthomperoo/simple-proxy/
+                string proxyHost = "127.0.0.1";
+                string proxyPort = "8888";
+                var proxy = new WebProxy {
+                    Address = new Uri($"http://{proxyHost}:{proxyPort}"),
+                    BypassProxyOnLocal = false,
+                    UseDefaultCredentials = true
+                    //UseDefaultCredentials = false,
+                    //Credentials = new NetworkCredential(userName: proxyUserName, password: proxyPassword)
+                };
+                webrequest.Proxy = proxy;
+            */
+            webrequest.Proxy = null;
             webrequest.ContentType = this.ContentType + "; charset=utf-8";
 
             // Set some reasonable limits on resources used by this request
