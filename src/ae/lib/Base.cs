@@ -100,6 +100,10 @@ namespace ae.lib
                         var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
                         serviceInstance.Init();
                         Services[theServiceName] = serviceInstance;
+                    } else {
+                        string msg = "Error in Base.Init(): No one service is configured!";
+                        LogError(msg);
+                        throw new Exception(msg);
                     }
                 }
             }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using ae.lib;
 
@@ -24,7 +24,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.AddDays(-4).ToString("yyyy-MM-dd");
             //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
@@ -374,7 +374,7 @@ namespace ae.services.EDI
                                     codeTT_part2 = found_item.codeTT_part2,
                                     codeTT_part3 = found_item.codeTT_part3,
                                     Items = newItems,
-                                    status = 0, //current state in 1C
+                                    status1c = 0, //current state in 1C
                                     deal_status = deal_status //current state in EDI
                                 });
                             }
@@ -427,7 +427,7 @@ namespace ae.services.EDI
                             so.Value.codeTT_part3,
                         preSaleType = "6", //EDI order
                         dateFrom = so.Value.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                        dateTo = so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                        dateTo =   so.Value.OrderExecutionDate.ToString("yyyy-MM-ddTHH:mm:ss"),
                         warehouseCode = warehouse_code,
                         vatCalcMod = "0", // 0 - price without PDV, 1 - with PDV
                         custId = int.Parse(Base.torg_sklad).ToString(),
@@ -491,7 +491,7 @@ namespace ae.services.EDI
             var newOrders = new List<structure._1C.NewOrders_Order>();
             foreach (var so in source)
             {
-                if (so.Value.status == 0)
+                if (so.Value.status1c == 0)
                 {
                     int num = 1;
                     var newItems = new List<structure._1C.NewOrders_Item>();
@@ -523,10 +523,17 @@ namespace ae.services.EDI
                             continue;
                         }
 
+                        //encoding of orderEDINumber
+                        Encoding fromEnc = Encoding.UTF8;
+                        Encoding toEnc = Encoding.ASCII;
+                        byte[] oNumberBytes = Encoding.Convert(fromEnc, toEnc, fromEnc.GetBytes(so.Value.orderNumber));
+                        string oNumber = toEnc.GetString(oNumberBytes);
+
                         newOrders.Add(new structure._1C.NewOrders_Order()
                         {
                             id = so.Key,
                             orderNumber = so.Value.resut_orderNo,
+                            orderEDINumber = oNumber,
                             outletId = so.Value.result_outletId,
                             executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                             codeTT_part1 = so.Value.codeTT_part1,
@@ -551,7 +558,7 @@ namespace ae.services.EDI
                     foreach (var oO in output_Orders)
                     {
                         if (source.ContainsKey(oO.id)) {
-                            source[oO.id].status = oO.returnStatus;
+                            source[oO.id].status1c = oO.returnStatus;
                         }
                     }
                     return true;
@@ -576,11 +583,11 @@ namespace ae.services.EDI
                     var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
                     if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
-                        var fp = Path.Combine(dirPath, fileJSON);
+                        //var fp = Path.Combine(dirPath, fileJSON);
                         //if (!File.Exists(fp)) {
                         //    throw new Exception("STOP");
                         //}
-                        //var ordersListFiltered = JSON.fromJSON<List<lib.classes.VchasnoEDI.Order>>(File.ReadAllText(fp));
+                        //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
                         JSON.DumpToFile(dirPath, fileJSON, ordersListFiltered);
                         //throw new Exception("STOP");
 

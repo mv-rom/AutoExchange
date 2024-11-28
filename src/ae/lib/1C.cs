@@ -27,7 +27,7 @@ namespace ae.lib
         private Type   type1C = null;
         //private string WorkDir = "";
         private string ReportDirPath = "";
-        private string LogFileName = "log_1c.txt";
+        //private string LogFileName = "log_1c.txt";
         private string LogFilePath = "";
         private string torg_sklad = "";
 

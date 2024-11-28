@@ -31,7 +31,7 @@ namespace ae.services.EDI.structure
 
         public List<SplittedOrdersClass_Order> Items { get; set; }
 
-        public int status { get; set; } //default 0 - not processing, 1 - processing, 2 - otmenena
+        public int status1c { get; set; } //default 0 - not processing, 1 - processing, 2 - otmenena
         public string deal_status { get; set; } //default new, proccessig, reject
 
         public string resut_orderNo { get; set; }

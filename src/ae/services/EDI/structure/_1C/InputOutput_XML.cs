@@ -55,19 +55,19 @@ namespace ae.services.EDI.structure._1C
         public int Number { get; set; }
 
 
-        [XmlElement(ElementName = "EAN")]
+        [XmlAttribute(AttributeName = "EAN")]
         public long EAN { get; set; }
 
-        [XmlElement(ElementName = "Title")]
+        [XmlAttribute(AttributeName = "Title")]
         public string Title { get; set; }
 
-        [XmlElement(ElementName = "ProductCode")]
+        [XmlAttribute(AttributeName = "ProductCode")]
         public int ProductCode { get; set; }
 
-        [XmlElement(ElementName = "ProductType")]
+        [XmlAttribute(AttributeName = "ProductType")]
         public int ProductType { get; set; }  //0 - pivo, 1 - kega, 3 - b/a
 
-        [XmlElement(ElementName = "BasePrice")]
+        [XmlAttribute(AttributeName = "BasePrice")]
         public float BasePrice { get; set; }
     }
 
@@ -136,7 +136,10 @@ namespace ae.services.EDI.structure._1C
 
         [XmlAttribute(AttributeName = "orderNumber")]
         public string orderNumber { get; set; }
-        
+
+        [XmlAttribute(AttributeName = "orderEDINumber")]
+        public string orderEDINumber { get; set; }
+
         [XmlAttribute(AttributeName = "outletId")]
         public string outletId { get; set; }
 
