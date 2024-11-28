@@ -30,7 +30,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
         private bool Init(ConfigClass config)
         {
             bool result = false;
-            int HttpClientTimeout = 2*60*1000;
+            int HttpClientTimeout = 1*60*1000;
             try
             {
                 this.Authorization_BaseUrl = "";
