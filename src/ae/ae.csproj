@@ -85,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="lib\1C.cs" />
-    <Compile Include="lib\Action.cs" />
     <Compile Include="lib\Arguments.cs" />
     <Compile Include="lib\Base.cs" />
     <Compile Include="lib\Service.cs" />
