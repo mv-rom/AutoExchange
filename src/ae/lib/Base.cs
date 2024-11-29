@@ -89,26 +89,25 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
-            var cServs = Config.ConfigSettings.Services;
-            var cServsMembers = cServs.GetType().GetMembers();
-            if (cServsMembers.Length <= 0) {
-                string msg = "Error in Base.Init(): No one service is configured!";
-                LogError(msg);
-                throw new Exception(msg);
-            }
-
+            var configServiceMembers = Config.ConfigSettings.Services.GetType().GetMembers();
             Services = new Dictionary<string, Service>();
             foreach (var t in asm.GetTypes()) {
                 var m = r.Match(t.Namespace);
                 if (m.Success && t.BaseType == typeof(Service) && t.GetConstructors().Length>0) {
                     var theServiceName = m.Groups[1].Value;
-                    var cSM = cServsMembers.Where(mem => (mem.Name == theServiceName)).ToList();
+                    List<MemberInfo> cSM = configServiceMembers.Where(mem => (mem.Name == theServiceName)).ToList();
                     if (cSM.Count > 0) {
                         var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
                         serviceInstance.Init();
                         Services[theServiceName] = serviceInstance;
                     }
                 }
+            }
+
+            if (Services.Count <= 0) {
+                string msg = "Error in Base.Init(): No one service is configured!";
+                LogError(msg);
+                throw new Exception(msg);
             }
 
             Log("Base.Init() is complete with success.");
@@ -228,7 +227,7 @@ namespace ae.lib
                 if (!Directory.Exists(DirPath)) {
                     Directory.CreateDirectory(DirPath);
                     if (!Directory.Exists(DirPath)) {
-                        LogError("Error in Base.MakeFolder(): Не хватает прав для создания папки [" + DirPath + "]!");
+                        LogError("Error in Base.MakeFolder(): There is no right to create directory [" + DirPath + "]!");
                     }
                     else
                         result = true;
@@ -252,27 +251,27 @@ namespace ae.lib
                 {
                     FileInfo fi = new FileInfo(Path.Combine(Dir, f));
                     TimeSpan DayCount = DateTime.Now - fi.LastWriteTime;
-                    Log1(":", "-> файл " + fi.Name + " с верменем создания [" + fi.CreationTime + "]" + " - создан " + DayCount.TotalDays + " дней назад");
+                    Log1(":", "-> File " + fi.Name + " with time creating [" + fi.CreationTime + "]" + " - was created " + DayCount.TotalDays + " days ago");
                     if (DayCount.TotalDays > Period - 1) {
                         try
                         {
                             File.Delete(fi.FullName);
                             if (!File.Exists(fi.FullName)) {
-                                Log2(@"\ - удален.");
+                                Log2(@"\ - deleted.");
                             } else {
-                                string msg = "> Error in Base.RotateArcheves():.. удаление файла неуспешное!";
+                                string msg = "> Error in Base.RotateArchives():.. deleting is unsuccessful!";
                                 LogError(msg);
                                 throw new Exception(msg);
                             }
                         }
                         catch (Exception ex)
                         {
-                            LogError("> Error in Base.RotateArcheves(): проблема при удалении файла [" + fi.FullName + "] - " + ex.Message + "!");
+                            LogError("> Error in Base.RotateArchives(): проблема при удалении файла [" + fi.FullName + "] - " + ex.Message + "!");
                         }
                     }
                 }
             } else {
-                Log1("> Архивная папка не найдена!");
+                Log1("> Archived directory wasn't found!");
             }
         }
 
@@ -283,9 +282,9 @@ namespace ae.lib
             string ZipPathName = Path.Combine(arch_dir, ZipName);
 
             // архивирование файла в архив
-            Console.WriteLine("Сохранение лог-файла в архив [" + ZipName + "]:");
+            Console.WriteLine("Saving log-file in the archive [" + ZipName + "]:");
             if (ZIP.Create(file_path, ZipPathName, false) && File.Exists(ZipPathName)) {
-                Console.WriteLine(@"\- сохранен.");
+                Console.WriteLine(@"\- saved.");
             }
         }
 
