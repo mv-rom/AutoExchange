@@ -54,12 +54,52 @@ namespace ae.lib
             this.data = null;
         }
 
-        public byte RunAction(string ServiceName, string ActionName, string t="")
+
+        public void Run()
+        {
+            var tb = "|> ";
+            Base.Log1("Run task:", tb);
+            if (this.tasks.Count > 0) {
+                this.loadData();
+                foreach(var t in this.tasks)
+                {
+                    if (t.Service.Length > 0 && t.Action.Length > 0) {
+                        string Name = t.Service + "." + t.Action;
+                        Base.Log1("|--> task [" + Name + "]:");
+
+                        byte lastStatus = 0;
+                        int lastRunTime = 0;
+                        SchedulerData taskData = this.getData(Name);
+                        if (taskData != null) {
+                            lastStatus = taskData.lastStatus;
+                            lastRunTime = taskData.lastRunTime;
+                        }
+
+                        var stc = new SchedulerTask();
+                        if (lastStatus == 0 || stc.checkStartTime(t.StartTime, lastRunTime)) {
+                            lastStatus = RunAction(t.Service, t.Action);
+                            lastRunTime = (int)Base.getCurentUnixDateTime();
+                            this.setData(Name, lastRunTime, lastStatus);
+                        } else {
+                            Base.Log1(@"\__ passed..");
+                        }
+                        Base.Log1("");
+                    } else {
+                        Base.Log1("Warning in Scheduler.Run(): some field of service ["+t.Service+"] or action ["+t.Action+"] is empty.");
+                    }
+                }
+                this.saveData();
+            }
+            else {
+                Base.Log1(@"\__ There is no one task to execution.", tb);
+            }
+        }
+
+        public byte RunAction(string ServiceName, string ActionName, string t = "")
         {
             byte result = 0;
             t = (t.Length > 0) ? t : "\t:: ";
-            Base.Log1(" > Run action [" + ActionName + "]:", t);
-
+            Base.Log1(" > Run action [" + ActionName + "] in service ["+ServiceName+"]:", t);
             try
             {
                 Service service = null;
@@ -70,52 +110,10 @@ namespace ae.lib
             }
             catch (Exception ex)
             {
-                string msg = "Error in Scheduler.RunAction("+ServiceName+","+ActionName+"): execution is unsuccessful!";
-                msg = msg + "> " + ex.Message;
-                Base.LogError(msg);
+                Base.LogError("Error in Scheduler.RunAction(): execution is unsuccessful!");
+                Base.LogError("> " + ex.Message);
             }
             return result;
-        }
-
-        public void Run()
-        {
-            var tb = "|> ";
-            Base.Log1("Run task:", tb);
-            if (this.tasks.Count > 0) {
-                this.loadData();
-                foreach(var t in this.tasks)
-                {
-                    string Name = t.Service + "." + t.Action;
-                    Base.Log1("|--> task [" + Name + "]:");
-                    
-                    int lastRunTime = 0;
-                    byte lastStatus = 0;
-
-                    SchedulerData taskData = this.getData(Name);
-                    if (taskData != null) {
-                        lastRunTime = taskData.lastRunTime;
-                        lastStatus = taskData.lastStatus;
-                    }
-                        
-                    var stc = new SchedulerTask();
-                    if (lastStatus == 0 || stc.checkStartTime(t.StartTime, lastRunTime)) {
-                        lastRunTime = (int)Base.getCurentUnixDateTime();
-
-                        if (t.Action.Length > 0)
-                            lastStatus = RunAction(t.Service, t.Action);
-                        else
-                            Base.Log1("\\__ isn't executed! Field of action wasn't found.");
-
-                        this.setData(Name, lastRunTime, lastStatus);
-                    } else
-                        Base.Log1("\\__ passed..");
-                    Base.Log1("");
-                }
-                this.saveData();
-            }
-            else {
-                Base.Log1(@"\_ There is no one task to execution.", tb);
-            }
         }
 
         public SchedulerData getData(string Name)
