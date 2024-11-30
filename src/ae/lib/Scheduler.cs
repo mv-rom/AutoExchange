@@ -27,16 +27,14 @@ namespace ae.lib
 
         public Scheduler()
         {
-            DataFilePath =  Path.Combine(Base.RunDir, DataFileName);
-            data =  new List<SchedulerData>();
-            tasks = new List<SchedulerTaskData>();
+            this.DataFilePath =  Path.Combine(Base.RunDir, DataFileName);
+            this.data =  new List<SchedulerData>();
+            this.tasks = new List<SchedulerTaskData>();
         }
 
         public bool Init()
         {
-            bool result = false;
-
-            this.data = new List<SchedulerData>();
+            Base.Log(" > Scheduler() is initialized:");
             foreach (var t in Base.Config.ConfigSettings.SchedulerSetting.tasks)
             {
                 if (t.Service.Length>0 && t.Action.Length > 0) {
@@ -44,7 +42,11 @@ namespace ae.lib
                 }
             }
 
-            return result;
+            if (this.tasks.Count <= 0) {
+                Base.Log1("Warning in Scheduler.Init(): There is no one task is configured.");
+                return false;
+            }
+            return true;
         }
 
         public void DeInit()
@@ -52,7 +54,7 @@ namespace ae.lib
             this.data = null;
         }
 
-        public int RunAction(string ActionName, string t="")
+        public int RunAction(string ServiceName, string ActionName, string t="")
         {
             int result = 0;
             t = (t.Length > 0) ? t : "\t:: ";
@@ -60,11 +62,14 @@ namespace ae.lib
 
             try
             {
-                //Run ActionName in Service
+                Service service = null;
+                if (Base.Services.TryGetValue(ServiceName, out service)) {
+                    service.RunAction(ActionName);
+                }
             }
             catch (Exception ex)
             {
-                string msg = "Error in Scheduler.RunAction(): execution is unsuccessful!";
+                string msg = "Error in Scheduler.RunAction("+ServiceName+","+ActionName+"): execution is unsuccessful!";
                 msg = msg + "> " + ex.Message;
                 Base.LogError(msg);
             }
@@ -79,28 +84,31 @@ namespace ae.lib
                 this.loadData();
                 foreach(var t in this.tasks)
                 {
-                    string Name = t.Service + "_" + t.Action;
+                    string Name = t.Service + "." + t.Action;
                     Base.Log1("|--> task [" + Name + "]:");
+                    
+                    int lastRunTime = 0;
+                    byte lastStatus = 0;
 
                     SchedulerData taskData = this.getData(Name);
                     if (taskData != null) {
-                        int lastRunTime = taskData.lastRunTime;
-                        byte lastStatus = taskData.lastStatus;
-
-                        var stc = new SchedulerTask();
-                        if (lastStatus == 0 || stc.checkStartTime(t.StartTime, lastRunTime)) {
-                            lastRunTime = (int)Base.getCurentUnixDateTime();
-
-                            if (t.Action.Length > 0)
-                                lastStatus = (byte)RunAction(t.Action);
-                            else
-                                Base.Log1("\\__ isn't executed! Field of action wasn't found.");
-
-                            this.setData(Name, lastRunTime, lastStatus);
-                        } else
-                            Base.Log1("\\__ passed..");
-                        Base.Log1("");
+                        lastRunTime = taskData.lastRunTime;
+                        lastStatus = taskData.lastStatus;
                     }
+                        
+                    var stc = new SchedulerTask();
+                    if (lastStatus == 0 || stc.checkStartTime(t.StartTime, lastRunTime)) {
+                        lastRunTime = (int)Base.getCurentUnixDateTime();
+
+                        if (t.Action.Length > 0)
+                            lastStatus = (byte)RunAction(t.Service, t.Action);
+                        else
+                            Base.Log1("\\__ isn't executed! Field of action wasn't found.");
+
+                        this.setData(Name, lastRunTime, lastStatus);
+                    } else
+                        Base.Log1("\\__ passed..");
+                    Base.Log1("");
                 }
                 this.saveData();
             }
@@ -199,12 +207,15 @@ namespace ae.lib
         }
     }
 
+    [Serializable]
     public class SchedulerData
     {
         public string Name { get; set; }
         public int lastRunTime { get; set; }
         public byte lastStatus { get; set; }
     }
+
+    [Serializable]
     public class SchedulerTaskData
     {
         public string StartTime { get; set; }

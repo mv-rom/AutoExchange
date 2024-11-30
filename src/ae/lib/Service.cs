@@ -41,8 +41,13 @@ namespace ae.lib
             return true;
         }
 
-        public void Run(string Name)
+        public void RunAction(string Name)
         {
+            if (Name.Length > 0) {
+                var t = this.GetType();
+                MethodInfo metd = t.GetMethod(Name);
+                metd.Invoke(this, null);
+            }
         }
     }
 }

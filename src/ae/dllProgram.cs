@@ -13,27 +13,25 @@ namespace ae
         {
             Base.Init();
 
-            var edi = (services.EDI.EDI)Base.Services["EDI"];
-            edi?.actionInBox();
+            //var edi = (services.EDI.EDI)Base.Services["EDI"];
+            //edi?.actionInBox();
             //edi?.actionOutBox();
 
-            /*
-                Base.Scheduler = Scheduler.getInstance();
-                try
-                {
-                    Base.Scheduler.Run();
-                }
-                catch (Exception ex)
-                {
-                    string msg = "Error in Program.Main(): "+ex.Message;
-                    Base.Log(msg);
-                    throw new Exception(msg);
-                }
-                finally
-                {
-                    Base.Scheduler.DeInit();
-                }
-            */
+            var Scheduler = lib.Scheduler.getInstance();
+            try
+            {
+                Scheduler.Run();
+            }
+            catch (Exception ex)
+            {
+                string msg = "Error in dllProgram.Entry(): " + ex.Message;
+                Base.Log(msg);
+                throw new Exception(msg);
+            }
+            finally
+            {
+                Scheduler.DeInit();
+            }
 
             // ротация файлов архивов (удаление старых) 
             // в архивной папке через период (количество дней)
@@ -47,7 +45,7 @@ namespace ae
             Base.RotateArchives(Base.ArchivesDir, pattern, day);
 
             Base.Log("");
-            Base.Log(">>> Работа скрипта завершена.");
+            Base.Log(">>> Work of script is complete.");
 
             Base.deInit();
 
