@@ -54,9 +54,9 @@ namespace ae.lib
             this.data = null;
         }
 
-        public int RunAction(string ServiceName, string ActionName, string t="")
+        public byte RunAction(string ServiceName, string ActionName, string t="")
         {
-            int result = 0;
+            byte result = 0;
             t = (t.Length > 0) ? t : "\t:: ";
             Base.Log1(" > Run action [" + ActionName + "]:", t);
 
@@ -65,6 +65,7 @@ namespace ae.lib
                 Service service = null;
                 if (Base.Services.TryGetValue(ServiceName, out service)) {
                     service.RunAction(ActionName);
+                    result = 1;
                 }
             }
             catch (Exception ex)
@@ -101,7 +102,7 @@ namespace ae.lib
                         lastRunTime = (int)Base.getCurentUnixDateTime();
 
                         if (t.Action.Length > 0)
-                            lastStatus = (byte)RunAction(t.Service, t.Action);
+                            lastStatus = RunAction(t.Service, t.Action);
                         else
                             Base.Log1("\\__ isn't executed! Field of action wasn't found.");
 

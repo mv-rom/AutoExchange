@@ -44,8 +44,7 @@ namespace ae.lib
         public void RunAction(string Name)
         {
             if (Name.Length > 0) {
-                var t = this.GetType();
-                MethodInfo metd = t.GetMethod(Name);
+                MethodInfo metd = this.GetType().GetMethod(Name);
                 metd.Invoke(this, null);
             }
         }
