@@ -571,7 +571,6 @@ namespace ae.services.EDI
 
         public void actionInBox()
         {
-            return;
             int ResCount = 0;
             var fileJSON = "orders.json";
             var dirPath = Path.GetFullPath(Path.Combine(Base.ServicesDir, "EDI", "InBox"));

@@ -178,7 +178,7 @@ namespace ae.lib
                         }
                     }
                 } catch (Exception ex) {
-                    string msg = "Error in Scheduler.loadData(): Нет возможности или прав для открытия data-файла: " + this.DataFilePath + "!";
+                    string msg = "Error in Scheduler.loadData(): there is the problem to load a data-file: " + this.DataFilePath + "!";
                     msg = msg + "> " + ex.Message;
                     Base.LogError(msg);
                     throw new Exception(msg);
@@ -198,7 +198,7 @@ namespace ae.lib
             }
             catch (Exception ex)
             {
-                string msg = "Error in Scheduler.saveData(): Нет возможности или прав для создания data-файла: " + this.DataFilePath + "!";
+                string msg = "Error in Scheduler.saveData(): there is the problem to save a data-file: " + this.DataFilePath + "!";
                 msg = msg + "> "+ex.Message;
                 Base.LogError(msg);
                 throw new Exception(msg);
