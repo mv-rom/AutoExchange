@@ -16,7 +16,7 @@ namespace ae
             var Scheduler = lib.Scheduler.getInstance();
             try
             {
-                Scheduler.Run();
+                //Scheduler.Run();
             }
             catch (Exception ex)
             {
@@ -33,15 +33,11 @@ namespace ae
             // в архивной папке через период (количество дней)
             int day = 14;
             // для архивов данных
-            string pattern = @".+_[A-Za-z0-9_-]*\.zip";
-            Base.RotateArchives(Base.ArchivesDir, pattern, day);
+            //Base.RotateArchives(Base.ArchivesDir, @"(.+(?!Log).)*_[0-9-]+_[0-9]+\.zip", day);
+            Base.RotateArchives(Base.ArchivesDir, @"^(?:(?!Log).)*$", day);
 
             // для архивов логов
-            pattern = @"Log_[A-Za-z0-9_-]*\.zip";
-            Base.RotateArchives(Base.ArchivesDir, pattern, day);
-
-            Base.Log("");
-            Base.Log(">>> Work of script is complete.");
+            Base.RotateArchives(Base.ArchivesDir, @".+Log_[0-9-]+_[0-9]+\.zip", day);
 
             Base.deInit();
 

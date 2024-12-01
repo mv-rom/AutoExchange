@@ -70,7 +70,7 @@ namespace ae.lib
                 {
                     using (ZipFile loanZip = new ZipFile())
                     {
-                        loanZip.AddFile(SourcePath);
+                        loanZip.AddFile(SourcePath, "");
                         loanZip.Save(zipFile); //(string.Format("{0}{1}.zip", zipDestinationPath, documentIdentifier.ToString()));
                         result = true;
                     }
@@ -84,14 +84,14 @@ namespace ae.lib
             bool result = false;
 
             if (Directory.Exists(SourcePath)) {
-                string[] list = Directory.GetFiles(SourcePath);
-                if (list.Length > 0) {
+                string[] fileList = Directory.GetFiles(SourcePath);
+                if (fileList.Length > 0) {
                     using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
                         using (ZipFile loanZip = new ZipFile()) {
-                            foreach (var l in list) {
-                                loanZip.AddFile(l);
+                            foreach (var f in fileList) {
+                                loanZip.AddFile(f, "");
                             }
-                            loanZip.Save(zipFile); //(string.Format("{0}{1}.zip", zipDestinationPath, documentIdentifier.ToString()));
+                            loanZip.Save(zipFile);
                             result = true;
                         }
                     }

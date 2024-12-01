@@ -78,9 +78,6 @@ namespace ae.lib
             }
 
             //Load Services using Namespace of CurrentDomain
-            string searchPatten = @"ae\.services\.(\w+)";
-            Regex r = new Regex(searchPatten, RegexOptions.IgnoreCase);
-
             var asmList = AppDomain.CurrentDomain.GetAssemblies();
             var asm = asmList.SingleOrDefault(assembly => assembly.GetName().Name == "ae");
             if (asm == null) {
@@ -88,6 +85,9 @@ namespace ae.lib
                 LogError(msg);
                 throw new Exception(msg);
             }
+
+            string searchPatten = @"ae\.services\.(\w+)";
+            Regex r = new Regex(searchPatten, RegexOptions.IgnoreCase);
 
             var configServiceMembers = Config.ConfigSettings.Services.GetType().GetMembers();
             Services = new Dictionary<string, Service>();
@@ -115,6 +115,10 @@ namespace ae.lib
         }
 
         public static void deInit() {
+            Base.Config = null;
+            Base.Services = null;
+            Base.Log("");
+            Base.Log("... Base.Init() is completed.");
             Base.logger.Logger.Repository.Shutdown();
         }
 
@@ -161,9 +165,7 @@ namespace ae.lib
         public static string Right(string s, int n_count)
         {
             if (String.IsNullOrEmpty(s)) return string.Empty;
-
             if (n_count <= 0) return s;
-
             int len = s.Length;
             if (n_count > len) {
                 return s;
@@ -246,28 +248,34 @@ namespace ae.lib
         {
             Log("");
             Log("Rotatin of files (template: " + Pattern + ") in archives folder [" + Dir + "]:");
+            Regex r = new Regex(Pattern, RegexOptions.IgnoreCase);
 
             if (Directory.Exists(Dir)) {
-                foreach (string f in Directory.GetFiles(Dir, Pattern))
+                var Files = Directory.GetFiles(Dir, "*.zip");
+                foreach (string f in Files)
                 {
-                    FileInfo fi = new FileInfo(Path.Combine(Dir, f));
-                    TimeSpan DayCount = DateTime.Now - fi.LastWriteTime;
-                    Log1(":", "-> File " + fi.Name + " with time creating [" + fi.CreationTime + "]" + " - was created " + DayCount.TotalDays + " days ago");
-                    if (DayCount.TotalDays > Period - 1) {
-                        try
-                        {
-                            File.Delete(fi.FullName);
-                            if (!File.Exists(fi.FullName)) {
-                                Log2(@"\ - deleted.");
-                            } else {
-                                string msg = "> Error in Base.RotateArchives():.. deleting is unsuccessful!";
-                                LogError(msg);
-                                throw new Exception(msg);
+                    if (r.IsMatch(f)) {
+                        FileInfo fi = new FileInfo(f);
+                        TimeSpan DayCount = DateTime.Now - fi.LastWriteTime;
+                        var fileTotalDays = Math.Floor(DayCount.TotalDays);
+                        Log1(":", "-> File " + fi.Name + " with time creating [" + fi.CreationTime + "]" + " - was created " + fileTotalDays + " days ago");
+                        var fName = fi.FullName;
+                        if (fileTotalDays > Period - 1) {
+                            try
+                            {
+                                File.Delete(fName);
+                                if (!File.Exists(fName)) {
+                                    Log2(@"\ - deleted.");
+                                } else {
+                                    string msg = "> Error in Base.RotateArchives():.. deleting is unsuccessful!";
+                                    LogError(msg);
+                                    throw new Exception(msg);
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            LogError("> Error in Base.RotateArchives(): проблема при удалении файла [" + fi.FullName + "] - " + ex.Message + "!");
+                            catch (Exception ex)
+                            {
+                                LogError("> Error in Base.RotateArchives(): проблема при удалении файла [" + fName + "] - " + ex.Message + "!");
+                            }
                         }
                     }
                 }
