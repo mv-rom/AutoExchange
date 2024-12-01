@@ -120,9 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="services\EDI\reports1c\EDI_product_profiles.ert" />
-    <None Include="services\EDI\reports1c\EDI_tt_by_gln.ert" />
-    <None Include="services\EDI\reports1c\EDI_vkachka_zayavok.ert" />
+    <None Include="services\EDI\reports1c\product_profiles.ert" />
+    <None Include="services\EDI\reports1c\tt_by_gln.ert" />
+    <None Include="services\EDI\reports1c\vkachka_zayavok.ert" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

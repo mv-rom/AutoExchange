@@ -26,6 +26,7 @@ namespace ae.services.EDI
             Base.Log("Service [" + this.GetType().Name + "]>> " + msg);
         }
 
+
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
@@ -105,7 +106,7 @@ namespace ae.services.EDI
 
                 if (listTT.Count() > 0)
                 {
-                    string report1cName = "EDI_tt_by_gln";
+                    string report1cName = "tt_by_gln";
                     var input = new structure._1C.TTbyGLN()
                     {
                         list = listTT
@@ -259,7 +260,7 @@ namespace ae.services.EDI
 
             if (groupPP.Count() > 0)
             {
-                string report1cName = "EDI_product_profiles";
+                string report1cName = "product_profiles";
                 var input = new structure._1C.ProductProfiles() {
                     group = groupPP
                 };
@@ -548,7 +549,7 @@ namespace ae.services.EDI
 
             if (newOrders.Count() > 0)
             {
-                string report1cName = "EDI_vkachka_zayavok";
+                string report1cName = "vkachka_zayavok";
                 var input = new structure._1C.NewOrders() {
                     orders = newOrders
                 };

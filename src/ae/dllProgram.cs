@@ -13,9 +13,6 @@ namespace ae
         {
             Base.Init();
 
-            //var edi = (services.EDI.EDI)Base.Services["EDI"];
-            //edi?.actionOutBox();
-
             var Scheduler = lib.Scheduler.getInstance();
             try
             {
