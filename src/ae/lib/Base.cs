@@ -98,8 +98,9 @@ namespace ae.lib
                     List<MemberInfo> cSM = configServiceMembers.Where(mem => (mem.Name == theServiceName)).ToList();
                     if (cSM.Count > 0) {
                         var serviceInstance = (Service)Activator.CreateInstance(t, theServiceName);
-                        serviceInstance.Init();
-                        Services[theServiceName] = serviceInstance;
+                        if (serviceInstance.Init()) {
+                            Services.Add(theServiceName, serviceInstance);
+                        }
                     }
                 }
             }
@@ -275,16 +276,32 @@ namespace ae.lib
             }
         }
 
-        public static void SaveLog(string arch_dir, string file_path)
+        public static void SaveLog(string archPath, string filePath)
         {
             // Данные для архива
             string ZipName = "Log_" + NumberDateTime(DateTime.Now) + ".zip";
-            string ZipPathName = Path.Combine(arch_dir, ZipName);
+            string ZipPathName = Path.Combine(archPath, ZipName);
 
             // архивирование файла в архив
             Console.WriteLine("Saving log-file in the archive [" + ZipName + "]:");
-            if (ZIP.Create(file_path, ZipPathName, false) && File.Exists(ZipPathName)) {
+            if (ZIP.Create(filePath, ZipPathName, false) && File.Exists(ZipPathName)) {
                 Console.WriteLine(@"\- saved.");
+            }
+        }
+
+        public static void SaveDirectory(string archPath, string dirPath, string dirName)
+        {
+            // Данные для архива
+            string zipName = dirName+"_" + NumberDateTime(DateTime.Now) + ".zip";
+            string zipPathName = Path.Combine(archPath, zipName);
+            string fullDirPath = Path.Combine(dirPath, dirName);
+
+            if (Directory.Exists(fullDirPath)) {
+                // архивирование файла в архив
+                Console.WriteLine("Saving directory to the archive [" + zipName + "]:");
+                if (ZIP.ListCreate(fullDirPath, zipPathName, false) && File.Exists(zipPathName)) {
+                    Console.WriteLine(@"\- saved.");
+                }
             }
         }
 

@@ -13,6 +13,7 @@ namespace ae.lib
         private string ServiceDirPath = "";
         public string InboxDir = "";
         public string OutboxDir = "";
+        public string Reports1cDir = "";
 
         public Service(string theServiceName) {
             this.ServiceName = theServiceName;
@@ -28,16 +29,28 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
-            this.InboxDir = Path.Combine(this.ServiceDirPath, @"Inbox");     // ConfigSetting.GetValName(Config, "base_setting").InboxDir;
-            this.OutboxDir = Path.Combine(this.ServiceDirPath, @"Outbox"); ; // Config.base_setting.OutboxDir;
-            Base.Log("Inbox dir: " + this.InboxDir);
-            Base.Log("Outbox dir: " + this.OutboxDir);
-
-            if (!Base.MakeFolder(this.InboxDir) || !Base.MakeFolder(this.OutboxDir)) {
-                string msg = "Error in Service.Init(): cann't create the folders: [" + this.InboxDir + " or " + this.OutboxDir + "]";
-                Base.LogError(msg);
+            this.InboxDir = Path.Combine(this.ServiceDirPath, @"Inbox");
+            if (!Base.MakeFolder(this.InboxDir)) {
+                Base.LogError("Error in Service.Init(): cann't create the directory [" + this.InboxDir + "]!");
                 return false;
             }
+            Base.Log("Inbox dir: " + this.InboxDir);
+
+            this.OutboxDir = Path.Combine(this.ServiceDirPath, @"Outbox");
+            if (!Base.MakeFolder(this.OutboxDir)) {
+                Base.LogError("Error in Service.Init(): cann't create the directory [" + this.OutboxDir + "]!");
+                return false;
+            }
+            Base.Log("Outbox dir: " + this.OutboxDir);
+
+            this.Reports1cDir = Path.Combine(this.ServiceDirPath, @"Reports1c");
+            if (!Base.MakeFolder(this.Reports1cDir))
+            {
+                Base.LogError("Error in Service.Init(): cann't create the directory [" + this.Reports1cDir + "]!");
+                return false;
+            }
+            Base.Log("Reports1c dir: " + this.Reports1cDir);
+
             return true;
         }
 

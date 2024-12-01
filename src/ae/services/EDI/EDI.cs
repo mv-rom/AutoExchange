@@ -21,6 +21,11 @@ namespace ae.services.EDI
             this.config = Base.Config.ConfigSettings.Services.EDI;
         }
 
+        public void log(string msg)
+        {
+            Base.Log("Service [" + this.GetType().Name + "]>> " + msg);
+        }
+
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
@@ -134,7 +139,7 @@ namespace ae.services.EDI
                     }
                     else
                     {
-                        Base.Log(
+                        this.log(
                             "Warning in getTTbyGLNfrom1C(): after do report [" + report1cName + "]!"
                         );
                     }
@@ -142,7 +147,7 @@ namespace ae.services.EDI
             }
             else
             {
-                Base.Log(
+                this.log(
                     "Warning in getTTbyGLNfrom1C(): hasn't parameter [gln] in config!"
                 );
             }
@@ -245,7 +250,7 @@ namespace ae.services.EDI
                 }
                 else
                 {
-                    Base.Log1(
+                    this.log(
                         "Warning in getProductProfilesOfTTfrom1C(): " +
                         "not found TT with GLN [" + glnTT + ", " + glnTT_gruz + "(" + delivery_address + ")]!"
                     );
@@ -295,7 +300,7 @@ namespace ae.services.EDI
                     output_groupPP = null;
                     return groupPP;
                 } else {
-                    Base.Log(
+                    this.log(
                         "Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!"
                     );
                 }
@@ -381,7 +386,7 @@ namespace ae.services.EDI
                         }
                         else
                         {
-                            Base.Log("Warning in doSplittingUpOrders(): not found order with id [" + id + "] in ProductProfiles_Group!");
+                            this.log("Warning in doSplittingUpOrders(): not found order with id [" + id + "] in ProductProfiles_Group!");
                             break;
                         }
                     }
@@ -394,7 +399,7 @@ namespace ae.services.EDI
         {
             string warehouse_code = "";
             if (!this.config.AbInbevEfes_ApiSetting.TryGetValue("warehouse_code", out warehouse_code)) {
-                Base.Log("Warning in CombineAbiePreSalesAndOrders(): not found [warehouse_code]!");
+                this.log("Warning in CombineAbiePreSalesAndOrders(): not found [warehouse_code]!");
                 return false;
             }
 
@@ -469,15 +474,11 @@ namespace ae.services.EDI
                                 var ErrorResult = AbInbevEfesAPI.getLogs(PreSaleResult.traceIdentifier);
                                 if (ErrorResult != null)
                                 {
-                                    Base.Log(ErrorResult.message);
+                                    this.log(ErrorResult.message);
                                 }
                             }
                         }
                     }
-
-                    //nCount++;
-                    //source[so.Key].resut_orderNo = Base.genarateKey();
-                    //source[so.Key].result_outletId = "6"+(Base.getCurentUnixDateTime() * 100000 + nCount).ToString();
                 }
             }
             return nCount > 0 ? true : false;
@@ -512,13 +513,13 @@ namespace ae.services.EDI
                     {
                         if (string.IsNullOrEmpty(so.Value.resut_orderNo))
                         {
-                            Base.Log("Warning in CheckAndAddOrdersIn1C(): order with id [" + so.Key + "] have empty [resut_orderNo]!");
+                            this.log("Warning in CheckAndAddOrdersIn1C(): order with id [" + so.Key + "] have empty [resut_orderNo]!");
                             newItems = null;
                             continue;
                         }
                         if (string.IsNullOrEmpty(so.Value.result_outletId))
                         {
-                            Base.Log("Warning in CheckAndAddOrdersIn1C(): order with id [" + so.Key + "] have empty [result_outletId]!");
+                            this.log("Warning in CheckAndAddOrdersIn1C(): order with id [" + so.Key + "] have empty [result_outletId]!");
                             newItems = null;
                             continue;
                         }
@@ -614,9 +615,9 @@ namespace ae.services.EDI
 
                         var checkStatus1c = CheckAndAddOrdersIn1C(ref SplittedOrders);
                         if (checkStatus1c)
-                            Base.Log("Processing orders in 1C is successful.");
+                            this.log("Processing orders in 1C is successful.");
                         else
-                            Base.Log("Some problems with processing orders in 1c!");
+                            this.log("Some problems with processing orders in 1c!");
 
                         if (combineStatus || checkStatus1c) {
                             //save Splited Order List
@@ -630,7 +631,7 @@ namespace ae.services.EDI
                 }
                 catch (Exception ex)
                 {
-                    Base.Log("Error in processInBox(): " + ex.Message);
+                    this.log("Error in actionInBox(): " + ex.Message);
                 }
                 finally
                 {
@@ -639,13 +640,14 @@ namespace ae.services.EDI
                     _1C.Instance = null;
                 }
             }
-            Base.Log("ResCount: " + ResCount);
+            this.log("ResCount: " + ResCount);
         }
 
         public void actionOutBox()
         {
             int ResCount = 0;
-            var dirPath = Path.Combine(Base.ServicesDir, "EDI", "OutBox");
+            string dirName = "OutBox";
+            var dirPath = Path.Combine(Base.ServicesDir, "EDI", dirName);
             if (Directory.Exists(dirPath))
             {
                 this.WorkDir = dirPath;
@@ -721,7 +723,7 @@ namespace ae.services.EDI
                                             }
                                         }
 
-                                        //Base.Log(desadvClass.HEAD.BUYER);
+                                        //this.log(desadvClass.HEAD.BUYER);
                                         string newFilepath = file; //file + "_"
                                         if (File.Exists(newFilepath)) File.Delete(newFilepath);
 
@@ -752,12 +754,16 @@ namespace ae.services.EDI
                 }
                 catch (Exception ex)
                 {
-                    Base.Log("Error in "+this.ToString()+"->actionOutBox(): " + ex.Message);
+                    this.log("Error in actionOutBox(): " + ex.Message);
+                }
+                finally
+                {
+                    Base.SaveDirectory(dirPath, dirName, Base.ArchivesDir);
                 }
             }
 
 __exit:
-            Base.Log("ResCount: " + ResCount);
+            this.log("ResCount: " + ResCount);
         }
     }
 }

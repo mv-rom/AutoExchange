@@ -48,8 +48,11 @@ namespace ae
 
             Base.deInit();
 
-            Base.SaveLog(Base.ArchivesDir, "ae.log");
-            File.Delete(Path.Combine(Base.RunDir, "ae.log"));
+            string logPath = Path.Combine(Base.RunDir, "ae.log");
+            if (File.Exists(logPath)) {
+                Base.SaveLog(Base.ArchivesDir, logPath);
+                File.Delete(logPath);
+            }
         }
     }
 }

@@ -61,12 +61,12 @@ namespace ae.lib
 
     internal class ZIP
     {
-        public static bool Create(string SourcePath, string ArchiveNamePath, bool recursive = false)
+        public static bool Create(string SourcePath, string ArchivePath, bool recursive = false)
         {
             bool result = false;
 
             if (File.Exists(SourcePath)) {
-                using (FileStream zipFile = File.Open(ArchiveNamePath, FileMode.Create))
+                using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create))
                 {
                     using (ZipFile loanZip = new ZipFile())
                     {
@@ -79,21 +79,16 @@ namespace ae.lib
             return result;
         }
 
-        public static bool ListCreate(string SourcePath, string ArchiveNamePath, bool recursive = false)
+        public static bool ListCreate(string SourcePath, string ArchivePath, bool recursive = false)
         {
             bool result = false;
 
-            if (Directory.Exists(SourcePath))
-            {
+            if (Directory.Exists(SourcePath)) {
                 string[] list = Directory.GetFiles(SourcePath);
-                if (list.Length > 0)
-                {
-                    using (FileStream zipFile = File.Open(ArchiveNamePath, FileMode.Create))
-                    {
-                        using (ZipFile loanZip = new ZipFile())
-                        {
-                            foreach (var l in list)
-                            {
+                if (list.Length > 0) {
+                    using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
+                        using (ZipFile loanZip = new ZipFile()) {
+                            foreach (var l in list) {
                                 loanZip.AddFile(l);
                             }
                             loanZip.Save(zipFile); //(string.Format("{0}{1}.zip", zipDestinationPath, documentIdentifier.ToString()));
