@@ -107,12 +107,11 @@ namespace ae.services.EDI
                 if (listTT.Count() > 0)
                 {
                     string report1cName = "tt_by_gln";
-                    var input = new structure._1C.TTbyGLN()
-                    {
+                    var input = new structure._1C.TTbyGLN() {
                         list = listTT
                     };
 
-                    var output = ae.lib._1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, report1cName, input);
+                    var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, report1cName, input);
                     if (output != null)
                     {
                         var output_listTT = output.list;
@@ -126,13 +125,10 @@ namespace ae.services.EDI
                             var output_item = output_listTT.
                                 Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
                                 FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                            if (output_item != null)
-                            {
+                            if (output_item != null) {
                                 listTT[i].codeTT = output_item.codeTT;
                                 i++;
-                            }
-                            else
-                            {
+                            } else {
                                 listTT.RemoveAt(i);
                             }
                         }
@@ -146,8 +142,7 @@ namespace ae.services.EDI
                     }
                 }
             }
-            else
-            {
+            else {
                 this.log(
                     "Warning in getTTbyGLNfrom1C(): hasn't parameter [gln] in config!"
                 );
