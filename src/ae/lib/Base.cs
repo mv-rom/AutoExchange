@@ -77,7 +77,7 @@ namespace ae.lib
                 throw new Exception(msg);
             }
 
-            //Load Services usig Namespace of CurrentDomain
+            //Load Services using Namespace of CurrentDomain
             string searchPatten = @"ae\.services\.(\w+)";
             Regex r = new Regex(searchPatten, RegexOptions.IgnoreCase);
 

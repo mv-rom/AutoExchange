@@ -36,11 +36,11 @@ namespace ae
             // в архивной папке через период (количество дней)
             int day = 14;
             // для архивов данных
-            string pattern = "_[A-Za-z0-9_-]*.zip";
+            string pattern = @".+_[A-Za-z0-9_-]*\.zip";
             Base.RotateArchives(Base.ArchivesDir, pattern, day);
 
             // для архивов логов
-            pattern = "Log_[A-Za-z0-9_-]*.zip";
+            pattern = @"Log_[A-Za-z0-9_-]*\.zip";
             Base.RotateArchives(Base.ArchivesDir, pattern, day);
 
             Base.Log("");
