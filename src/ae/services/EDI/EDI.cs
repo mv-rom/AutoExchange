@@ -28,24 +28,17 @@ namespace ae.services.EDI
 
         private string CalcExecuteOrderDate(DateTime execOrderDate, string PlaningListDaysofWeeek)
         {
-            var plDoW = PlaningListDaysofWeeek.Split(',');
-            if (execOrderDate.Day > DateTime.Now.Day)
-            {
-                int execDow = ((int)execOrderDate.DayOfWeek);
+            string[] plDoW = PlaningListDaysofWeeek.Split(',');
+            Array.Sort(plDoW);
+
+            if (execOrderDate.Day > DateTime.Now.Day) {
+                int execDow = (int)execOrderDate.DayOfWeek;
                 foreach (var p in plDoW)
                 {
                     int res_p = 0;
-                    if (Int32.TryParse(p, out res_p))
-                    {
-                        if (res_p >= execDow)
-                        {
-                            int diff_day = res_p - execDow;
-                            return execOrderDate.AddDays(diff_day).ToString();
-                        }
-                        else
-                        {
-                            //???????????
-                        }
+                    if (Int32.TryParse(p, out res_p) && 0 < res_p && res_p <= 7) {
+                        int diff_day = (res_p >= execDow) ? (res_p - execDow) : (7 - res_p);
+                        return execOrderDate.AddDays(diff_day).ToString();
                     }
                 }
             }
@@ -431,7 +424,6 @@ namespace ae.services.EDI
                                 }
                                 if (date_expected_delivery.Length > 0)
                                 {
-
                                     dictSO.Add(found_key, new structure.SplittedOrdersClass()
                                     {
                                         id = id,
@@ -649,7 +641,6 @@ namespace ae.services.EDI
                         //}
                         //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
                         JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
-                        throw new Exception("STOP");
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                         if (TTbyGLN_List == null)
@@ -669,6 +660,8 @@ namespace ae.services.EDI
                         var SplittedOrders = doSplittingUpOrders(ordersListFiltered, ProductProfiles, savedSplittedOrders);
                         if (SplittedOrders == null)
                             throw new Exception("Result of doSplittingUpOrders is null.");
+
+                        throw new Exception("STOP");
 
                         var combineStatus = CombineAbiePreSalesAndOrders(ref SplittedOrders);
 
