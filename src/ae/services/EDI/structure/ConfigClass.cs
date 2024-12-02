@@ -5,13 +5,19 @@ using System.Collections.Generic;
 
 namespace ae.services.EDI.structure
 {
+    public class GruzClass
+    {
+        public string gln { get; set; }
+        public string executionDayOfWeek { get; set; }
+    }
+
     public class CompaniesClass
     {
         public string gln { get; set; }
         public string edrpou { get; set; }
         public int enableOrderResponse { get; set; }
         public string comment { get; set; }
-        public string executionDayOfWeek { get; set; }
+        public GruzClass[] gruzs { get; set; }
     }
 
     public class PromotionsClass

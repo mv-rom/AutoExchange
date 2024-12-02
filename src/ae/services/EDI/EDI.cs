@@ -26,6 +26,7 @@ namespace ae.services.EDI
             Base.Log("Service [" + this.GetType().Name + "]> " + msg);
         }
 
+
         private string CalcExecuteOrderDate(DateTime execOrderDate, string PlaningListDaysofWeeek)
         {
             string[] plDoW = PlaningListDaysofWeeek.Split(',');
