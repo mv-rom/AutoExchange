@@ -208,7 +208,7 @@ namespace ae.services.EDI
                 foreach (var item in this.config.Companies)
                 {
                     if (long.Parse(item.gln) == glnTT) {
-                        var gruz = item.gruzs?.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
+                        var gruz = item.gruzs?.FirstOrDefault(t => (t.gln.Length > 0 && long.Parse(t.gln) == glnTT_gruz));
                         if (gruz != null) {
                             date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
                             break;
