@@ -301,13 +301,13 @@ namespace ae.lib
         {
             // Данные для архива
             string zipName = dirName+"_" + NumberDateTime(DateTime.Now) + ".zip";
-            string zipPathName = Path.Combine(archPath, zipName);
+            string zipPath = Path.Combine(archPath, zipName);
             string fullDirPath = Path.Combine(dirPath, dirName);
 
             if (Directory.Exists(fullDirPath)) {
                 // архивирование файла в архив
                 Console.WriteLine("Saving directory to the archive [" + zipName + "]:");
-                if (ZIP.ListCreate(fullDirPath, zipPathName, false) && File.Exists(zipPathName)) {
+                if (ZIP.ListCreate(fullDirPath, zipPath, false) && File.Exists(zipPath)) {
                     Console.WriteLine(@"\- saved.");
                 }
             }

@@ -16,7 +16,7 @@ namespace ae
             var Scheduler = lib.Scheduler.getInstance();
             try
             {
-                //Scheduler.Run();
+                Scheduler.Run();
             }
             catch (Exception ex)
             {
@@ -32,8 +32,8 @@ namespace ae
             // ротация файлов архивов (удаление старых) 
             // в архивной папке через период (количество дней)
             int day = 14;
+            
             // для архивов данных
-            //Base.RotateArchives(Base.ArchivesDir, @"(.+(?!Log).)*_[0-9-]+_[0-9]+\.zip", day);
             Base.RotateArchives(Base.ArchivesDir, @"^(?:(?!Log).)*$", day);
 
             // для архивов логов

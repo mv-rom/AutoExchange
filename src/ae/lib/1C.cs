@@ -32,24 +32,19 @@ namespace ae.lib
         private string torg_sklad = "";
 
 
-        public _1C()
+        public _1C(string reports1c_Dir)
         {
             this.type1C = null;
             this.instance1C = null;
-            //this.WorkDir = Base.InboxDir;
-
-            if (!Base.Config.ConfigSettings.App1cSetting.TryGetValue("report_dir", out this.ReportDirPath)) {
-                this.ReportDirPath = @"reports1c\";
-            }
-            this.ReportDirPath = Path.Combine(Base.RunDir, this.ReportDirPath);
+            this.ReportDirPath = reports1c_Dir;
             //this.LogFilePath = Path.Combine(this.WorkDir, this.LogFileName);
         }
 
-        public static _1C getInstance()
+        public static _1C getInstance(string reports1c_Dir)
         {
             if (_1C.Instance == null)
             {
-                _1C.Instance = new _1C();
+                _1C.Instance = new _1C(reports1c_Dir);
                 if (_1C.Instance.Init() != true) {
                     _1C.Instance.deInit();
                 }
@@ -222,11 +217,11 @@ namespace ae.lib
             return result;
         }
 
-        public static T runReportProcessingData<T>(string workDir, string report1c_Name, T inputObjectClass)
+        public static T runReportProcessingData<T>(string workDir, string reports1c_Dir, string report1c_Name, T inputObjectClass)
         {
             var result = default(T);
 
-            var inst1C = _1C.getInstance();
+            var inst1C = _1C.getInstance(reports1c_Dir);
             if (inst1C != null) {
                 var stringInput = XML.ConvertClassToXMLText(inputObjectClass);
                 if (inst1C.doReportFileInput(

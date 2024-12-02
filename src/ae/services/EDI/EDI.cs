@@ -111,7 +111,7 @@ namespace ae.services.EDI
                         list = listTT
                     };
 
-                    var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, report1cName, input);
+                    var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, this.Reports1CDir, report1cName, input);
                     if (output != null)
                     {
                         var output_listTT = output.list;
@@ -260,7 +260,7 @@ namespace ae.services.EDI
                     group = groupPP
                 };
 
-                var output = ae.lib._1C.runReportProcessingData<structure._1C.ProductProfiles>(WorkDir, report1cName, input);
+                var output = ae.lib._1C.runReportProcessingData<structure._1C.ProductProfiles>(WorkDir, this.Reports1CDir, report1cName, input);
                 if (output != null)
                 {
                     var output_groupPP = output.group;
@@ -549,7 +549,7 @@ namespace ae.services.EDI
                     orders = newOrders
                 };
 
-                var output = _1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, report1cName, input);
+                var output = _1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, this.Reports1CDir, report1cName, input);
                 if (output != null) {
                     var output_Orders = output.orders;
                     foreach (var oO in output_Orders)
@@ -570,10 +570,10 @@ namespace ae.services.EDI
         {
             int ResCount = 0;
             var fileJSON = "orders.json";
-            var dirPath = Path.GetFullPath(Path.Combine(Base.ServicesDir, "EDI", "InBox"));
-            if (Directory.Exists(dirPath))
+            //string dirName = "InBox";
+            if (Directory.Exists(this.InboxDir))
             {
-                this.WorkDir = dirPath;
+                this.WorkDir = this.InboxDir;
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
@@ -585,7 +585,7 @@ namespace ae.services.EDI
                         //    throw new Exception("STOP");
                         //}
                         //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
-                        JSON.DumpToFile(dirPath, fileJSON, ordersListFiltered);
+                        JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
                         //throw new Exception("STOP");
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
@@ -597,7 +597,7 @@ namespace ae.services.EDI
                             throw new Exception("Result of getProductProfilesOfTTfrom1C is null.");
 
                         string jsonStr = "";
-                        var filePathSO = Path.Combine(dirPath, "splitted_" + fileJSON);
+                        var filePathSO = Path.Combine(this.InboxDir, "splitted_" + fileJSON);
                         if (File.Exists(filePathSO)) {
                             jsonStr = File.ReadAllText(filePathSO);
                         }
@@ -643,10 +643,9 @@ namespace ae.services.EDI
         {
             int ResCount = 0;
             string dirName = "OutBox";
-            var dirPath = Path.Combine(Base.ServicesDir, "EDI", dirName);
-            if (Directory.Exists(dirPath))
+            if (Directory.Exists(this.OutboxDir))
             {
-                this.WorkDir = dirPath;
+                this.WorkDir = this.OutboxDir;
                 try
                 {
                     var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
@@ -674,15 +673,15 @@ namespace ae.services.EDI
 
                     //processing in OutboxDir
                     string pattern1 = @"^.+_DESADV_.+\.xml$";
-                    var dirsList = Directory.GetDirectories(dirPath);
+                    var dirsList = Directory.GetDirectories(this.OutboxDir);
                     foreach (var dPath in dirsList)
                     {
                         if (Directory.Exists(dPath))
                         {
-                            var DirName = new DirectoryInfo(dPath).Name;
+                            var dName = new DirectoryInfo(dPath).Name;
 
                             //filter by company gln
-/*                            var Company = this.config.Companies.FirstOrDefault(x => x.erdpou == DirName);
+/*                          var Company = this.config.Companies.FirstOrDefault(x => x.erdpou == dName);
                             if (Company != null) {
                                 var gln = Company.gln;
                             }
@@ -754,7 +753,7 @@ namespace ae.services.EDI
                 }
                 finally
                 {
-                    Base.SaveDirectory(dirPath, dirName, Base.ArchivesDir);
+                    Base.SaveDirectory(this.OutboxDir, dirName, Base.ArchivesDir);
                 }
             }
 
