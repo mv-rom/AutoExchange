@@ -13,6 +13,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
         private static API Instance = null;
         private RestApiClient Authorization_RAC;
         private RestApiClient RAC;
+        private string WorkDir;
 
         private string      Authorization_BaseUrl;
         private string      Authorization_ContentType;
@@ -27,12 +28,14 @@ namespace ae.services.EDI.tools.AbInbevEfes
         private string      Data_ContentType;
 
 
-        private bool Init(ConfigClass config)
+        private bool Init(ConfigClass config, string workDir)
         {
             bool result = false;
             int HttpClientTimeout = 1*60*1000;
             try
             {
+                this.WorkDir = workDir;
+
                 this.Authorization_BaseUrl = "";
                 if (!config.AbInbevEfes_ApiSetting.TryGetValue("authorization_url", out this.Authorization_BaseUrl))
                     return false;
@@ -88,11 +91,11 @@ namespace ae.services.EDI.tools.AbInbevEfes
             this.RAC = null;
         }
 
-        public static API getInstance(ConfigClass config)
+        public static API getInstance(ConfigClass config, string workDir)
         {
             if (API.Instance == null) {
                 API.Instance = new API();
-                if (API.Instance.Init(config) != true) API.Instance.DeInit();
+                if (API.Instance.Init(config, workDir) != true) API.Instance.DeInit();
             }
             return API.Instance;
         }
@@ -130,7 +133,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
 
 
         public string PUTfromDump(string requestString) {
-            var dirPath = Base.BaseDir;
+            var dirPath = this.WorkDir;
             //long OrderNumIndex = 611128000000000;
 
             if (!string.IsNullOrEmpty(requestString) && Directory.Exists(dirPath)) {
@@ -164,11 +167,11 @@ namespace ae.services.EDI.tools.AbInbevEfes
             try
             {
                 var requestString = JSON.toJSON(packetPreSale);
-                Base.DumpToFile(Base.BaseDir, "(request-getPreSales).json", requestString);
+                Base.DumpToFile(this.WorkDir, "(request-getPreSales).json", requestString);
 
                 //string responseString = this.PUTfromDump(requestString);
                 string responseString = this.RAC.PUT("/api/PreSales", "", requestString);
-                Base.DumpToFile(Base.BaseDir, "(response-getPreSales).json", responseString);
+                Base.DumpToFile(this.WorkDir, "(response-getPreSales).json", responseString);
 
                 if (!String.IsNullOrEmpty(responseString)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(responseString);

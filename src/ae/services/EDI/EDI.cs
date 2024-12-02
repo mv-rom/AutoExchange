@@ -435,7 +435,7 @@ namespace ae.services.EDI
                         preSalesDetails = preSalesDetails
                     };
 
-                    var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance(this.config);
+                    var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance(this.config, WorkDir);
                     if (AbInbevEfesAPI != null)
                     {
                         var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
@@ -530,9 +530,9 @@ namespace ae.services.EDI
                         {
                             id = so.Key,
                             orderNumber = so.Value.resut_orderNo,
-                            orderEDINumber = oNumber,
+                            orderEDINumber = oNumber, //???????????????????
                             outletId = so.Value.result_outletId,
-                            executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
+                            executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"), ????????????????????
                             codeTT_part1 = so.Value.codeTT_part1,
                             codeTT_part2 = so.Value.codeTT_part2,
                             codeTT_part3 = so.Value.codeTT_part3,
