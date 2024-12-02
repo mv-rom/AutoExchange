@@ -26,6 +26,31 @@ namespace ae.services.EDI
             Base.Log("Service [" + this.GetType().Name + "]> " + msg);
         }
 
+        private string CalcExecuteOrderDate(DateTime execOrderDate, string PlaningListDaysofWeeek)
+        {
+            var plDoW = PlaningListDaysofWeeek.Split(',');
+            if (execOrderDate.Day > DateTime.Now.Day)
+            {
+                int execDow = ((int)execOrderDate.DayOfWeek);
+                foreach (var p in plDoW)
+                {
+                    int res_p = 0;
+                    if (Int32.TryParse(p, out res_p))
+                    {
+                        if (res_p >= execDow)
+                        {
+                            int diff_day = res_p - execDow;
+                            return execOrderDate.AddDays(diff_day).ToString();
+                        }
+                        else
+                        {
+                            //???????????
+                        }
+                    }
+                }
+            }
+            return "";
+        }
 
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
@@ -182,8 +207,18 @@ namespace ae.services.EDI
                 var id = s.id;
                 var glnTT = long.Parse(s.as_json.buyer_gln);
                 var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
-                var date_expected_delivery = s.as_json.date_expected_delivery;
                 var delivery_address = s.as_json.delivery_address;
+
+                var execD = DateTime.Parse(s.as_json.date_expected_delivery);
+                string date_expected_delivery = "";
+                foreach (var item in this.config.Companies)
+                {
+                    if (long.Parse(item.gln) == glnTT) {
+                        date_expected_delivery = this.CalcExecuteOrderDate(execD, item.executionDayOfWeek);
+                        break;
+                    }
+                }
+                if (date_expected_delivery.Length <= 0) continue;
 
                 //search in listTT
                 bool found = false;
@@ -383,20 +418,35 @@ namespace ae.services.EDI
                             //add new
                             if (newItems.Count > 0)
                             {
-                                dictSO.Add(found_key, new structure.SplittedOrdersClass()
+                                var glnTT = long.Parse(o.as_json.buyer_gln);
+
+                                var execD = DateTime.Parse(o.as_json.date_expected_delivery);
+                                string date_expected_delivery = "";
+                                foreach (var item in this.config.Companies)
                                 {
-                                    id = id,
-                                    ae_id = Base.genarateKey(),
-                                    orderNumber = o.number,
-                                    OrderDate = DateTime.Parse(o.as_json.date),
-                                    OrderExecutionDate = DateTime.Parse(o.as_json.date_expected_delivery),
-                                    codeTT_part1 = found_item.codeTT_part1,
-                                    codeTT_part2 = found_item.codeTT_part2,
-                                    codeTT_part3 = found_item.codeTT_part3,
-                                    Items = newItems,
-                                    status1c = 0, //current state in 1C
-                                    deal_status = deal_status //current state in EDI
-                                });
+                                    if (long.Parse(item.gln) == glnTT) {
+                                        date_expected_delivery = this.CalcExecuteOrderDate(execD, item.executionDayOfWeek);
+                                        break;
+                                    }
+                                }
+                                if (date_expected_delivery.Length > 0)
+                                {
+
+                                    dictSO.Add(found_key, new structure.SplittedOrdersClass()
+                                    {
+                                        id = id,
+                                        ae_id = Base.genarateKey(),
+                                        orderNumber = o.number,
+                                        OrderDate = DateTime.Parse(o.as_json.date),
+                                        OrderExecutionDate = DateTime.Parse(date_expected_delivery),
+                                        codeTT_part1 = found_item.codeTT_part1,
+                                        codeTT_part2 = found_item.codeTT_part2,
+                                        codeTT_part3 = found_item.codeTT_part3,
+                                        Items = newItems,
+                                        status1c = 0, //current state in 1C
+                                        deal_status = deal_status //current state in EDI
+                                    });
+                                }
                             }
                         }
                         else
