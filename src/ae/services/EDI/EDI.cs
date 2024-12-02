@@ -520,17 +520,11 @@ namespace ae.services.EDI
                             continue;
                         }
 
-                        //encoding of orderEDINumber
-                        Encoding fromEnc = Encoding.UTF8;
-                        Encoding toEnc = Encoding.ASCII;
-                        byte[] oNumberBytes = Encoding.Convert(fromEnc, toEnc, fromEnc.GetBytes(so.Value.orderNumber));
-                        string oNumber = toEnc.GetString(oNumberBytes);
-
                         newOrders.Add(new structure._1C.NewOrders_Order()
                         {
                             id = so.Key,
                             orderNumber = so.Value.resut_orderNo,
-                            orderEDINumber = oNumber, //???????????????????
+                            orderEDINumber = so.Value.orderNumber,
                             outletId = so.Value.result_outletId,
                             executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"), ????????????????????
                             codeTT_part1 = so.Value.codeTT_part1,

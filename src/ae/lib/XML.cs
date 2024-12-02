@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Xml;
+
 //using System.Runtime.Remoting.Messaging;
 //using System.Xml;
 using System.Xml.Serialization;
@@ -63,22 +66,29 @@ namespace ae.lib
         }
 
 
-        public static string ConvertClassToXMLText(object objectClass)
+        public static string ConvertClassToXMLText(object objectClass, Encoding enc = null)
         {
             string result = "";
-            Encoding TextEncoding = Encoding.UTF8; //Encoding.Default;
+            Encoding TextEncoding = Encoding.UTF8;  //Encoding.Default;
+            if (enc != null)
+                TextEncoding = enc;
             try
             {
-                Type objectType = objectClass.GetType();
-                XmlSerializer formatter = new XmlSerializer(objectType);
-                using (var mStream = new MemoryStream())
+                XmlSerializer formatter = new XmlSerializer(objectClass.GetType());
+                var settings = new XmlWriterSettings {
+                    Encoding = enc,
+                    Indent = true
+                };
+                using (var ms = new MemoryStream())
                 {
-                    formatter.Serialize(mStream, objectClass);
-                    result = TextEncoding.GetString(mStream.ToArray());
+                    using (var writer = XmlWriter.Create(ms, settings))
+                    {
+                        formatter.Serialize(writer, objectClass, null);
+                        result = TextEncoding.GetString(ms.ToArray());
+                    }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Base.Log("Error in " + ex.GetType().Name + ".ConvertClassToXMLText(): " + ex.Message);
             }
             return result;
@@ -93,9 +103,9 @@ namespace ae.lib
                 {
                     XmlSerializer formatter = new XmlSerializer(typeof(T));
                     byte[] byteArray = TextEncoding.GetBytes(objectClassXMLString);
-                    using (var mStream = new MemoryStream(byteArray))
+                    using (var ms = new MemoryStream(byteArray))
                     {
-                        result = (T)formatter.Deserialize(mStream);
+                        result = (T)formatter.Deserialize(ms);
                     }
                 }
                 catch (Exception ex)
