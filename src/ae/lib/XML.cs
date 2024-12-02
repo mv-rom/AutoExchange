@@ -69,7 +69,7 @@ namespace ae.lib
         public static string ConvertClassToXMLText(object objectClass, Encoding enc = null)
         {
             string result = "";
-            Encoding TextEncoding = Encoding.UTF8;  //Encoding.Default;
+            Encoding TextEncoding = Encoding.UTF8;
             if (enc != null)
                 TextEncoding = enc;
             try
@@ -97,7 +97,7 @@ namespace ae.lib
         public static T ConvertXMLTextToClass<T>(string objectClassXMLString)
         {
             T result = default(T);
-            Encoding TextEncoding = Encoding.UTF8; //Encoding.Default;
+            Encoding TextEncoding = Encoding.UTF8;
             if (objectClassXMLString.Length > 0) {
                 try
                 {

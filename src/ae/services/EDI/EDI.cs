@@ -30,8 +30,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-4).ToString("yyyy-MM-dd");
-            //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd"); //DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
