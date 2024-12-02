@@ -171,6 +171,13 @@ namespace ae.lib
             bool result = false;
             string className = this.GetType().Name;
 
+            //encoding of orderEDINumber
+            //Encoding fromEnc = Encoding.UTF8;
+            //Encoding toEnc = Encoding.ASCII;
+            //byte[] dataBytes = Encoding.Convert(fromEnc, toEnc, fromEnc.GetBytes(data));
+            //string encodingData = toEnc.GetString(dataBytes);
+            //string encodingData = data;
+
             if (data.Length > 0) {
                 var InputFilePath = Path.Combine(workDir, "1CInput.xml");
                 try
@@ -178,7 +185,7 @@ namespace ae.lib
                     if (File.Exists(InputFilePath)) {
                         File.Delete(InputFilePath);
                     }
-                    File.WriteAllText(InputFilePath, data, Encoding.ASCII); //Encoding.GetEncoding("windows-1251"));
+                    File.WriteAllText(InputFilePath, data, Encoding.GetEncoding("windows-1251"));
                     result = true;
                 }
                 catch (Exception ex)
@@ -223,7 +230,7 @@ namespace ae.lib
 
             var inst1C = _1C.getInstance(reports1c_Dir);
             if (inst1C != null) {
-                var stringInput = XML.ConvertClassToXMLText(inputObjectClass);
+                var stringInput = XML.ConvertClassToXMLText(inputObjectClass, Encoding.GetEncoding("windows-1251"));
                 if (inst1C.doReportFileInput(
                     workDir,
                     stringInput
