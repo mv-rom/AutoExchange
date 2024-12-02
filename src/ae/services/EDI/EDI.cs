@@ -23,7 +23,7 @@ namespace ae.services.EDI
 
         public void log(string msg)
         {
-            Base.Log("Service [" + this.GetType().Name + "]>> " + msg);
+            Base.Log("Service [" + this.GetType().Name + "]> " + msg);
         }
 
 
@@ -42,23 +42,45 @@ namespace ae.services.EDI
             //filter only Orders
             var result = ordersList.Where(x => x.type == 1).ToList();
 
-            //Filter by deal_id (like order_number)
             int count = result.Count();
-            if (count > 0) {
-                int i = 0;
-                while (i < count)
-                {
-                    var item = result[i];
-                    if (ordersList.FirstOrDefault(t => t.type > 1 && t.deal_id.Equals(item.deal_id)) != null) {
-                        result.Remove(item);
-                        count = result.Count();
-                    } else {
-                        i++;
-                    }
+            if (count <= 0) return null;
+
+            //Filter by deal_id (like order_number) - leave only new orders
+            int i = 0;
+            while (i < count) {
+                var item = result[i];
+                if (ordersList.FirstOrDefault(t => t.type > 1 && t.deal_id.Equals(item.deal_id)) != null) {
+                    result.Remove(item);
+                    count = result.Count();
+                } else {
+                    i++;
                 }
-            } else {
-                result = null;
             }
+            if (count <= 0) return null;
+
+            //check our EDRPOU
+            string ourEdrpou = "";
+            if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("edrpou", out ourEdrpou)) {
+                this.log("There is not EDRPOU of our company!");
+                return null;
+            }
+
+            //Filter by edrpou - leave only from the list of Companies
+            var companyList = this.config.Companies;
+            i = 0;
+            while (i < count) {
+                var item = result[i];
+                if (companyList.FirstOrDefault(t => (
+                    item.company_to_edrpou.Equals(ourEdrpou) && t.edrpou.Equals(item.company_from_edrpou))
+                ) != null) {
+                    i++;
+                } else {
+                    result.Remove(item);
+                    count = result.Count();
+                }
+            }
+            if (count <= 0) return null;
+
             return result;
         }
 
@@ -227,14 +249,12 @@ namespace ae.services.EDI
 
                         //search in listPP
                         bool item_found = false;
-                        foreach (var l in groupPP[tt_found_in_PP_i].list)
-                        {
+                        foreach (var l in groupPP[tt_found_in_PP_i].list) {
                             if (l.EAN == product_code) item_found = true;
                         }
 
                         if (!item_found) {
-                            pp_g.list.Add(new structure._1C.ProductProfiles_Item()
-                            {
+                            pp_g.list.Add(new structure._1C.ProductProfiles_Item() {
                                 EAN = product_code,
                                 Title = title,
                                 Number = num
@@ -579,7 +599,7 @@ namespace ae.services.EDI
                         //}
                         //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
                         JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
-                        //throw new Exception("STOP");
+                        throw new Exception("STOP");
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);
                         if (TTbyGLN_List == null)
@@ -680,7 +700,7 @@ namespace ae.services.EDI
                             }
  */                           //var ORDRSP = 1;
 
-                            var xmlFilesList = Directory.GetFiles(dPath);
+            var xmlFilesList = Directory.GetFiles(dPath);
                             foreach (var file in xmlFilesList)
                             {
                                 //parse *_DESADV_*.xml:

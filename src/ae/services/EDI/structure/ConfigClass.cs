@@ -7,9 +7,11 @@ namespace ae.services.EDI.structure
 {
     public class CompaniesClass
     {
-        public string erdpou { get; set; }
-        public int enable_order_response { get; set; }
+        public string gln { get; set; }
+        public string edrpou { get; set; }
+        public int enableOrderResponse { get; set; }
         public string comment { get; set; }
+        public string executionDayOfWeek { get; set; }
     }
 
     public class PromotionsClass
