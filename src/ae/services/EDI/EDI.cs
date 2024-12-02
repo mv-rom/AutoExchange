@@ -49,7 +49,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd"); //DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"); //DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
@@ -80,7 +80,7 @@ namespace ae.services.EDI
             //check our EDRPOU
             string ourEdrpou = "";
             if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("edrpou", out ourEdrpou)) {
-                this.log("There is not EDRPOU of our company!");
+                this.log("There is not EDRPOU of this company!");
                 return null;
             }
 
@@ -208,11 +208,20 @@ namespace ae.services.EDI
                 foreach (var item in this.config.Companies)
                 {
                     if (long.Parse(item.gln) == glnTT) {
-                        date_expected_delivery = this.CalcExecuteOrderDate(execD, item.executionDayOfWeek);
-                        break;
+                        var gruz = item.gruzs?.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
+                        if (gruz != null) {
+                            date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
+                            break;
+                        }
                     }
                 }
-                if (date_expected_delivery.Length <= 0) continue;
+                if (date_expected_delivery.Length <= 0) {
+                    this.log(
+                        "Warning in getProductProfilesOfTTfrom1C(): " + 
+                        "date_expected_delivery is empty or not right in order ["+ id + "]!"
+                    );
+                    continue;
+                }
 
                 //search in listTT
                 bool found = false;
@@ -291,9 +300,7 @@ namespace ae.services.EDI
                             num++;
                         }
                     }
-                }
-                else
-                {
+                } else {
                     this.log(
                         "Warning in getProductProfilesOfTTfrom1C(): " +
                         "not found TT with GLN [" + glnTT + ", " + glnTT_gruz + "(" + delivery_address + ")]!"
@@ -413,16 +420,20 @@ namespace ae.services.EDI
                             if (newItems.Count > 0)
                             {
                                 var glnTT = long.Parse(o.as_json.buyer_gln);
-
+                                var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
                                 var execD = DateTime.Parse(o.as_json.date_expected_delivery);
                                 string date_expected_delivery = "";
                                 foreach (var item in this.config.Companies)
                                 {
                                     if (long.Parse(item.gln) == glnTT) {
-                                        date_expected_delivery = this.CalcExecuteOrderDate(execD, item.executionDayOfWeek);
-                                        break;
+                                        var gruz = item.gruzs?.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
+                                        if (gruz != null) {
+                                            date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
+                                            break;
+                                        }
                                     }
                                 }
+
                                 if (date_expected_delivery.Length > 0)
                                 {
                                     dictSO.Add(found_key, new structure.SplittedOrdersClass()
@@ -439,6 +450,11 @@ namespace ae.services.EDI
                                         status1c = 0, //current state in 1C
                                         deal_status = deal_status //current state in EDI
                                     });
+                                } else {
+                                    this.log(
+                                        "Warning in doSplittingUpOrders(): " +
+                                        "date_expected_delivery is empty or not right in splitted order [" + found_key + "]!"
+                                    );
                                 }
                             }
                         }
@@ -588,7 +604,7 @@ namespace ae.services.EDI
                             orderNumber = so.Value.resut_orderNo,
                             orderEDINumber = so.Value.orderNumber,
                             outletId = so.Value.result_outletId,
-                            executionDate = DateTime.Now.AddDays(1).ToString("dd-MM-yyyy"), //so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"), ????????????????????
+                            executionDate = so.Value.OrderExecutionDate.ToString("dd-MM-yyyy"),
                             codeTT_part1 = so.Value.codeTT_part1,
                             codeTT_part2 = so.Value.codeTT_part2,
                             codeTT_part3 = so.Value.codeTT_part3,
