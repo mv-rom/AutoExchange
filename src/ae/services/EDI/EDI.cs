@@ -15,7 +15,7 @@ namespace ae.services.EDI
     {
         private string WorkDir = "";
         public structure.ConfigClass config;
-        private int __N_AddExecuteDay = 1;
+        private int __N_AddDayToExecuteDay = 0;
 
         public EDI(string theServiceName) : base(theServiceName)
         {
@@ -36,7 +36,7 @@ namespace ae.services.EDI
             if (orderExecuteDate.Day > DateTime.Now.Day) {
                 int execDow = (int)orderExecuteDate.DayOfWeek;
                 int firstPlanningDayOfWeek = 0;
-                int daysDifference = 0;
+                int daysDifference = -1;
                 foreach (var p in plDoW)
                 {
                     int res_p = 0;
@@ -48,7 +48,7 @@ namespace ae.services.EDI
                         }
                     }
                 }
-                daysDifference = (daysDifference == 0) ? (7 - execDow + firstPlanningDayOfWeek) : daysDifference;
+                daysDifference = (daysDifference == -1) ? (7 - execDow + firstPlanningDayOfWeek) : daysDifference;
                 return orderExecuteDate.AddDays(daysDifference).ToString();
             }
             return "";
@@ -57,8 +57,8 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"); //DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-            var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var nowDT = DateTime.Now.ToString("yyyy-MM-dd"); //var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
 
@@ -211,7 +211,7 @@ namespace ae.services.EDI
                 var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
                 var delivery_address = s.as_json.delivery_address;
 
-                var execD = DateTime.Parse(s.as_json.date_expected_delivery).AddDays(this.__N_AddExecuteDay);
+                var execD = DateTime.Parse(s.as_json.date_expected_delivery).AddDays(this.__N_AddDayToExecuteDay);
                 string date_expected_delivery = "";
                 foreach (var item in this.config.Companies)
                 {
@@ -429,7 +429,7 @@ namespace ae.services.EDI
                             {
                                 var glnTT = long.Parse(o.as_json.buyer_gln);
                                 var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
-                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(this.__N_AddExecuteDay);
+                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(this.__N_AddDayToExecuteDay);
                                 string date_expected_delivery = "";
                                 foreach (var item in this.config.Companies)
                                 {
@@ -727,9 +727,7 @@ namespace ae.services.EDI
                 this.WorkDir = this.OutboxDir;
                 try
                 {
-                    var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
-                    //var nowDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
-                    //var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
+                    var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
                     var VchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config); //this.config.VchasnoEDI_ApiSetting
@@ -765,9 +763,7 @@ namespace ae.services.EDI
                                 var gln = Company.gln;
                             }
  */                           //var ORDRSP = 1;
-
-            var xmlFilesList = Directory.GetFiles(dPath);
-                            foreach (var file in xmlFilesList)
+                            foreach (var file in Directory.GetFiles(dPath))
                             {
                                 //parse *_DESADV_*.xml:
                                 if (Regex.IsMatch(file, pattern1) && File.Exists(file))
@@ -776,8 +772,7 @@ namespace ae.services.EDI
                                     if (desadvClass != null)
                                     {
                                         tools.VchasnoEDI.structure.Order _founded = null;
-                                        foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER))
-                                        {
+                                        foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER)) {
                                             _founded = item;
                                             break;
                                         }
