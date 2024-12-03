@@ -678,8 +678,6 @@ namespace ae.services.EDI
                         if (SplittedOrders == null)
                             throw new Exception("Result of doSplittingUpOrders is null.");
 
-                        throw new Exception("STOP");
-
                         var combineStatus = CombineAbiePreSalesAndOrders(ref SplittedOrders);
 
                         var checkStatus1c = CheckAndAddOrdersIn1C(ref SplittedOrders);
