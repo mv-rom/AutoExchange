@@ -207,8 +207,8 @@ namespace ae.services.EDI
                 string date_expected_delivery = "";
                 foreach (var item in this.config.Companies)
                 {
-                    if (long.Parse(item.gln) == glnTT) {
-                        var gruz = item.gruzs?.FirstOrDefault(t => (t.gln.Length > 0 && long.Parse(t.gln) == glnTT_gruz));
+                    if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
+                        var gruz = item.gruzs.FirstOrDefault(t => (t.gln.Length > 0 && long.Parse(t.gln) == glnTT_gruz));
                         if (gruz != null) {
                             date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
                             break;
@@ -425,8 +425,8 @@ namespace ae.services.EDI
                                 string date_expected_delivery = "";
                                 foreach (var item in this.config.Companies)
                                 {
-                                    if (long.Parse(item.gln) == glnTT) {
-                                        var gruz = item.gruzs?.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
+                                    if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
+                                        var gruz = item.gruzs.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
                                         if (gruz != null) {
                                             date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
                                             break;

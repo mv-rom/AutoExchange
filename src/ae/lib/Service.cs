@@ -60,7 +60,9 @@ namespace ae.lib
         {
             if (Name.Length > 0) {
                 MethodInfo metd = this.GetType().GetMethod(Name);
-                metd?.Invoke(this, null);
+                if (metd != null) {
+                    metd.Invoke(this, null);
+                }
             }
         }
     }
