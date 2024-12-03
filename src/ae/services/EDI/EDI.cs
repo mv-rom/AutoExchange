@@ -27,21 +27,26 @@ namespace ae.services.EDI
         }
 
 
-        private string CalcExecuteOrderDate(DateTime execOrderDate, string PlaningListDaysofWeeek)
+        private string CalcExecuteOrderDate(DateTime orderExecuteDate, string PlanningListDaysOfWeeek)
         {
-            string[] plDoW = PlaningListDaysofWeeek.Split(',');
+            string[] plDoW = PlanningListDaysOfWeeek.Split(',');
             Array.Sort(plDoW);
 
-            if (execOrderDate.Day > DateTime.Now.Day) {
-                int execDow = (int)execOrderDate.DayOfWeek;
+            if (orderExecuteDate.Day > DateTime.Now.Day) {
+                int execDow = (int)orderExecuteDate.DayOfWeek;
+                int firstPlanningDayOfWeek = 0;
+                int daysDifference = 0;
                 foreach (var p in plDoW)
                 {
                     int res_p = 0;
                     if (Int32.TryParse(p, out res_p) && 0 < res_p && res_p <= 7) {
-                        int diff_day = (res_p >= execDow) ? (res_p - execDow) : (7 - res_p);
-                        return execOrderDate.AddDays(diff_day).ToString();
+                        firstPlanningDayOfWeek = Int32.Parse(plDoW[0]);
+                        if (res_p >= execDow)
+                            daysDifference = res_p - execDow;
                     }
                 }
+                daysDifference = (daysDifference == 0) ? (7 - execDow + firstPlanningDayOfWeek) : daysDifference;
+                return orderExecuteDate.AddDays(daysDifference).ToString();
             }
             return "";
         }
