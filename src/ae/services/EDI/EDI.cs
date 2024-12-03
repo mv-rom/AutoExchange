@@ -203,7 +203,7 @@ namespace ae.services.EDI
                 var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
                 var delivery_address = s.as_json.delivery_address;
 
-                var execD = DateTime.Parse(s.as_json.date_expected_delivery);
+                var execD = DateTime.Parse(s.as_json.date_expected_delivery).AddDays(1);
                 string date_expected_delivery = "";
                 foreach (var item in this.config.Companies)
                 {
@@ -421,7 +421,7 @@ namespace ae.services.EDI
                             {
                                 var glnTT = long.Parse(o.as_json.buyer_gln);
                                 var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
-                                var execD = DateTime.Parse(o.as_json.date_expected_delivery);
+                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(1);
                                 string date_expected_delivery = "";
                                 foreach (var item in this.config.Companies)
                                 {
