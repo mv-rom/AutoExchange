@@ -15,6 +15,7 @@ namespace ae.services.EDI
     {
         private string WorkDir = "";
         public structure.ConfigClass config;
+        private int __N_AddExecuteDay = 1;
 
         public EDI(string theServiceName) : base(theServiceName)
         {
@@ -27,7 +28,7 @@ namespace ae.services.EDI
         }
 
 
-        private string CalcExecuteOrderDate(DateTime orderExecuteDate, string PlanningListDaysOfWeeek)
+        private string CalcOrderExecuteDate(DateTime orderExecuteDate, string PlanningListDaysOfWeeek)
         {
             string[] plDoW = PlanningListDaysOfWeeek.Split(',');
             Array.Sort(plDoW);
@@ -210,14 +211,14 @@ namespace ae.services.EDI
                 var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
                 var delivery_address = s.as_json.delivery_address;
 
-                var execD = DateTime.Parse(s.as_json.date_expected_delivery).AddDays(1);
+                var execD = DateTime.Parse(s.as_json.date_expected_delivery).AddDays(this.__N_AddExecuteDay);
                 string date_expected_delivery = "";
                 foreach (var item in this.config.Companies)
                 {
                     if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
                         var gruz = item.gruzs.FirstOrDefault(t => (t.gln.Length > 0 && long.Parse(t.gln) == glnTT_gruz));
                         if (gruz != null) {
-                            date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
+                            date_expected_delivery = this.CalcOrderExecuteDate(execD, gruz.executionDayOfWeek);
                             break;
                         }
                     }
@@ -428,14 +429,14 @@ namespace ae.services.EDI
                             {
                                 var glnTT = long.Parse(o.as_json.buyer_gln);
                                 var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
-                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(1);
+                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(this.__N_AddExecuteDay);
                                 string date_expected_delivery = "";
                                 foreach (var item in this.config.Companies)
                                 {
                                     if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
                                         var gruz = item.gruzs.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
                                         if (gruz != null) {
-                                            date_expected_delivery = this.CalcExecuteOrderDate(execD, gruz.executionDayOfWeek);
+                                            date_expected_delivery = this.CalcOrderExecuteDate(execD, gruz.executionDayOfWeek);
                                             break;
                                         }
                                     }
