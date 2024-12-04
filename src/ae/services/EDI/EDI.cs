@@ -57,7 +57,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
@@ -651,6 +651,7 @@ namespace ae.services.EDI
         public void actionInBox()
         {
             int ResCount = 0;
+            string dirName = "InBox";
             var fileJSON = "orders.json";
             //string dirName = "InBox";
             if (Directory.Exists(this.InboxDir))
@@ -715,6 +716,8 @@ namespace ae.services.EDI
                     if (_1C.Instance != null)
                         _1C.Instance.runExit();
                     _1C.Instance = null;
+
+                    Base.SaveDirectory(Base.ArchivesDir, this.InboxDir, dirName);
                 }
             }
             this.log("ResCount: " + ResCount);
@@ -829,7 +832,7 @@ namespace ae.services.EDI
                 }
                 finally
                 {
-                    Base.SaveDirectory(this.OutboxDir, dirName, Base.ArchivesDir);
+                    Base.SaveDirectory(Base.ArchivesDir, this.OutboxDir, dirName);
                 }
             }
 
