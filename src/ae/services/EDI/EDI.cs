@@ -57,7 +57,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd"); //var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
@@ -97,8 +97,10 @@ namespace ae.services.EDI
             i = 0;
             while (i < count) {
                 var item = result[i];
-                if (companyList.FirstOrDefault(t => (
-                    item.company_to_edrpou.Equals(ourEdrpou) && t.edrpou.Equals(item.company_from_edrpou))
+                if (companyList.FirstOrDefault(t =>
+                    item.company_to_edrpou.Equals(ourEdrpou) && 
+                    t.edrpou.Equals(item.company_from_edrpou) &&
+                    t.gln.Equals(item.as_json.buyer_gln)
                 ) != null) {
                     i++;
                 } else {
@@ -727,7 +729,7 @@ namespace ae.services.EDI
                 this.WorkDir = this.OutboxDir;
                 try
                 {
-                    var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+                    var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
                     var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
                     var VchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config); //this.config.VchasnoEDI_ApiSetting
