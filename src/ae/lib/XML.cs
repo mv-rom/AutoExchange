@@ -1,11 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Xml;
-
-//using System.Runtime.Remoting.Messaging;
-//using System.Xml;
 using System.Xml.Serialization;
 
 // https://www.newtonsoft.com/json/help/html/convertingjsonandxml.htm
@@ -116,71 +112,5 @@ namespace ae.lib
             return result;
         }
 
-
     }
-
-    /*
-    public object Create(object parent, object configContext, XmlNode section)
-    {
-        XmlSerializer xmlSerializer = new XmlSerializer(typeof(RewriterConfiguration));
-        return xmlSerializer.Deserialize(new XmlNodeReader(section));
-    }
-
-    public override void FromXml(string xml)
-    {
-        XmlDataDocument xmlDataDocument = new XmlDataDocument();
-        xmlDataDocument.LoadXml(xml);
-        if (xmlDataDocument.ChildNodes.Count == 0)
-        {
-            ArgumentException ex = new ArgumentException("Invalid xml. No GpsGate.License node");
-            ServerLicenseNoDB.m_nlog.ErrorException(ex.Message, ex);
-            throw ex;
-        }
-        foreach (object obj in xmlDataDocument.ChildNodes)
-        {
-            XmlElement xmlElement = (XmlElement)obj;
-            if (xmlElement.Name == "GpsGate.License")
-            {
-                foreach (object obj2 in xmlElement)
-                {
-                    XmlElement xmlElement2 = (XmlElement)obj2;
-                    if (xmlElement2.Name == "Key")
-                    {
-                        this.PublicKey = xmlElement2.InnerText;
-                    }
-                    if (xmlElement2.Name == "LicenseID")
-                    {
-                        this.LicenseID = new Guid(xmlElement2.InnerText);
-                    }
-                    if (xmlElement2.Name == "CustomerID")
-                    {
-                        this.CustomerID = xmlElement2.InnerText;
-                    }
-                    if (xmlElement2.Name == "Description")
-                    {
-                        this.Description = xmlElement2.InnerText;
-                    }
-                    if (xmlElement2.Name == "Email")
-                    {
-                        this.Email = xmlElement2.InnerText;
-                    }
-                    if (xmlElement2.Name == "LicensedUsers")
-                    {
-                        try
-                        {
-                            this.LicensedUsers = int.Parse(xmlElement2.InnerText);
-                        }
-                        catch (Exception)
-                        {
-                            throw new ParseErrorException("Unable to parse LicensedUsrers.");
-                        }
-                    }
-                    if (xmlElement2.Name == "Signature")
-                    {
-                        this.Signature = xmlElement2.InnerText;
-                    }
-                }
-            }
-        }
-    */
 }

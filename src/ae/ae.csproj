@@ -87,6 +87,7 @@
     <Compile Include="lib\1C.cs" />
     <Compile Include="lib\Arguments.cs" />
     <Compile Include="lib\Base.cs" />
+    <Compile Include="lib\EmailInformer.cs" />
     <Compile Include="lib\Service.cs" />
     <Compile Include="services\EDI\structure\ConfigClass.cs" />
     <Compile Include="services\EDI\tools\AbInbevEfes\API.cs" />
