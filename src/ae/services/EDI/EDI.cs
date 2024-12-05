@@ -48,7 +48,10 @@ namespace ae.services.EDI
                         }
                     }
                 }
-                daysDifference = (daysDifference == -1) ? (7 - execDow + firstPlanningDayOfWeek) : daysDifference;
+
+                if (daysDifference == -1) {
+                    daysDifference = 7 - execDow + firstPlanningDayOfWeek;
+                }
                 return orderExecuteDate.AddDays(daysDifference).ToString();
             }
             return "";
@@ -413,7 +416,7 @@ namespace ae.services.EDI
                                             ean13 = ean13,
                                             codeKPK = found_list_item.ProductCode,
                                             basePrice = found_list_item.BasePrice,
-                                            qty = float.Parse(s_qty),
+                                            qty = float.Parse(s_qty), //Math.Round((decimal)floatValue, 2);
                                             promoType = 0,
                                             totalDiscount = 0
                                         });
