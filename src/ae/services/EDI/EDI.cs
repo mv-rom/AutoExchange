@@ -318,7 +318,7 @@ namespace ae.services.EDI
                 };
 
                 var output = ae.lib._1C.runReportProcessingData<structure._1C.ProductProfiles>(WorkDir, this.Reports1CDir, report1cName, input);
-                if (output != null) {
+                if (output == null) {
                     this.log("Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!");
                     return null;
                 }
