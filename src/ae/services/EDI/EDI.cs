@@ -376,7 +376,8 @@ namespace ae.services.EDI
                 {
                     var found_key = id + "@" + type_of_product;
                     structure.SplittedOrdersClass so = null;
-                    if (splittedOrders != null && splittedOrders.TryGetValue(found_key, out so) && so.resut_orderNo.Length > 0) { //ContainsKey(found_key) && splittedOrders[found_key].resut_orderNo) {
+                    //ContainsKey(found_key) && splittedOrders[found_key].resut_orderNo) {
+                    if (splittedOrders != null && splittedOrders.TryGetValue(found_key, out so) && so.resut_orderNo.Length > 0) {
                         //TODO: if (!s.deal_status.Equals("new")) { }
                         splittedOrders[found_key].deal_status = deal_status;
                         dictSO.Add(found_key, splittedOrders[found_key]);
@@ -384,84 +385,84 @@ namespace ae.services.EDI
                     else
                     {
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
-                        if (found_item != null)
+                        if (found_item != null) {
+                            this.log(
+                                "Warning in doSplittingUpOrders(): not found order with id " +
+                                "[" + id + "] in ProductProfiles_Group!"
+                            );
+                            break;
+                        }
+
+                        var newItems = new List<structure.SplittedOrdersClass_Order>();
+                        try
                         {
-                            var newItems = new List<structure.SplittedOrdersClass_Order>();
-                            try
+                            var listItems = o.as_json.items;
+                            foreach (var it in listItems)
                             {
-                                var listItems = o.as_json.items;
-                                foreach (var it in listItems)
+                                var ean13 = long.Parse(it.product_code);
+                                var found_list_item = found_item.list.
+                                    Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
+                                if (found_list_item != null)
                                 {
-                                    var ean13 = long.Parse(it.product_code);
-                                    var found_list_item = found_item.list.
-                                        Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
-                                    if (found_list_item != null)
+                                    var s_qty = (it.quantity.Contains(".")) ? it.quantity.Replace(".", ",") : it.quantity;
+                                    newItems.Add(new structure.SplittedOrdersClass_Order()
                                     {
-                                        var s_qty = (it.quantity.Contains(".")) ? it.quantity.Replace(".", ",") : it.quantity;
-                                        newItems.Add(new structure.SplittedOrdersClass_Order()
-                                        {
-                                            ean13 = ean13,
-                                            codeKPK = found_list_item.ProductCode,
-                                            basePrice = found_list_item.BasePrice,
-                                            qty = float.Parse(s_qty), //Math.Round((decimal)floatValue, 2);
-                                            promoType = 0,
-                                            totalDiscount = 0
-                                        });
-                                    }
-                                    var title = it.title;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Base.LogError(ex.Message, ex);
-                            }
-
-                            //add new
-                            if (newItems.Count > 0)
-                            {
-                                var glnTT = long.Parse(o.as_json.buyer_gln);
-                                var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
-                                var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(this.__N_AddDayToExecuteDay);
-                                string date_expected_delivery = "";
-                                foreach (var item in this.config.Companies)
-                                {
-                                    if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
-                                        var gruz = item.gruzs.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
-                                        if (gruz != null) {
-                                            date_expected_delivery = this.CalcOrderExecuteDate(execD, gruz.executionDayOfWeek);
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (date_expected_delivery.Length > 0)
-                                {
-                                    dictSO.Add(found_key, new structure.SplittedOrdersClass()
-                                    {
-                                        id = id,
-                                        ae_id = Base.genarateKey(),
-                                        orderNumber = o.number,
-                                        OrderDate = DateTime.Parse(o.as_json.date),
-                                        OrderExecutionDate = DateTime.Parse(date_expected_delivery),
-                                        codeTT_part1 = found_item.codeTT_part1,
-                                        codeTT_part2 = found_item.codeTT_part2,
-                                        codeTT_part3 = found_item.codeTT_part3,
-                                        Items = newItems,
-                                        status1c = 0, //current state in 1C
-                                        deal_status = deal_status //current state in EDI
+                                        ean13 = ean13,
+                                        codeKPK = found_list_item.ProductCode,
+                                        basePrice = found_list_item.BasePrice,
+                                        qty = float.Parse(s_qty), //Math.Round((decimal)floatValue, 2);
+                                        promoType = 0,
+                                        totalDiscount = 0
                                     });
-                                } else {
-                                    this.log(
-                                        "Warning in doSplittingUpOrders(): " +
-                                        "date_expected_delivery is empty or not right in splitted order [" + found_key + "]!"
-                                    );
                                 }
+                                var title = it.title;
                             }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            this.log("Warning in doSplittingUpOrders(): not found order with id [" + id + "] in ProductProfiles_Group!");
-                            break;
+                            Base.LogError(ex.Message, ex);
+                        }
+
+                        //add new
+                        if (newItems.Count > 0)
+                        {
+                            var glnTT = long.Parse(o.as_json.buyer_gln);
+                            var glnTT_gruz = long.Parse(o.as_json.delivery_gln);
+                            var execD = DateTime.Parse(o.as_json.date_expected_delivery).AddDays(this.__N_AddDayToExecuteDay);
+                            string date_expected_delivery = "";
+                            foreach (var item in this.config.Companies)
+                            {
+                                if (long.Parse(item.gln) == glnTT && item.gruzs != null) {
+                                    var gruz = item.gruzs.FirstOrDefault(t => long.Parse(t.gln) == glnTT_gruz);
+                                    if (gruz != null) {
+                                        date_expected_delivery = this.CalcOrderExecuteDate(execD, gruz.executionDayOfWeek);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (date_expected_delivery.Length > 0)
+                            {
+                                dictSO.Add(found_key, new structure.SplittedOrdersClass()
+                                {
+                                    id = id,
+                                    ae_id = Base.genarateKey(),
+                                    orderNumber = o.number,
+                                    OrderDate = DateTime.Parse(o.as_json.date),
+                                    OrderExecutionDate = DateTime.Parse(date_expected_delivery),
+                                    codeTT_part1 = found_item.codeTT_part1,
+                                    codeTT_part2 = found_item.codeTT_part2,
+                                    codeTT_part3 = found_item.codeTT_part3,
+                                    Items = newItems,
+                                    status1c = 0, //current state in 1C
+                                    deal_status = deal_status //current state in EDI
+                                });
+                            } else {
+                                this.log(
+                                    "Warning in doSplittingUpOrders(): " +
+                                    "date_expected_delivery is empty or not right in splitted order [" + found_key + "]!"
+                                );
+                            }
                         }
                     }
                 }
