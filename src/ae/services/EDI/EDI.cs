@@ -384,7 +384,7 @@ namespace ae.services.EDI
                     else
                     {
                         var found_item = groupPP.Where(x => (x.id == id)).FirstOrDefault();
-                        if (found_item != null) {
+                        if (found_item == null) {
                             this.log(
                                 "Warning in doSplittingUpOrders(): not found order with id " +
                                 "[" + id + "] in ProductProfiles_Group!"
