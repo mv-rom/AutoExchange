@@ -163,16 +163,11 @@ namespace ae.lib
                 // text or html
                 myMail.IsBodyHtml = true;
 
-                this.mySmtpClient.SendAsync(myMail);
-            }
-            catch (SmtpException ex)
-            {
-                throw new ApplicationException
-                  ("SmtpException has occured: " + ex.Message);
+                this.mySmtpClient.SendAsync(this.myMail, null);
             }
             catch (Exception ex)
             {
-                throw ex;
+                Base.LogError(ex.Message, ex);
             }
         }
     }
