@@ -103,25 +103,21 @@ namespace ae.lib
                 }
 
 
-                this.mySmtpClient = new SmtpClient(ServerHost);
-                if (this.mySmtpClient != null)
-                {
-                    this.mySmtpClient.EnableSsl = bool.Parse(ServerSSLEnable);
-                    this.mySmtpClient.Port = int.Parse(ServerPort);
-
+                this.mySmtpClient = new SmtpClient(ServerHost) {
+                    EnableSsl = bool.Parse(ServerSSLEnable),
+                    Port = int.Parse(ServerPort),
                     // set smtp-client with basicAuthentication
-                    this.mySmtpClient.UseDefaultCredentials = false;
-                    var basicAuthenticationInfo = new NetworkCredential(ServerUser, ServerPassword);
-                    this.mySmtpClient.Credentials = basicAuthenticationInfo;
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(ServerUser, ServerPassword)
+                };
 
-                    // add from,to mailaddresses
-                    var from = new MailAddress(SourceEmailAddress, SourceAddressInfo);
-                    var to =   new MailAddress(DestinationEmailAddress, DestinationAddressInfo);
-                    this.myMail = new MailMessage(from, to);
+                if (this.mySmtpClient != null) {
+                    this.myMail = new MailMessage() {
+                        From = new MailAddress(SourceEmailAddress, SourceAddressInfo)
+                    };
 
-                    // add ReplyTo
-                    //var replyTo = new MailAddress("reply@example.com");
-                    //myMail.ReplyToList.Add(replyTo);
+                    //add recipient
+                    this.myMail.To.Add(new MailAddress(DestinationEmailAddress, DestinationAddressInfo));
                     result = true;
                 }
             }
