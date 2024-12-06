@@ -15,7 +15,7 @@ namespace ae.services.EDI
     {
         private string WorkDir = "";
         public structure.ConfigClass config;
-        private int __N_AddDayToExecuteDay = 1;
+        private int __N_AddDayToExecuteDay = 0;
 
         public EDI(string theServiceName) : base(theServiceName)
         {
@@ -60,7 +60,7 @@ namespace ae.services.EDI
         private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.AddDays(0).ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
@@ -376,7 +376,6 @@ namespace ae.services.EDI
                 {
                     var found_key = id + "@" + type_of_product;
                     structure.SplittedOrdersClass so = null;
-                    //ContainsKey(found_key) && splittedOrders[found_key].resut_orderNo) {
                     if (splittedOrders != null && splittedOrders.TryGetValue(found_key, out so) && so.resut_orderNo.Length > 0) {
                         //TODO: if (!s.deal_status.Equals("new")) { }
                         splittedOrders[found_key].deal_status = deal_status;
