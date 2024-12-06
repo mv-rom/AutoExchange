@@ -31,6 +31,7 @@ namespace ae.lib
         public bool Init()
         {
             bool result = false;
+            string hMsg = "Error in " + this.GetType().Name + ".Init(): ";
             try
             {
                 string Enable = "false";
@@ -42,14 +43,38 @@ namespace ae.lib
 
                 string ServerHost = "";
                 if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerHost", out ServerHost)) {
-                    string msg = "Error in EmailInformer.Init(): Hasn't found ServerHost in settings of configuration!";
-                    throw new Exception(msg);
+                    Base.Log(hMsg + "Hasn't found ServerHost in settings of configuration!");
+                    return false;
                 }
 
                 string ServerPort = "";
-                string ServerSSLEnable = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerPort", out ServerPort))
+                {
+                    Base.Log(hMsg + "Hasn't found ServerPort in settings of configuration!");
+                    return false;
+                }
+
+                string ServerSSLEnable = "true";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerSSLEnable", out ServerSSLEnable))
+                {
+                    Base.Log(hMsg + "Hasn't found ServerSSLEnable in settings of configuration!");
+                    return false;
+                }
+
                 string ServerUser = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerUser", out ServerUser))
+                {
+                    Base.Log(hMsg + "Hasn't found ServerUser in settings of configuration!");
+                    return false;
+                }
+
                 string ServerPassword = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerPassword", out ServerPassword))
+                {
+                    Base.Log(hMsg + "Hasn't found ServerPassword in settings of configuration!");
+                    return false;
+                }
+
                 string SourceEmailAddress = "";
                 string SourceAddressInfo = "";
                 string DestinationEmailAddress = "";
@@ -75,13 +100,12 @@ namespace ae.lib
                     // add ReplyTo
                     //var replyTo = new MailAddress("reply@example.com");
                     //myMail.ReplyToList.Add(replyTo);
-
                     result = true;
                 }
             }
             catch (Exception ex)
             {
-                Base.LogError("Error in " + this.GetType().Name + ".Init(): " + ex.Message, ex);
+                Base.LogError(hMsg + ex.Message, ex);
                 result = false;
             }
             return result;

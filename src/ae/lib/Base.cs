@@ -41,7 +41,7 @@ namespace ae.lib
 
             RunDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             //RunDir =  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            BaseDir = Path.Combine(RunDir, @"..\");
+            BaseDir = Path.GetFullPath(Path.Combine(RunDir, @"..\"));
             Log("----------------------------");
             Log("RunDir: " +  RunDir);
             Log("BaseDir: " + BaseDir);
@@ -118,7 +118,7 @@ namespace ae.lib
             Base.Config = null;
             Base.Services = null;
             Base.Log("");
-            Base.Log("... Base.Init() is completed.");
+            Base.Log("... Base.deInit() is finished.");
             Base.logger.Logger.Repository.Shutdown();
         }
 
