@@ -224,6 +224,7 @@ namespace ae.services.EDI
                     continue;
                 }
 
+
                 //search in listTT
                 bool found = false;
                 int found_i = 0;
@@ -236,76 +237,76 @@ namespace ae.services.EDI
                     found_i++;
                 }
 
-                if (found)
-                {
-                    var foundTT = listTT[found_i];
-
-                    //search group in groupPP
-                    bool tt_found_in_PP = false;
-                    int tt_found_in_PP_i = 0;
-                    foreach (var g in groupPP)
-                    {
-                        if (g.codeTT_part1 == foundTT.codeTT_part1 &&
-                            g.codeTT_part2 == foundTT.codeTT_part2 &&
-                            g.codeTT_part3 == foundTT.codeTT_part3 &&
-                            g.id == id
-                        ) {
-                            tt_found_in_PP = true;
-                            break;
-                        }
-                        tt_found_in_PP_i++;
-                    }
-
-                    structure._1C.ProductProfiles_Group pp_g = null;
-                    if (!tt_found_in_PP) {
-                        pp_g = new structure._1C.ProductProfiles_Group()
-                        {
-                            id = id,
-                            ExecutionDate = date_expected_delivery,
-                            codeTT_part1 = foundTT.codeTT_part1,
-                            codeTT_part2 = foundTT.codeTT_part2,
-                            codeTT_part3 = foundTT.codeTT_part3,
-                            list = new List<structure._1C.ProductProfiles_Item>()
-                        };
-                        groupPP.Add(pp_g);
-                    } else {
-                        pp_g = groupPP[tt_found_in_PP_i];
-                    }
-
-                    //search items in listPP.group.items
-                    var listItems = s.as_json.items;
-                    int num = 1;
-                    foreach (var it in listItems)
-                    {
-                        var product_code = long.Parse(it.product_code);
-                        var title = it.title;
-                        //var position = int.Parse(it.position);
-                        //var buyer_code = long.Parse(it.buyer_code);
-                        //var measure = it.measure; //PCE
-                        //var supplier_code = it.supplier_code;
-                        //var tax_rate = int.Parse(it.tax_rate); //20
-                        //var quantity = float.Parse(it.quantity);
-
-                        //search in listPP
-                        bool item_found = false;
-                        foreach (var l in groupPP[tt_found_in_PP_i].list) {
-                            if (l.EAN == product_code) item_found = true;
-                        }
-
-                        if (!item_found) {
-                            pp_g.list.Add(new structure._1C.ProductProfiles_Item() {
-                                EAN = product_code,
-                                Title = title,
-                                Number = num
-                            });
-                            num++;
-                        }
-                    }
-                } else {
+                if (!found) {
                     this.log(
                         "Warning in getProductProfilesOfTTfrom1C(): " +
                         "not found TT with GLN [" + glnTT + ", " + glnTT_gruz + "(" + delivery_address + ")]!"
                     );
+                    continue;
+                }
+                var foundTT = listTT[found_i];
+
+
+                //search group in groupPP
+                bool tt_found_in_PP = false;
+                int tt_found_in_PP_i = 0;
+                foreach (var g in groupPP)
+                {
+                    if (g.codeTT_part1 == foundTT.codeTT_part1 &&
+                        g.codeTT_part2 == foundTT.codeTT_part2 &&
+                        g.codeTT_part3 == foundTT.codeTT_part3 &&
+                        g.id == id
+                    ) {
+                        tt_found_in_PP = true;
+                        break;
+                    }
+                    tt_found_in_PP_i++;
+                }
+
+                structure._1C.ProductProfiles_Group pp_g = null;
+                if (!tt_found_in_PP) {
+                    pp_g = new structure._1C.ProductProfiles_Group()
+                    {
+                        id = id,
+                        ExecutionDate = date_expected_delivery,
+                        codeTT_part1 = foundTT.codeTT_part1,
+                        codeTT_part2 = foundTT.codeTT_part2,
+                        codeTT_part3 = foundTT.codeTT_part3,
+                        list = new List<structure._1C.ProductProfiles_Item>()
+                    };
+                    groupPP.Add(pp_g);
+                } else {
+                    pp_g = groupPP[tt_found_in_PP_i];
+                }
+
+                //search items in listPP.group.items
+                var listItems = s.as_json.items;
+                int num = 1;
+                foreach (var it in listItems)
+                {
+                    var product_code = long.Parse(it.product_code);
+                    var title = it.title;
+                    //var position = int.Parse(it.position);
+                    //var buyer_code = long.Parse(it.buyer_code);
+                    //var measure = it.measure; //PCE
+                    //var supplier_code = it.supplier_code;
+                    //var tax_rate = int.Parse(it.tax_rate); //20
+                    //var quantity = float.Parse(it.quantity);
+
+                    //search in listPP
+                    bool item_found = false;
+                    foreach (var l in groupPP[tt_found_in_PP_i].list) {
+                        if (l.EAN == product_code) item_found = true;
+                    }
+
+                    if (!item_found) {
+                        pp_g.list.Add(new structure._1C.ProductProfiles_Item() {
+                            EAN = product_code,
+                            Title = title,
+                            Number = num
+                        });
+                        num++;
+                    }
                 }
             }
 
@@ -317,45 +318,43 @@ namespace ae.services.EDI
                 };
 
                 var output = ae.lib._1C.runReportProcessingData<structure._1C.ProductProfiles>(WorkDir, this.Reports1CDir, report1cName, input);
-                if (output != null)
-                {
-                    var output_groupPP = output.group;
-                    int i = 0;
-                    while (i < groupPP.Count())
-                    {
-                        var g = groupPP[i];
-                        var output_item = output_groupPP.Where(x => (x.id == g.id)).FirstOrDefault();
-                        if (output_item != null)
-                        {
-                            int j = 0;
-                            while (j < g.list.Count())
-                            {
-                                var g_el = g.list[j];
-                                var output_item_el = output_item.list.Where(x => (x.EAN == g_el.EAN)).FirstOrDefault();
-                                if (output_item_el != null)
-                                {
-                                    g_el.ProductCode = output_item_el.ProductCode;
-                                    g_el.ProductType = output_item_el.ProductType;
-                                    g_el.BasePrice = output_item_el.BasePrice;
-                                    j++;
-                                }
-                                else
-                                {
-                                    g.list.RemoveAt(j);
-                                }
-                            }
-                            i++;
-                        } else {
-                            groupPP.RemoveAt(i);
-                        }
-                    }
-                    output_groupPP = null;
-                    return groupPP;
-                } else {
-                    this.log(
-                        "Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!"
-                    );
+                if (output != null) {
+                    this.log("Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!");
+                    return null;
                 }
+                
+                var output_groupPP = output.group;
+                int i = 0;
+                while (i < groupPP.Count())
+                {
+                    var g = groupPP[i];
+                    var output_item = output_groupPP.Where(x => (x.id == g.id)).FirstOrDefault();
+                    if (output_item != null)
+                    {
+                        int j = 0;
+                        while (j < g.list.Count())
+                        {
+                            var g_el = g.list[j];
+                            var output_item_el = output_item.list.Where(x => (x.EAN == g_el.EAN)).FirstOrDefault();
+                            if (output_item_el != null)
+                            {
+                                g_el.ProductCode = output_item_el.ProductCode;
+                                g_el.ProductType = output_item_el.ProductType;
+                                g_el.BasePrice = output_item_el.BasePrice;
+                                j++;
+                            }
+                            else
+                            {
+                                g.list.RemoveAt(j);
+                            }
+                        }
+                        i++;
+                    } else {
+                        groupPP.RemoveAt(i);
+                    }
+                }
+                output_groupPP = null;
+                return groupPP;
             }
             return null;
         }
