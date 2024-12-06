@@ -135,24 +135,35 @@ namespace ae.lib
 
         public void DeInit()
         {
+            if (this.myMail != null) {
+                this.myMail.Dispose();
+            }
+
+            if (this.mySmtpClient != null) {
+                this.mySmtpClient.Dispose();
+            }
             EmailInformer.Instance = null;
         }
 
-        public void SendMsg(string Subject, string msg)
+        public void SendMsg(string Subject, string Message, string AttachmentFilePath)
         {
             try
             {
+                if (AttachmentFilePath.Length > 0 && System.IO.File.Exists(AttachmentFilePath)) {
+                    this.myMail.Attachments.Add(new Attachment(AttachmentFilePath));
+                }
+
                 // set subject and encoding
                 this.myMail.Subject = Subject; // "EDI Service Informer";
                 this.myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
                 // set body-message and encoding
-                myMail.Body = "<b>AutoExchange Informer</b><br>" + msg + "<b>HTML</b>.";
+                myMail.Body = "<b>AutoExchange Informer</b><br>" + Message + "<b>HTML</b>.";
                 myMail.BodyEncoding = System.Text.Encoding.UTF8;
                 // text or html
                 myMail.IsBodyHtml = true;
 
-                this.mySmtpClient.Send(myMail);
+                this.mySmtpClient.SendAsync(myMail);
             }
             catch (SmtpException ex)
             {
