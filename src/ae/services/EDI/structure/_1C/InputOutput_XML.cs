@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 
 namespace ae.services.EDI.structure._1C
 {
+/*
     [Serializable]
     [XmlRoot(ElementName = "codeTT")]
     public class codeTT
@@ -19,22 +20,27 @@ namespace ae.services.EDI.structure._1C
         [XmlElement(ElementName = "part3")]
         public int part3 { get; set; }
     }
-
+*/
     //--------------------------------------------------------------
 
     [Serializable]
     [XmlRoot(ElementName = "ITEM")]
     public class TTbyGLN_Item
     {
-        [XmlElement(ElementName = "glnTT")]
+        [XmlAttribute(AttributeName = "glnTT")]
         public long glnTT { get; set; }
 
-        [XmlElement(ElementName = "glnTT_gruz")]
+        [XmlAttribute(AttributeName = "glnTT_gruz")]
         public long glnTT_gruz { get; set; }
 
-        [XmlElement(ElementName = "codeTT")]
-        public codeTT codeTT { get; set; }
+        [XmlAttribute(AttributeName = "codeTT_part1")]
+        public int codeTT_part1 { get; set; }
 
+        [XmlAttribute(AttributeName = "codeTT_part2")]
+        public int codeTT_part2 { get; set; }
+
+        [XmlAttribute(AttributeName = "codeTT_part3")]
+        public int codeTT_part3 { get; set; }
     }
 
     [Serializable]

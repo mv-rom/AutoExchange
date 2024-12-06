@@ -119,86 +119,74 @@ namespace ae.services.EDI
         private List<structure._1C.TTbyGLN_Item> getTTbyGLNfrom1C(List<tools.VchasnoEDI.structure.Order> source)
         {
             string gln = this.config.gln;
-            if (gln.Length > 0)
+            if (gln.Length <= 0) {
+                this.log("Warning in getTTbyGLNfrom1C(): hasn't parameter [gln] in config!");
+                return null;
+            }
+
+            var listTT = new List<structure._1C.TTbyGLN_Item>();
+            foreach (var s in source)
             {
-                var listTT = new List<structure._1C.TTbyGLN_Item>();
-                foreach (var s in source)
+                if (gln.Equals(s.as_json.seller_gln))
                 {
-                    var self_gln = s.as_json.seller_gln;
-                    if (gln.Equals(self_gln))
+                    bool found = false;
+                    var glnTT =      long.Parse(s.as_json.buyer_gln);
+                    var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
+
+                    foreach (var l in listTT)
                     {
-                        bool found = false;
-                        var glnTT = long.Parse(s.as_json.buyer_gln);
-                        var glnTT_gruz = long.Parse(s.as_json.delivery_gln);
-
-                        foreach (var l in listTT)
+                        if (glnTT == l.glnTT && glnTT_gruz == l.glnTT_gruz)
                         {
-                            if (glnTT == l.glnTT && glnTT_gruz == l.glnTT_gruz)
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                        {
-                            listTT.Add(new structure._1C.TTbyGLN_Item()
-                            {
-                                glnTT = glnTT,
-                                glnTT_gruz = glnTT_gruz,
-                                codeTT = new structure._1C.codeTT()
-                                {
-                                    part1 = 0,
-                                    part2 = 0,
-                                    part3 = 0
-                                }
-                            });
+                            found = true;
+                            break;
                         }
                     }
-                }
 
-                if (listTT.Count() > 0)
-                {
-                    string report1cName = "tt_by_gln";
-                    var input = new structure._1C.TTbyGLN() {
-                        list = listTT
-                    };
-
-                    var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, this.Reports1CDir, report1cName, input);
-                    if (output != null)
+                    if (!found)
                     {
-                        var output_listTT = output.list;
-
-                        int i = 0;
-                        while (i < listTT.Count())
+                        listTT.Add(new structure._1C.TTbyGLN_Item()
                         {
-                            var glnTT = listTT[i].glnTT;
-                            var glnTT_gruz = listTT[i].glnTT_gruz;
-
-                            var output_item = output_listTT.
-                                Where(x => x.glnTT == glnTT).                       //Where(x => x.glnTT.Equals(glnTT)).
-                                FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);    //FirstOrDefault(y => y.glnTT_gruz.Equals(glnTT_gruz));
-                            if (output_item != null) {
-                                listTT[i].codeTT = output_item.codeTT;
-                                i++;
-                            } else {
-                                listTT.RemoveAt(i);
-                            }
-                        }
-                        return listTT;
-                    }
-                    else
-                    {
-                        this.log(
-                            "Warning in getTTbyGLNfrom1C(): after do report [" + report1cName + "]!"
-                        );
+                            glnTT = glnTT,
+                            glnTT_gruz = glnTT_gruz,
+                            codeTT_part1 = 0,
+                            codeTT_part2 = 0,
+                            codeTT_part3 = 0
+                        });
                     }
                 }
             }
-            else {
-                this.log(
-                    "Warning in getTTbyGLNfrom1C(): hasn't parameter [gln] in config!"
-                );
+
+            if (listTT.Count() > 0)
+            {
+                string report1cName = "tt_by_gln";
+                var input = new structure._1C.TTbyGLN() { list = listTT };
+
+                var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, this.Reports1CDir, report1cName, input);
+                if (output == null) {
+                    this.log("Warning in getTTbyGLNfrom1C(): after do report [" + report1cName + "]!");
+                    return null;
+                }
+
+                var output_listTT = output.list;
+                int i = 0;
+                while (i < listTT.Count())
+                {
+                    var glnTT = listTT[i].glnTT;
+                    var glnTT_gruz = listTT[i].glnTT_gruz;
+
+                    var output_item = output_listTT.
+                        Where(x => x.glnTT == glnTT).
+                        FirstOrDefault(y => y.glnTT_gruz == glnTT_gruz);
+                    if (output_item != null) {
+                        listTT[i].codeTT_part1 = output_item.codeTT_part1;
+                        listTT[i].codeTT_part2 = output_item.codeTT_part2;
+                        listTT[i].codeTT_part3 = output_item.codeTT_part3;
+                        i++;
+                    } else {
+                        listTT.RemoveAt(i);
+                    }
+                }
+                return listTT;
             }
             return null;
         }
@@ -257,9 +245,9 @@ namespace ae.services.EDI
                     int tt_found_in_PP_i = 0;
                     foreach (var g in groupPP)
                     {
-                        if (g.codeTT_part1 == foundTT.codeTT.part1 &&
-                            g.codeTT_part2 == foundTT.codeTT.part2 &&
-                            g.codeTT_part3 == foundTT.codeTT.part3 &&
+                        if (g.codeTT_part1 == foundTT.codeTT_part1 &&
+                            g.codeTT_part2 == foundTT.codeTT_part2 &&
+                            g.codeTT_part3 == foundTT.codeTT_part3 &&
                             g.id == id
                         ) {
                             tt_found_in_PP = true;
@@ -274,9 +262,9 @@ namespace ae.services.EDI
                         {
                             id = id,
                             ExecutionDate = date_expected_delivery,
-                            codeTT_part1 = foundTT.codeTT.part1,
-                            codeTT_part2 = foundTT.codeTT.part2,
-                            codeTT_part3 = foundTT.codeTT.part3,
+                            codeTT_part1 = foundTT.codeTT_part1,
+                            codeTT_part2 = foundTT.codeTT_part2,
+                            codeTT_part3 = foundTT.codeTT_part3,
                             list = new List<structure._1C.ProductProfiles_Item>()
                         };
                         groupPP.Add(pp_g);

@@ -18,7 +18,6 @@ namespace ae.lib
         private MailMessage myMail;
 
 
-
         public static EmailInformer getInstance()
         {
             if (EmailInformer.Instance == null) {
@@ -76,9 +75,32 @@ namespace ae.lib
                 }
 
                 string SourceEmailAddress = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("SourceEmailAddress", out SourceEmailAddress))
+                {
+                    Base.Log(hMsg + "Hasn't found SourceEmailAddress in settings of configuration!");
+                    return false;
+                }
+
                 string SourceAddressInfo = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("SourceAddressInfo", out SourceAddressInfo))
+                {
+                    Base.Log(hMsg + "Hasn't found SourceAddressInfo in settings of configuration!");
+                    return false;
+                }
+
                 string DestinationEmailAddress = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("DestinationEmailAddress", out DestinationEmailAddress))
+                {
+                    Base.Log(hMsg + "Hasn't found DestinationEmailAddress in settings of configuration!");
+                    return false;
+                }
+
                 string DestinationAddressInfo = "";
+                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("DestinationAddressInfo", out DestinationAddressInfo))
+                {
+                    Base.Log(hMsg + "Hasn't found DestinationAddressInfo in settings of configuration!");
+                    return false;
+                }
 
 
                 this.mySmtpClient = new SmtpClient(ServerHost);
@@ -125,7 +147,7 @@ namespace ae.lib
                 this.myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
                 // set body-message and encoding
-                myMail.Body = "<b>AutoExchange Informer</b><br>"+ msg + "<b>HTML</b>.";
+                myMail.Body = "<b>AutoExchange Informer</b><br>" + msg + "<b>HTML</b>.";
                 myMail.BodyEncoding = System.Text.Encoding.UTF8;
                 // text or html
                 myMail.IsBodyHtml = true;
