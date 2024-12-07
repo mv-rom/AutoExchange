@@ -145,8 +145,14 @@ namespace ae.lib
         {
             try
             {
-                if (AttachmentFilePath.Length > 0 && System.IO.File.Exists(AttachmentFilePath)) {
-                    this.myMail.Attachments.Add(new Attachment(AttachmentFilePath));
+                if (AttachmentFilePath.Length > 0) {
+                    string[] afp = AttachmentFilePath.Split(',');
+                    foreach (var a in afp) {
+                        a.Trim();
+                        if (a.Length > 0 && System.IO.File.Exists(a)) {
+                            this.myMail.Attachments.Add(new Attachment(a));
+                        }
+                    }
                 }
 
                 // set subject and encoding
@@ -154,7 +160,7 @@ namespace ae.lib
                 this.myMail.SubjectEncoding = System.Text.Encoding.UTF8;
 
                 // set body-message and encoding
-                myMail.Body = "<b>AutoExchange Informer</b><br>" + Message + "<b>HTML</b>.";
+                myMail.Body = "<h2>AutoExchange Informer</h2><br>" + Message + "<b>HTML</b>.";
                 myMail.BodyEncoding = System.Text.Encoding.UTF8;
                 // text or html
                 myMail.IsBodyHtml = true;
