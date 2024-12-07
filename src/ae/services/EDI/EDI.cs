@@ -40,8 +40,8 @@ namespace ae.services.EDI
                 foreach (var p in plDoW)
                 {
                     int res_p = 0;
-                    if (Int32.TryParse(p, out res_p) && 0 < res_p && res_p <= 7) {
-                        firstPlanningDayOfWeek = Int32.Parse(plDoW[0]);
+                    if (int.TryParse(p, out res_p) && 0 < res_p && res_p <= 7) {
+                        firstPlanningDayOfWeek = int.Parse(plDoW[0]);
                         if (res_p >= execDow) {
                             daysDifference = res_p - execDow;
                             break;
