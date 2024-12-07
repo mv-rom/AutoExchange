@@ -24,11 +24,13 @@ namespace ae.lib
 
         public static Config Config = null;
         public static Dictionary<string, Service> Services;
+        public static EmailInformer EI;
         public static int dumpIndex = 0;
 
 
         public static void Init(string Logo="")
         {
+            string hMsg = "Error in Base.Init(): ";
             logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
             Log("");
@@ -50,21 +52,21 @@ namespace ae.lib
             ArchivesDir = Path.Combine(BaseDir, @"Archives");
             Log("ArchivesDir: " + ArchivesDir);
             if (!MakeFolder(ArchivesDir)) {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ArchivesDir + "]!";
+                string msg = hMsg + "Cann't create a directory: [" + ArchivesDir + "]!";
                 LogError(msg);
                 throw new Exception(msg);
             }
 
             Base.Config = new Config();
             if (!Base.Config.Init()) {
-                string msg = "Error in Base.Init(): Problem with init settings of configuration!";
+                string msg = hMsg + "Problem with init settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);
             }
 
             if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out torg_sklad))
             {
-                string msg = "Error in Base.Init(): Hasn't found torg_sklad in settings of configuration!";
+                string msg = hMsg + "Hasn't found torg_sklad in settings of configuration!";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -72,7 +74,7 @@ namespace ae.lib
             ServicesDir = Path.Combine(BaseDir, @"Services");
             Log("ServicesDir: " + ServicesDir);
             if (!Base.MakeFolder(ServicesDir)) {
-                string msg = "Error in Base.Init(): cann't create a folder: [" + ServicesDir + "]!";
+                string msg = hMsg + "Cann't create a directory: [" + ServicesDir + "]!";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -81,7 +83,7 @@ namespace ae.lib
             var asmList = AppDomain.CurrentDomain.GetAssemblies();
             var asm = asmList.SingleOrDefault(assembly => assembly.GetName().Name == "ae");
             if (asm == null) {
-                string msg = "Error in Base.Init(): cann't found [ae] assembly!";
+                string msg = hMsg + "Cann't found [ae] assembly!";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -106,7 +108,15 @@ namespace ae.lib
             }
 
             if (Services.Count <= 0) {
-                string msg = "Error in Base.Init(): No one service is configured!";
+                string msg = hMsg + "No one service is configured!";
+                LogError(msg);
+                throw new Exception(msg);
+            }
+
+            Base.EI = new EmailInformer();
+            if (!Base.EI.Init())
+            {
+                string msg = hMsg + "Problem with init EmailInformer!";
                 LogError(msg);
                 throw new Exception(msg);
             }
@@ -115,6 +125,8 @@ namespace ae.lib
         }
 
         public static void deInit() {
+            Base.EI.deInit();
+
             Base.Config = null;
             Base.Services = null;
             Base.Log("");

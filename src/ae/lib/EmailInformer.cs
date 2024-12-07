@@ -1,28 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
 
 
 namespace ae.lib
 {
-    internal class EmailInformer
+    public class EmailInformer
     {
-        private static EmailInformer Instance = null;
-
+        public static EmailInformer Instance = null;
         private SmtpClient mySmtpClient;
-        private MailMessage myMail;
+        private MailAddress From;
+        private MailAddress To;
 
 
         public static EmailInformer getInstance()
         {
             if (EmailInformer.Instance == null) {
                 EmailInformer.Instance = new EmailInformer();
-                if (EmailInformer.Instance.Init() != true) EmailInformer.Instance.DeInit();
+                if (EmailInformer.Instance.Init() != true) EmailInformer.Instance.deInit();
             }
             return EmailInformer.Instance;
         }
@@ -87,6 +82,7 @@ namespace ae.lib
                     Base.Log(hMsg + "Hasn't found SourceAddressInfo in settings of configuration!");
                     return false;
                 }
+                this.From = new MailAddress(SourceEmailAddress, SourceAddressInfo);
 
                 string DestinationEmailAddress = "";
                 if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("DestinationEmailAddress", out DestinationEmailAddress))
@@ -101,40 +97,26 @@ namespace ae.lib
                     Base.Log(hMsg + "Hasn't found DestinationAddressInfo in settings of configuration!");
                     return false;
                 }
+                this.To = new MailAddress(DestinationEmailAddress, DestinationAddressInfo);
 
-
-                this.mySmtpClient = new SmtpClient(ServerHost) {
+                this.mySmtpClient = new SmtpClient(ServerHost)
+                {
                     EnableSsl = bool.Parse(ServerSSLEnable),
                     Port = int.Parse(ServerPort),
                     // set smtp-client with basicAuthentication
                     UseDefaultCredentials = false,
                     Credentials = new NetworkCredential(ServerUser, ServerPassword)
                 };
-
-                if (this.mySmtpClient != null) {
-                    this.myMail = new MailMessage() {
-                        From = new MailAddress(SourceEmailAddress, SourceAddressInfo)
-                    };
-
-                    //add recipient
-                    this.myMail.To.Add(new MailAddress(DestinationEmailAddress, DestinationAddressInfo));
-                    result = true;
-                }
+                result = true;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Base.LogError(hMsg + ex.Message, ex);
-                result = false;
             }
             return result;
         }
 
-        public void DeInit()
+        public void deInit()
         {
-            if (this.myMail != null) {
-                this.myMail.Dispose();
-            }
-
             if (this.mySmtpClient != null) {
                 this.mySmtpClient.Dispose();
             }
@@ -143,33 +125,50 @@ namespace ae.lib
 
         public void SendMsg(string Subject, string Message, string AttachmentFilePath)
         {
+            string hMsg = "Error in " + this.GetType().Name + ".SendMsg(): ";
+
+            if (this.mySmtpClient == null) {
+                Base.Log(hMsg + "Not initialized mySmtpClient()!");
+                return;
+            }
+
             try
             {
-                if (AttachmentFilePath.Length > 0) {
-                    string[] afp = AttachmentFilePath.Split(',');
-                    foreach (var a in afp) {
-                        a.Trim();
-                        if (a.Length > 0 && System.IO.File.Exists(a)) {
-                            this.myMail.Attachments.Add(new Attachment(a));
+                using (var myMail = new MailMessage())
+                {
+                    myMail.From = this.From;
+                    //add recipient
+                    myMail.To.Add(this.To);
+
+                    if (AttachmentFilePath.Length > 0)
+                    {
+                        string[] afp = AttachmentFilePath.Split(',');
+                        foreach (var a in afp)
+                        {
+                            a.Trim();
+                            if (a.Length > 0 && System.IO.File.Exists(a))
+                            {
+                                myMail.Attachments.Add(new Attachment(a));
+                            }
                         }
                     }
+
+                    // set subject and encoding
+                    myMail.Subject = Subject; // "EDI Service Informer";
+                    myMail.SubjectEncoding = System.Text.Encoding.UTF8;
+
+                    // set body-message and encoding
+                    myMail.Body = "<h2>AutoExchange Informer</h2><br>" + Message + "<b>HTML</b>.";
+                    myMail.BodyEncoding = System.Text.Encoding.UTF8;
+                    // text or html
+                    myMail.IsBodyHtml = true;
+
+                    this.mySmtpClient.SendAsync(myMail, null);
                 }
-
-                // set subject and encoding
-                this.myMail.Subject = Subject; // "EDI Service Informer";
-                this.myMail.SubjectEncoding = System.Text.Encoding.UTF8;
-
-                // set body-message and encoding
-                myMail.Body = "<h2>AutoExchange Informer</h2><br>" + Message + "<b>HTML</b>.";
-                myMail.BodyEncoding = System.Text.Encoding.UTF8;
-                // text or html
-                myMail.IsBodyHtml = true;
-
-                this.mySmtpClient.SendAsync(this.myMail, null);
             }
             catch (Exception ex)
             {
-                Base.LogError(ex.Message, ex);
+                Base.LogError(hMsg + ex.Message, ex);
             }
         }
     }
