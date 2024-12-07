@@ -107,6 +107,7 @@ namespace ae.lib
                     UseDefaultCredentials = false,
                     Credentials = new NetworkCredential(ServerUser, ServerPassword)
                 };
+                Base.Log(this.GetType().Name + ".Init() is done.");
                 result = true;
             }
             catch (Exception ex) {

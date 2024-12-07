@@ -41,8 +41,7 @@ namespace ae.lib
                 Log(Logo);
             }
 
-            RunDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            //RunDir =  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            RunDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location); //GetExecutingAssembly()
             BaseDir = Path.GetFullPath(Path.Combine(RunDir, @"..\"));
             Log("----------------------------");
             Log("RunDir: " +  RunDir);
@@ -112,6 +111,7 @@ namespace ae.lib
                 LogError(msg);
                 throw new Exception(msg);
             }
+            Base.Log("Services.Init() is done.");
 
             Base.EI = new EmailInformer();
             if (!Base.EI.Init())
@@ -134,10 +134,12 @@ namespace ae.lib
             Base.logger.Logger.Repository.Shutdown();
         }
 
+
         public static void Log(string msg)
         {
             logger.Info(msg);
         }
+
         public static void LogError(string msg, Exception ex=null)
         {
             logger.Error(msg);
