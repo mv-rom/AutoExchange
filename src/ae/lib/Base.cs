@@ -112,7 +112,7 @@ namespace ae.lib
                 throw new Exception(msg);
             }
             Base.Log("Services.Init() is done.");
-
+/*
             Base.EI = new EmailInformer();
             if (!Base.EI.Init())
             {
@@ -120,12 +120,12 @@ namespace ae.lib
                 LogError(msg);
                 throw new Exception(msg);
             }
-
+*/
             Log("Base.Init() is complete with success.");
         }
 
         public static void deInit() {
-            Base.EI.deInit();
+//            Base.EI.deInit();
 
             Base.Config = null;
             Base.Services = null;
