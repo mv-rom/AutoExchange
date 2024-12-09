@@ -28,56 +28,62 @@ namespace ae.lib
             string hMsg = "Error in " + this.GetType().Name + ".Init(): ";
             try
             {
+                var EI = Base.Config.ConfigSettings.EmailInformer;
+                if (EI == null && EI.Count <= 0) {
+                    Base.Log(hMsg + "EmailInformer isn't configured!");
+                    return false;
+                }
+
                 string Enable = "false";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("Enable", out Enable)) {
+                if (!EI.TryGetValue("Enable", out Enable)) {
                     Enable = "false";
                 }
                 //Enable Informer only with true
                 if (bool.Parse(Enable) != true) return false;
 
                 string ServerHost = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerHost", out ServerHost)) {
+                if (!EI.TryGetValue("ServerHost", out ServerHost)) {
                     Base.Log(hMsg + "Hasn't found ServerHost in settings of configuration!");
                     return false;
                 }
 
                 string ServerPort = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerPort", out ServerPort))
+                if (!EI.TryGetValue("ServerPort", out ServerPort))
                 {
                     Base.Log(hMsg + "Hasn't found ServerPort in settings of configuration!");
                     return false;
                 }
 
                 string ServerSSLEnable = "true";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerSSLEnable", out ServerSSLEnable))
+                if (!EI.TryGetValue("ServerSSLEnable", out ServerSSLEnable))
                 {
                     Base.Log(hMsg + "Hasn't found ServerSSLEnable in settings of configuration!");
                     return false;
                 }
 
                 string ServerUser = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerUser", out ServerUser))
+                if (!EI.TryGetValue("ServerUser", out ServerUser))
                 {
                     Base.Log(hMsg + "Hasn't found ServerUser in settings of configuration!");
                     return false;
                 }
 
                 string ServerPassword = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("ServerPassword", out ServerPassword))
+                if (!EI.TryGetValue("ServerPassword", out ServerPassword))
                 {
                     Base.Log(hMsg + "Hasn't found ServerPassword in settings of configuration!");
                     return false;
                 }
 
                 string SourceEmailAddress = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("SourceEmailAddress", out SourceEmailAddress))
+                if (!EI.TryGetValue("SourceEmailAddress", out SourceEmailAddress))
                 {
                     Base.Log(hMsg + "Hasn't found SourceEmailAddress in settings of configuration!");
                     return false;
                 }
 
                 string SourceAddressInfo = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("SourceAddressInfo", out SourceAddressInfo))
+                if (!EI.TryGetValue("SourceAddressInfo", out SourceAddressInfo))
                 {
                     Base.Log(hMsg + "Hasn't found SourceAddressInfo in settings of configuration!");
                     return false;
@@ -85,14 +91,14 @@ namespace ae.lib
                 this.From = new MailAddress(SourceEmailAddress, SourceAddressInfo);
 
                 string DestinationEmailAddress = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("DestinationEmailAddress", out DestinationEmailAddress))
+                if (!EI.TryGetValue("DestinationEmailAddress", out DestinationEmailAddress))
                 {
                     Base.Log(hMsg + "Hasn't found DestinationEmailAddress in settings of configuration!");
                     return false;
                 }
 
                 string DestinationAddressInfo = "";
-                if (!Base.Config.ConfigSettings.EmailInformer.TryGetValue("DestinationAddressInfo", out DestinationAddressInfo))
+                if (!EI.TryGetValue("DestinationAddressInfo", out DestinationAddressInfo))
                 {
                     Base.Log(hMsg + "Hasn't found DestinationAddressInfo in settings of configuration!");
                     return false;
