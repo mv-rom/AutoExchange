@@ -236,15 +236,16 @@ namespace ae.lib
             return (int)Math.Floor(unixTicks.TotalSeconds); //( x /1000 )
         }
 
-        public static bool MakeFolder(string DirPath)
+        public static bool MakeFolder(string dirPath)
         {
             bool result = false;
             try
             {
-                if (!Directory.Exists(DirPath)) {
-                    Directory.CreateDirectory(DirPath);
-                    if (!Directory.Exists(DirPath)) {
-                        LogError("Error in Base.MakeFolder(): There is no right to create directory [" + DirPath + "]!");
+                var di = new DirectoryInfo(dirPath);
+                if (!di.Exists) {
+                    di.Create();
+                    if (!di.Exists) {
+                        LogError("Error in Base.MakeFolder(): There is no right to create directory [" + dirPath + "]!");
                     }
                     else
                         result = true;
@@ -258,14 +259,14 @@ namespace ae.lib
             return result;
         }
 
-        public static void RotateArchives(string Dir, string Pattern, int Period)
+        public static void RotateArchives(string dirPath, string Pattern, int Period)
         {
             Log("");
-            Log("Rotatin of files (template: " + Pattern + ") in archives folder [" + Dir + "]:");
+            Log("Rotating of files (template: " + Pattern + ") in archives directory [" + dirPath + "]:");
             Regex r = new Regex(Pattern, RegexOptions.IgnoreCase);
 
-            if (Directory.Exists(Dir)) {
-                var Files = Directory.GetFiles(Dir, "*.zip");
+            if (Directory.Exists(dirPath)) {
+                var Files = Directory.GetFiles(dirPath, "*.zip");
                 foreach (string f in Files)
                 {
                     if (r.IsMatch(f)) {
@@ -277,9 +278,9 @@ namespace ae.lib
                         if (fileTotalDays > Period - 1) {
                             try
                             {
-                                File.Delete(fName);
-                                if (!File.Exists(fName)) {
-                                    Log2(@"\ - deleted.");
+                                fi.Delete();
+                                if (!fi.Exists) {
+                                    Log2(@"\ - is deleted.");
                                 } else {
                                     string msg = "> Error in Base.RotateArchives():.. deleting is unsuccessful!";
                                     LogError(msg);
@@ -288,13 +289,13 @@ namespace ae.lib
                             }
                             catch (Exception ex)
                             {
-                                LogError("> Error in Base.RotateArchives(): проблема при удалении файла [" + fName + "] - " + ex.Message + "!");
+                                LogError("> Error in Base.RotateArchives(): is the problem with delete file [" + fName + "] - " + ex.Message + "!");
                             }
                         }
                     }
                 }
             } else {
-                Log1("> Archived directory wasn't found!");
+                Log1("Warning in Base.RotateArchives():" + "> Archived directory wasn't found!");
             }
         }
 
@@ -311,34 +312,29 @@ namespace ae.lib
             }
         }
 
-        public static void SaveDirectory(string archPath, string dirPath, string dirName)
+        public static void SaveDirectory(string archPath, string dirPath)
         {
-            // Данные для архива
-            string zipName = dirName+"_" + NumberDateTime(DateTime.Now) + ".zip";
-            string zipPath = Path.Combine(archPath, zipName);
-            string fullDirPath = Path.Combine(dirPath, dirName);
+            var di = new DirectoryInfo(dirPath);
+            if (di.Exists) {
+                var dirName = Path.GetDirectoryName(di.FullName);
+                string zipName = dirName + "_" + NumberDateTime(DateTime.Now) + ".zip";
+                string zipPath = Path.Combine(archPath, zipName);
 
-            if (Directory.Exists(fullDirPath)) {
-                // архивирование файла в архив
-                Console.WriteLine("Saving directory to the archive [" + zipName + "]:");
-                if (ZIP.ListCreate(fullDirPath, zipPath, false) && File.Exists(zipPath)) {
-                    Console.WriteLine(@"\- saved.");
+                Base.Log("Saving directory to the archive [" + zipName + "]:");
+                if (ZIP.ListCreate(dirPath, zipPath, false) && File.Exists(zipPath)) {
+                    Base.Log(@"\- saved.");
                 }
             }
         }
 
-        public static bool DumpToFile(string dirPath, string fileName, string strData)
+        public static void DumpToFile(string dirPath, string fileName, string strData)
         {
-            bool result = false;
             var index = Base.dumpIndex++;
             var path =  Path.Combine(dirPath, "dump"+index+"_"+ Base.NumberDateTime(DateTime.Now) +"_" + fileName);
 
-            using (StreamWriter file = File.CreateText(Path.GetFullPath(path)))
-            {
+            using (StreamWriter file = File.CreateText(Path.GetFullPath(path))) {
                 file.WriteLine(strData);
-                result = true;
             }
-            return result;
         }
 
         public static string genarateKey()

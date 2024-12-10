@@ -641,9 +641,7 @@ namespace ae.services.EDI
         public void actionInBox()
         {
             int ResCount = 0;
-            string dirName = "InBox";
             var fileJSON = "orders.json";
-            //string dirName = "InBox";
             if (Directory.Exists(this.InboxDir))
             {
                 this.WorkDir = this.InboxDir;
@@ -710,7 +708,7 @@ namespace ae.services.EDI
                         _1C.Instance.runExit();
                     _1C.Instance = null;
 
-                    Base.SaveDirectory(Base.ArchivesDir, this.InboxDir, dirName);
+                    Base.SaveDirectory(Base.ArchivesDir, this.InboxDir);
                 }
             }
             this.log("ResCount: " + ResCount);
@@ -719,7 +717,6 @@ namespace ae.services.EDI
         public void actionOutBox()
         {
             int ResCount = 0;
-            string dirName = "OutBox";
             if (Directory.Exists(this.OutboxDir))
             {
                 this.WorkDir = this.OutboxDir;
@@ -825,7 +822,7 @@ namespace ae.services.EDI
                 }
                 finally
                 {
-                    Base.SaveDirectory(Base.ArchivesDir, this.OutboxDir, dirName);
+                    Base.SaveDirectory(Base.ArchivesDir, this.OutboxDir);
                 }
             }
 

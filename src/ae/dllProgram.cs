@@ -32,19 +32,17 @@ namespace ae
             // ротация файлов архивов (удаление старых) 
             // в архивной папке через период (количество дней)
             int day = 14;
-            
             // для архивов данных
             Base.RotateArchives(Base.ArchivesDir, @"^(?:(?!Log).)*$", day);
-
             // для архивов логов
             Base.RotateArchives(Base.ArchivesDir, @".+Log_[0-9-]+_[0-9]+\.zip", day);
 
             Base.deInit();
 
-            string logPath = Path.Combine(Base.RunDir, "ae.log");
-            if (File.Exists(logPath)) {
-                Base.SaveLog(Base.ArchivesDir, logPath);
-                File.Delete(logPath);
+            var fi = new FileInfo(Path.Combine(Base.RunDir, "ae.log"));
+            if (fi.Exists) {
+                Base.SaveLog(Base.ArchivesDir, fi.FullName);
+                fi.Delete();
             }
         }
     }
