@@ -489,8 +489,8 @@ namespace ae.services.EDI
                         basePrice = it.basePrice.ToString("F4", CultureInfo.InvariantCulture),
                         qty = it.qty.ToString("F4", CultureInfo.InvariantCulture),
                         lotId = "-",
-                        promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - ni (default)
-                        vat = "20.0" // 20.0% - PDV
+                        promoType = it.promoType.ToString(), //1 - vstugnu kyputu, 0 - general (default)
+                        vat = "20.0" // 20.0% - PDV ??? get from 1C
                     });
                 }
 
@@ -656,6 +656,7 @@ namespace ae.services.EDI
                         //    throw new Exception("STOP");
                         //}
                         //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
+
                         JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
 
                         var TTbyGLN_List = getTTbyGLNfrom1C(ordersListFiltered);

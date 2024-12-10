@@ -18,19 +18,17 @@ namespace ae.lib
 {
     internal class JSON
     {
-        public static bool DumpToFile(string dirPath, string fileName, object SourceObj)
+        public static void DumpToFile(string dirPath, string fileName, object SourceObj)
         {
             bool result = false;
             var index = Base.dumpIndex++;
-            var path =  Path.Combine(dirPath, "dump" + index + "_" + Base.NumberDateTime(DateTime.Now) + "_" + fileName);
+            var path =  Path.Combine(dirPath, "dump_" + Base.NumberDateTime(DateTime.Now) + "_" + index + "_" + fileName);
 
             using (StreamWriter file = File.CreateText(Path.GetFullPath(path)))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, SourceObj);
-                result = true;
             }
-            return result;
         }
 
         public static string toJSON(object rawData, Formatting Formatting=Formatting.None)
