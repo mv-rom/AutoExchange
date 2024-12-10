@@ -307,21 +307,21 @@ namespace ae.lib
 
             // архивирование файла в архив
             Console.WriteLine("Saving log-file in the archive [" + ZipName + "]:");
-            if (ZIP.Create(filePath, ZipPathName, false) && File.Exists(ZipPathName)) {
+            if (ZIP.CreateFromFile(filePath, ZipPathName, false) && File.Exists(ZipPathName)) {
                 Console.WriteLine(@"\- saved.");
             }
         }
 
-        public static void SaveDirectory(string archPath, string dirPath)
+        public static void SaveDirectory(string archPath, string dirPath, bool recursive = false)
         {
             var di = new DirectoryInfo(dirPath);
             if (di.Exists) {
-                var dirName = Path.GetDirectoryName(di.FullName);
+                var dirName = di.FullName.Split(Path.DirectorySeparatorChar).Last();
                 string zipName = dirName + "_" + NumberDateTime(DateTime.Now) + ".zip";
                 string zipPath = Path.Combine(archPath, zipName);
 
                 Base.Log("Saving directory to the archive [" + zipName + "]:");
-                if (ZIP.ListCreate(dirPath, zipPath, false) && File.Exists(zipPath)) {
+                if (ZIP.CreateFromDirectory(dirPath, zipPath, recursive) && File.Exists(zipPath)) {
                     Base.Log(@"\- saved.");
                 }
             }

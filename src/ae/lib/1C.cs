@@ -25,7 +25,6 @@ namespace ae.lib
 
         private object instance1C = null;
         private Type   type1C = null;
-        //private string WorkDir = "";
         private string ReportDirPath = "";
         //private string LogFileName = "log_1c.txt";
         private string LogFilePath = "";
@@ -250,7 +249,6 @@ namespace ae.lib
                     Base.Log1("Error before run 1c report [" + report1c_Name + "]: the problem with initialization of instance 1c!");
                 }
             }
-
             return result;
         }
 

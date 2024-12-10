@@ -61,39 +61,54 @@ namespace ae.lib
 
     internal class ZIP
     {
-        public static bool Create(string SourcePath, string ArchivePath, bool recursive = false)
+        public static bool CreateFromFile(string SourcePath, string ArchivePath, bool recursive = false)
         {
             bool result = false;
-
             if (File.Exists(SourcePath)) {
-                using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create))
+                try
                 {
-                    using (ZipFile loanZip = new ZipFile())
-                    {
-                        loanZip.AddFile(SourcePath, "");
-                        loanZip.Save(zipFile); //(string.Format("{0}{1}.zip", zipDestinationPath, documentIdentifier.ToString()));
-                        result = true;
+                    using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
+                        using (ZipFile loanZip = new ZipFile()) {
+                            loanZip.AddFile(SourcePath, "");
+                            loanZip.Save(zipFile); //(string.Format("{0}{1}.zip", zipDestinationPath, documentIdentifier.ToString()));
+                            result = true;
+                        }
                     }
+                }
+                catch {
+                    Base.Log("CreateFromFile has problems!");
+                    result = false;
                 }
             }
             return result;
         }
 
-        public static bool ListCreate(string SourcePath, string ArchivePath, bool recursive = false)
+        public static bool CreateFromDirectory(string SourcePath, string ArchivePath, bool recursive = false)
         {
             bool result = false;
-
             if (Directory.Exists(SourcePath)) {
                 string[] fileList = Directory.GetFiles(SourcePath);
                 if (fileList.Length > 0) {
-                    using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
-                        using (ZipFile loanZip = new ZipFile()) {
-                            foreach (var f in fileList) {
-                                loanZip.AddFile(f, "");
+                    try
+                    {
+                        using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
+                            using (ZipFile loanZip = new ZipFile()) {
+                                foreach (string dir in Directory.GetDirectories(SourcePath)) {
+                                    //?
+                                }
+
+                                foreach (var f in fileList)
+                                {
+                                    loanZip.AddFile(f, "");
+                                }
+                                loanZip.Save(zipFile);
+                                result = true;
                             }
-                            loanZip.Save(zipFile);
-                            result = true;
                         }
+                    }
+                    catch {
+                        Base.Log("CreateFromDirectory has problems!");
+                        result = false;
                     }
                 }
             }
