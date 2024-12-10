@@ -59,7 +59,7 @@ namespace ae.lib
             string className = this.GetType().Name;
 
             Base.Log("> Запускаем интерфейс 1C 7.7:");
-            Base.Log1(className + "Init() ..");
+            Base.Log1(className + ".Init() ..");
             try
             {
                 if (!Base.Config.ConfigSettings.BaseSetting.TryGetValue("torg_sklad", out this.torg_sklad)) {
@@ -86,12 +86,12 @@ namespace ae.lib
                         );
                         res = (bool)objInitializeRes;
                     } else
-                        Base.Log1("> Не удалось инициализировать объект 1С!");
+                        Base.Log1(className + "> Не удалось инициализировать объект 1С!");
                 } else
                     Base.Log1("> Не найден тип [V77.Application] програми 1С!");
             }
             catch (Exception ex) {
-                Base.Log1("Error on "+className+".Init(): "+ex.Message);
+                Base.Log1("Error on " + className + ".Init(): "+ex.Message);
             }
             return res;
         }
