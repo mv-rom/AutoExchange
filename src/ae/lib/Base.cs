@@ -329,12 +329,15 @@ namespace ae.lib
 
         public static void DumpToFile(string dirPath, string fileName, string strData)
         {
-            var index = Base.dumpIndex++;
-            var path =  Path.Combine(dirPath, "dump_"+ Base.NumberDateTime(DateTime.Now) +"_" + index + "_" + fileName);
-
+            var path =  Path.Combine(dirPath, "dump_"+ Base.NumberDateTime(DateTime.Now) +"_" + Base.getDumpIndex() + "_" + fileName);
             using (StreamWriter file = File.CreateText(Path.GetFullPath(path))) {
                 file.WriteLine(strData);
             }
+        }
+
+        public static int getDumpIndex()
+        {
+            return Base.dumpIndex++;
         }
 
         public static string genarateKey()
