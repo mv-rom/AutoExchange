@@ -644,6 +644,10 @@ namespace ae.services.EDI
             var fileJSON = "orders.json";
             if (Directory.Exists(this.InboxDir))
             {
+                //Clean Inbox dir first
+                var arrExcludeFiles = new string[] { "splitted_orders.json" };
+                Base.CleanDirectory(this.InboxDir, arrExcludeFiles);
+
                 this.WorkDir = this.InboxDir;
                 try
                 {

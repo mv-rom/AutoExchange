@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -257,6 +258,27 @@ namespace ae.lib
                 LogError("Error in Base.MakeFolder(): " + ex.Message);
             }
             return result;
+        }
+
+        public static void CleanDirectory(string dirPath, string[] arrExcludePattern)
+        {
+            if (Directory.Exists(dirPath))
+            {
+                foreach(var dir in Directory.GetDirectories(dirPath))
+                {
+                    var dirName = dir.Split(Path.DirectorySeparatorChar).Last();
+                    if (arrExcludePattern.Where(x => dirName.Contains(x)).ToList().Count <= 0)
+                        Directory.Delete(dir, true);
+                }
+
+                foreach(var file in Directory.GetFiles(dirPath))
+                {
+                    var fileName = file.Split(Path.DirectorySeparatorChar).Last();
+                    if (arrExcludePattern.Where(x => fileName.Contains(x)).ToList().Count <= 0)
+                        File.Delete(file);
+                }
+
+            }
         }
 
         public static void RotateArchives(string dirPath, string Pattern, int Period)

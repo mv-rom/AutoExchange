@@ -83,33 +83,43 @@ namespace ae.lib
             return result;
         }
 
+        private static void AddElementsDF(ZipFile instanceZip, string SourcePath, bool recursive = false)
+        {
+            foreach (string dir in Directory.GetDirectories(SourcePath))
+            {
+                instanceZip.AddDirectory(dir, "");
+                if (recursive)
+                    AddElementsDF(instanceZip, dir, recursive);
+            }
+
+            foreach (var f in Directory.GetFiles(SourcePath))
+            {
+                instanceZip.AddFile(f, "");
+            }
+        }
+
         public static bool CreateFromDirectory(string SourcePath, string ArchivePath, bool recursive = false)
         {
             bool result = false;
             if (Directory.Exists(SourcePath)) {
+                string[] dirList = Directory.GetDirectories(SourcePath);
                 string[] fileList = Directory.GetFiles(SourcePath);
-                if (fileList.Length > 0) {
-                    try
-                    {
-                        using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
-                            using (ZipFile loanZip = new ZipFile()) {
-                                foreach (string dir in Directory.GetDirectories(SourcePath)) {
-                                    //?
-                                }
+                if (fileList.Length <= 0 && dirList.Length <= 0)
+                    return true;
 
-                                foreach (var f in fileList)
-                                {
-                                    loanZip.AddFile(f, "");
-                                }
-                                loanZip.Save(zipFile);
-                                result = true;
-                            }
+                try
+                {
+                    using (FileStream zipFile = File.Open(ArchivePath, FileMode.Create)) {
+                        using (ZipFile instanceZip = new ZipFile()) {
+                            ZIP.AddElementsDF(instanceZip, SourcePath, recursive);
+                            instanceZip.Save(zipFile);
+                            result = true;
                         }
                     }
-                    catch {
-                        Base.Log("CreateFromDirectory has problems!");
-                        result = false;
-                    }
+                }
+                catch {
+                    Base.Log("CreateFromDirectory has problems!");
+                    result = false;
                 }
             }
             return result;
