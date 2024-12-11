@@ -829,8 +829,8 @@ namespace ae.services.EDI
                 }
             }
 
-__exit:
-            this.log("ResCount: " + ResCount);
+            __exit:
+                this.log("ResCount: " + ResCount);
         }
     }
 }
