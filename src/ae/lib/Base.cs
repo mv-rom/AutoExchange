@@ -266,16 +266,24 @@ namespace ae.lib
             {
                 foreach(var dir in Directory.GetDirectories(dirPath))
                 {
-                    var dirName = dir.Split(Path.DirectorySeparatorChar).Last();
-                    if (arrExcludePattern.Where(x => dirName.Contains(x)).ToList().Count <= 0)
+                    if (arrExcludePattern != null) {
+                        var dirName = dir.Split(Path.DirectorySeparatorChar).Last();
+                        if (arrExcludePattern.Where(x => dirName.Contains(x)).ToList().Count <= 0)
+                            Directory.Delete(dir, true);
+                    } else {
                         Directory.Delete(dir, true);
+                    }
                 }
 
                 foreach(var file in Directory.GetFiles(dirPath))
                 {
-                    var fileName = file.Split(Path.DirectorySeparatorChar).Last();
-                    if (arrExcludePattern.Where(x => fileName.Contains(x)).ToList().Count <= 0)
+                    if (arrExcludePattern != null) {
+                        var fileName = file.Split(Path.DirectorySeparatorChar).Last();
+                        if (arrExcludePattern.Where(x => fileName.Contains(x)).ToList().Count <= 0)
+                            File.Delete(file);
+                    } else {
                         File.Delete(file);
+                    }
                 }
 
             }

@@ -825,6 +825,7 @@ namespace ae.services.EDI
                 finally
                 {
                     Base.SaveDirectory(Base.ArchivesDir, this.OutboxDir);
+                    Base.CleanDirectory(this.OutboxDir, null);
                 }
             }
 
