@@ -346,8 +346,12 @@ namespace ae.lib
         {
             var di = new DirectoryInfo(dirPath);
             if (di.Exists) {
-                var dirName = di.FullName.Split(Path.DirectorySeparatorChar).Last();
-                string zipName = dirName + "_" + NumberDateTime(DateTime.Now) + ".zip";
+                string[] arrFN = di.FullName.Split(Path.DirectorySeparatorChar);
+                int count = arrFN.Length;
+                var parentdirName = (count >= 2) ? arrFN[count - 2] + "_" : "";
+                var dirName = (count >= 2) ? arrFN[count - 1] + "_" : "";
+
+                string zipName = parentdirName + dirName + NumberDateTime(DateTime.Now) + ".zip";
                 string zipPath = Path.Combine(archPath, zipName);
 
                 Base.Log("Saving directory to the archive [" + zipName + "]:");
