@@ -244,8 +244,8 @@ namespace ae.lib
             {
                 var di = new DirectoryInfo(dirPath);
                 if (!di.Exists) {
-                    di.Create();
-                    if (!di.Exists) {
+                    var dic = Directory.CreateDirectory(dirPath);
+                    if (!dic.Exists) {
                         LogError("Error in Base.MakeFolder(): There is no right to create directory [" + dirPath + "]!");
                     }
                     else
