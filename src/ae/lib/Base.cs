@@ -348,8 +348,8 @@ namespace ae.lib
             if (di.Exists) {
                 string[] arrFN = di.FullName.Split(Path.DirectorySeparatorChar);
                 int count = arrFN.Length;
+                var dirName = (count >= 1) ? arrFN[count - 1] + "_" : "";
                 var parentdirName = (count >= 2) ? arrFN[count - 2] + "_" : "";
-                var dirName = (count >= 2) ? arrFN[count - 1] + "_" : "";
 
                 string zipName = parentdirName + dirName + NumberDateTime(DateTime.Now) + ".zip";
                 string zipPath = Path.Combine(archPath, zipName);
