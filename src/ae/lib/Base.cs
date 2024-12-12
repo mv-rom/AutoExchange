@@ -268,10 +268,10 @@ namespace ae.lib
                 {
                     if (arrExcludePattern != null) {
                         var dirName = dir.Split(Path.DirectorySeparatorChar).Last();
-                        if (arrExcludePattern.Where(x => dirName.Contains(x)).ToList().Count <= 0)
-                            Directory.Delete(dir, true);
+                        //if (arrExcludePattern.Where(x => dirName.Contains(x)).ToList().Count <= 0)
+                        //    Directory.Delete(dir, true);
                     } else {
-                        Directory.Delete(dir, true);
+                        //Directory.Delete(dir, true);
                     }
                 }
 
