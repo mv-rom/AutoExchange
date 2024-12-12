@@ -32,8 +32,9 @@ namespace ae.services.EDI
         {
             string[] plDoW = PlanningListDaysOfWeeek.Split(',');
             Array.Sort(plDoW);
+            int NN = 0;
 
-            if (orderExecuteDate.Day > DateTime.Now.Day) {
+            if (orderExecuteDate.Day > DateTime.Now.AddDays(NN).Day) {
                 int execDow = (int)orderExecuteDate.DayOfWeek;
                 int firstPlanningDayOfWeek = 0;
                 int daysDifference = -1;
@@ -376,7 +377,9 @@ namespace ae.services.EDI
                 {
                     var found_key = id + "@" + type_of_product;
                     structure.SplittedOrdersClass so = null;
-                    if (splittedOrders != null && splittedOrders.TryGetValue(found_key, out so) && so.resut_orderNo.Length > 0) {
+                    if (splittedOrders != null && splittedOrders.TryGetValue(found_key, out so) &&
+                        so.resut_orderNo != null && so.resut_orderNo.Length > 0)
+                    {
                         //TODO: if (!s.deal_status.Equals("new")) { }
                         splittedOrders[found_key].deal_status = deal_status;
                         dictSO.Add(found_key, splittedOrders[found_key]);
@@ -653,22 +656,22 @@ namespace ae.services.EDI
             var fileJSON = "orders.json";
             if (Directory.Exists(this.InboxDir))
             {
-                //Clean Inbox dir first
-                var arrExcludeFiles = new string[] { "splitted_orders.json" };
-                Base.CleanDirectory(this.InboxDir, arrExcludeFiles);
-
                 this.WorkDir = this.InboxDir;
+
+                //Clean Inbox dir first
+                var arrExcludeFiles = new string[] { "orders.json", "splitted_orders.json" };
+                Base.CleanDirectory(this.InboxDir, arrExcludeFiles);
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
-                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
-                    if (ordersListFiltered != null && ordersListFiltered.Count > 0)
+                    //var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
+                    //if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
-                        //var fp = Path.Combine(dirPath, fileJSON);
-                        //if (!File.Exists(fp)) {
-                        //    throw new Exception("STOP");
-                        //}
-                        //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
+                        var fp = Path.Combine(this.InboxDir, fileJSON);
+                        if (!File.Exists(fp)) {
+                            throw new Exception("STOP");
+                        }
+                        var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
 
                         JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
 
