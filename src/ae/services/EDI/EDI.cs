@@ -636,8 +636,17 @@ namespace ae.services.EDI
             return false;
         }
 
+        private void loadAnalogProdutList()
+        {
 
+        }
 
+        private void loadAgentNumberList()
+        {
+
+        }
+
+        //------------------------------------------------------------------
         public void actionInBox()
         {
             int ResCount = 0;
