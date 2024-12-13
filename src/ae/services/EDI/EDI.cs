@@ -16,6 +16,8 @@ namespace ae.services.EDI
         private string WorkDir = "";
         public structure.ConfigClass config;
         private int __N_AddDayToExecuteDay = 0;
+        private structure.AlterProcutClass AlterProcutList;
+        private structure.AgentNumberListClass agentNumberList;
 
         public EDI(string theServiceName) : base(theServiceName)
         {
@@ -642,14 +644,29 @@ namespace ae.services.EDI
             return false;
         }
 
-        private void loadAlternativeProdutList(string workDir)
+        private bool loadAlternativeProdutList(string workDir)
         {
-            var alterFilePath = Path.Combine(workDir, "alterProductList.json");
+            var filePath = Path.Combine(workDir, "alterProductList.json");
+            if (File.Exists(filePath)) {
+                this.AlterProcutList =  JSON.fromJSON<structure.AlterProcutClass>(File.ReadAllText(filePath));
+                if (this.AlterProcutList != null && this.AlterProcutList.AlterProcutList != null) {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        private void loadAgentNumberList()
+        private bool loadAgentNumberList(string workDir)
         {
-
+            var filePath = Path.Combine(workDir, "Outlets.xml");
+            if (File.Exists(filePath))
+            {
+                this.agentNumberList = XML.ConvertXMLTextToClass<structure.AgentNumberListClass>(File.ReadAllText(filePath));
+                if (this.agentNumberList != null && this.agentNumberList.Outlets != null) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         //------------------------------------------------------------------
@@ -664,6 +681,19 @@ namespace ae.services.EDI
                 //Clean Inbox dir first
                 var arrExcludeFiles = new string[] { "orders.json", "splitted_orders.json" };
                 Base.CleanDirectory(this.InboxDir, arrExcludeFiles);
+
+                if (!loadAlternativeProdutList(this.WorkDir)) {
+                    this.log("loadAlternativeProdutList has problem!");
+                    return;
+                }
+
+                if (!loadAgentNumberList(this.WorkDir))
+                {
+                    this.log("loadAgentNumberList has problem!");
+                    return;
+                }
+
+
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);

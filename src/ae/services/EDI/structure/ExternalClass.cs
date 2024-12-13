@@ -47,9 +47,9 @@ namespace ae.services.EDI.structure
 
     [Serializable]
     [XmlRoot(ElementName = "ROOT")]
-    public class AgentNumberList
+    public class AgentNumberListClass
     {
         [XmlElement(ElementName = "Outlets")]
-        public Outlets Outlet { get; set; }
+        public Outlets Outlets { get; set; }
     }
 }
