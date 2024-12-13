@@ -134,8 +134,6 @@ namespace ae.services.EDI.tools.AbInbevEfes
 
         public string PUTfromDump(string requestString) {
             var dirPath = this.WorkDir;
-            //long OrderNumIndex = 611128000000000;
-
             if (!string.IsNullOrEmpty(requestString) && Directory.Exists(dirPath)) {
                 var preSaleNo = JSON.fromJSON<PreSalesRequest>(requestString).preSaleNo;
                 string[] search = Directory.GetFiles(dirPath, "dump(response-packetPreSale)_*.json");
@@ -149,11 +147,8 @@ namespace ae.services.EDI.tools.AbInbevEfes
                         if (response.result != null &&
                             !string.IsNullOrEmpty(preSaleNo) &&
                             !string.IsNullOrEmpty(response.result.preSaleNo) &&
-                            string.Equals(preSaleNo, response.result.preSaleNo))
-                        {
-
-                            //OrderNumIndex++;
-                            //response.result.orderNo = OrderNumIndex;
+                            string.Equals(preSaleNo, response.result.preSaleNo)
+                        ) {
                             return JSON.toJSON(response);
                         }
                     }
@@ -180,8 +175,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
                         var response = JSON.fromJSON<PreSalesResponse>(responseString);
                         if (response.result == null) {
                             var responseLogs = this.getLogs(response.traceIdentifier);
-                        } else
-                        {
+                        } else {
                             return response;
                         }
                     }

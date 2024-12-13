@@ -163,7 +163,6 @@ namespace ae.services.EDI
             {
                 string report1cName = "tt_by_gln";
                 var input = new structure._1C.TTbyGLN() { list = listTT };
-
                 var output = _1C.runReportProcessingData<structure._1C.TTbyGLN>(WorkDir, this.Reports1CDir, report1cName, input);
                 if (output == null) {
                     this.log("Warning in getTTbyGLNfrom1C(): after do report [" + report1cName + "]!");
@@ -316,10 +315,7 @@ namespace ae.services.EDI
             if (groupPP.Count() > 0)
             {
                 string report1cName = "product_profiles";
-                var input = new structure._1C.ProductProfiles() {
-                    group = groupPP
-                };
-
+                var input = new structure._1C.ProductProfiles() { group = groupPP };
                 var output = ae.lib._1C.runReportProcessingData<structure._1C.ProductProfiles>(WorkDir, this.Reports1CDir, report1cName, input);
                 if (output == null) {
                     this.log("Warning in getProductProfilesOfTTfrom1C(): after do report [" + report1cName + "]!");
@@ -482,6 +478,12 @@ namespace ae.services.EDI
                 return false;
             }
 
+            var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance(this.config, WorkDir);
+            if (AbInbevEfesAPI == null) {
+                this.log("Warning in CombineAbiePreSalesAndOrders(): AbInbevEfesAPI is null!");
+                return false;
+            }
+
             int nCount = 0;
             foreach (var so in source)
             {
@@ -521,44 +523,39 @@ namespace ae.services.EDI
                         preSalesDetails = preSalesDetails
                     };
 
-                    var AbInbevEfesAPI = tools.AbInbevEfes.API.getInstance(this.config, WorkDir);
-                    if (AbInbevEfesAPI != null)
+                    var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
+                    if (PreSaleResult != null)
                     {
-                        var PreSaleResult = AbInbevEfesAPI.getPreSales(request);
-                        if (PreSaleResult != null)
+                        if (PreSaleResult.result != null)
                         {
-                            if (PreSaleResult.result != null)
-                            {
-                                //updating SplittedOrders
-                                source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
-                                source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
-                                source[so.Key].resut_owner_id = this.selectionAgent(PreSaleResult.result.outletCode);
+                            //updating SplittedOrders
+                            source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
+                            source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
+                            source[so.Key].resut_owner_id = this.selectionAgent(PreSaleResult.result.outletCode);
 
-                                bool foundAtleastOne = false;
-                                var listItems = PreSaleResult.result.details;
-                                foreach (var its in listItems)
+                            bool foundAtleastOne = false;
+                            var listItems = PreSaleResult.result.details;
+                            foreach (var its in listItems)
+                            {
+                                var compareCodeKPK = int.Parse(its.productCode);
+                                var qty = its.qty;
+                                for (int i = 0; i < so.Value.Items.Count; i++)
                                 {
-                                    var compareCodeKPK = int.Parse(its.productCode);
-                                    var qty = its.qty;
-                                    for (int i = 0; i < so.Value.Items.Count; i++)
+                                    var vit = so.Value.Items[i];
+                                    if ((vit.codeKPK == compareCodeKPK) && (vit.qty == qty))
                                     {
-                                        var vit = so.Value.Items[i];
-                                        if ((vit.codeKPK == compareCodeKPK) && (vit.qty == qty))
-                                        {
-                                            source[so.Key].Items[i].totalDiscount = its.totalDiscount;
-                                            foundAtleastOne = true;
-                                        }
+                                        source[so.Key].Items[i].totalDiscount = its.totalDiscount;
+                                        foundAtleastOne = true;
                                     }
                                 }
-                                if (foundAtleastOne) nCount++;
                             }
-                            else
-                            {
-                                var ErrorResult = AbInbevEfesAPI.getLogs(PreSaleResult.traceIdentifier);
-                                if (ErrorResult != null)
-                                {
-                                    this.log(ErrorResult.message);
-                                }
+                            if (foundAtleastOne) nCount++;
+                        }
+                        else {
+                            //???
+                            var ErrorResult = AbInbevEfesAPI.getLogs(PreSaleResult.traceIdentifier);
+                            if (ErrorResult != null) {
+                                this.log(ErrorResult.message);
                             }
                         }
                     }
@@ -627,18 +624,13 @@ namespace ae.services.EDI
             if (newOrders.Count() > 0)
             {
                 string report1cName = "vkachka_zayavok";
-                var input = new structure._1C.NewOrders() {
-                    orders = newOrders
-                };
-
+                var input = new structure._1C.NewOrders() { orders = newOrders };
                 var output = _1C.runReportProcessingData<structure._1C.NewOrders>(WorkDir, this.Reports1CDir, report1cName, input);
                 if (output != null) {
                     var output_Orders = output.orders;
                     foreach (var oO in output_Orders)
                     {
-                        if (source.ContainsKey(oO.id)) {
-                            source[oO.id].status1c = oO.returnStatus;
-                        }
+                        if (source.ContainsKey(oO.id)) source[oO.id].status1c = oO.returnStatus;
                     }
                     return true;
                 }
