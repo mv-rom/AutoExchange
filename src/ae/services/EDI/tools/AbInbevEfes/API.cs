@@ -204,7 +204,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
                     if (!String.IsNullOrEmpty(data)) {
                         var res1 = JSON.fromJSON<LogsErrorAnswer>(data);
                         if ((res1 == null) || (res1.error == null) || (res1.error.Length <= 0)) {
-                            Base.Log(errorDescription + "have data in dumpLogs file ...(response-getLogs).json");
+                            Base.Log(errorDescription + "have data error in dump file ...(response-getLogs).json");
                             return JSON.fromJSON<LogsResponse>(data);
                         }
                     }

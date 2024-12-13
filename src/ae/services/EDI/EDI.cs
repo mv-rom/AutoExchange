@@ -32,9 +32,9 @@ namespace ae.services.EDI
         {
             string[] plDoW = PlanningListDaysOfWeeek.Split(',');
             Array.Sort(plDoW);
-            int NN = 0; //-1
+            int N_DisplacementNowDay = 0; //-1
 
-            if (orderExecuteDate.Day > DateTime.Now.AddDays(NN).Day) {
+            if (orderExecuteDate.Day > DateTime.Now.AddDays(N_DisplacementNowDay).Day) {
                 int execDow = (int)orderExecuteDate.DayOfWeek;
                 int firstPlanningDayOfWeek = 0;
                 int daysDifference = -1;
@@ -642,7 +642,7 @@ namespace ae.services.EDI
             return false;
         }
 
-        private void loadAnalogProdutList()
+        private void loadAlternativeProdutList()
         {
 
         }
