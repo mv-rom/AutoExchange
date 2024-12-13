@@ -176,7 +176,10 @@ namespace ae.services.EDI.tools.AbInbevEfes
                 if (!String.IsNullOrEmpty(responseString)) {
                     var res1 = JSON.fromJSON<PreSalesErrorAnswer>(responseString);
                     if ((res1 == null) || (res1.error == null) || (res1.error.Length > 0)) {
-                        return JSON.fromJSON<PreSalesResponse>(responseString);
+                        var response = JSON.fromJSON<PreSalesResponse>(responseString);
+                        if (response.result == null) {
+                            var responseLogs = this.getLogs(response.traceIdentifier);
+                        }
                     }
                 }
             }
@@ -192,7 +195,10 @@ namespace ae.services.EDI.tools.AbInbevEfes
             if (!String.IsNullOrEmpty(traceIdentifier)) {
                 try
                 {
-                    string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "Filter=logLevel=\"error\"|logLevel=\"warning\"");
+                    //string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "Filter=logLevel=\"error\"|logLevel=\"warning\"");
+                    string data = this.RAC.GET("/api/Logs/" + traceIdentifier, "", "application/vnd.salesworks.logs.traceidentifier+json");
+                    Base.DumpToFile(this.WorkDir, "(response-getLogs).json", data);
+
                     if (!String.IsNullOrEmpty(data)) {
                         var res1 = JSON.fromJSON<LogsErrorAnswer>(data);
                         if ((res1 == null) || (res1.error == null) || (res1.error.Length <= 0)) {

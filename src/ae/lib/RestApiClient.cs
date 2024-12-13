@@ -32,7 +32,7 @@ namespace ae.lib
             this.Timeout = Timeout;
         }
 
-        private string HTTPClient(string Method, string SubUrl, string Arguments, string rawData="")
+        private string HTTPClient(string Method, string SubUrl, string Arguments, string rawData, string accept)
         {
             var final_url = this.BaseUrl;
             if (SubUrl.Length > 0) {
@@ -52,7 +52,12 @@ namespace ae.lib
             webrequest.Method = Method;
             webrequest.Timeout = this.Timeout;
             webrequest.KeepAlive = false;
-            webrequest.Accept = @"*/*";
+            if (string.IsNullOrEmpty(accept)) {
+                webrequest.Accept = @"*/*";
+            }
+            else {
+                webrequest.Accept = accept;
+            }
             webrequest.UserAgent = "AutoExchange";
             webrequest.Headers["Cache-Control"] = "no-cache";
             webrequest.Credentials = CredentialCache.DefaultCredentials;
@@ -138,19 +143,19 @@ namespace ae.lib
             return rawResponse;
         }
 
-        public string GET(string url, string args)
+        public string GET(string url, string args, string accept="")
         {
-            return this.HTTPClient(WebRequestMethods.Http.Get, url, args);
+            return this.HTTPClient(WebRequestMethods.Http.Get, url, args, "", accept);
         }
 
         public string POST(string url, string args, string data)
         {
-            return this.HTTPClient(WebRequestMethods.Http.Post, url, args, data);
+            return this.HTTPClient(WebRequestMethods.Http.Post, url, args, data, "");
         }
 
         public string PUT(string url, string args, string data)
         {
-            return this.HTTPClient(WebRequestMethods.Http.Put, url, args, data);
+            return this.HTTPClient(WebRequestMethods.Http.Put, url, args, data, "");
         }
 
         /*

@@ -32,7 +32,7 @@ namespace ae.services.EDI
         {
             string[] plDoW = PlanningListDaysOfWeeek.Split(',');
             Array.Sort(plDoW);
-            int NN = 0;
+            int NN = 0; //-1
 
             if (orderExecuteDate.Day > DateTime.Now.AddDays(NN).Day) {
                 int execDow = (int)orderExecuteDate.DayOfWeek;
@@ -381,8 +381,8 @@ namespace ae.services.EDI
                         so.resut_orderNo != null && so.resut_orderNo.Length > 0)
                     {
                         //TODO: if (!s.deal_status.Equals("new")) { }
-                        splittedOrders[found_key].deal_status = deal_status;
-                        dictSO.Add(found_key, splittedOrders[found_key]);
+                        so.deal_status = deal_status;
+                        dictSO.Add(found_key, so);
                     }
                     else
                     {
@@ -483,6 +483,9 @@ namespace ae.services.EDI
             int nCount = 0;
             foreach (var so in source)
             {
+                //Verification for the previous satisfactory request
+                if (so.Value.resut_orderNo != null && so.Value.resut_orderNo.Length > 0) continue;
+
                 var preSalesDetails = new List<tools.AbInbevEfes.structure.preSalesDetails>();
                 foreach (var it in so.Value.Items)
                 {
