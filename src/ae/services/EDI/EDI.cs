@@ -667,14 +667,14 @@ namespace ae.services.EDI
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
-                    //var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
-                    //if (ordersListFiltered != null && ordersListFiltered.Count > 0)
+                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI);
+                    if (ordersListFiltered != null && ordersListFiltered.Count > 0)
                     {
-                        var fp = Path.Combine(this.InboxDir, fileJSON);
-                        if (!File.Exists(fp)) {
-                            throw new Exception("STOP");
-                        }
-                        var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
+                        //var fp = Path.Combine(this.InboxDir, fileJSON);
+                        //if (!File.Exists(fp)) {
+                        //    throw new Exception("STOP");
+                        //}
+                        //var ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
 
                         JSON.DumpToFile(this.InboxDir, fileJSON, ordersListFiltered);
 
