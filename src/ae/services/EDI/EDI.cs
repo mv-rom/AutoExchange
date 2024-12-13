@@ -16,7 +16,7 @@ namespace ae.services.EDI
         private string WorkDir = "";
         public structure.ConfigClass config;
         private int __N_AddDayToExecuteDay = 0;
-        private structure.AlterProcutClass AlterProcutList;
+        private structure.AlterProductClass AlterProductList;
         private structure.AgentNumberListClass agentNumberList;
 
         public EDI(string theServiceName) : base(theServiceName)
@@ -644,14 +644,15 @@ namespace ae.services.EDI
             return false;
         }
 
+
         private bool loadAlternativeProdutList(string workDir)
         {
             var filePath = Path.Combine(workDir, "alterProductList.json");
             if (File.Exists(filePath)) {
-                this.AlterProcutList =  JSON.fromJSON<structure.AlterProcutClass>(File.ReadAllText(filePath));
-                if (this.AlterProcutList != null && 
-                    this.AlterProcutList.AlterProcutList != null && 
-                    this.AlterProcutList.AlterProcutList.Length > 0
+                this.AlterProductList =  JSON.fromJSON<structure.AlterProductClass>(File.ReadAllText(filePath));
+                if (this.AlterProductList != null && 
+                    this.AlterProductList.AlterProductList != null && 
+                    this.AlterProductList.AlterProductList.Length > 0
                 ) {
                     return true;
                 }
@@ -661,7 +662,7 @@ namespace ae.services.EDI
 
         private long selectionAlternativeProdut(long productEAN)
         {
-            var alterP = this.AlterProcutList.AlterProcutList.FirstOrDefault(x => x.EAN == productEAN);
+            var alterP = this.AlterProductList.AlterProductList.FirstOrDefault(x => x.EAN == productEAN);
             return (alterP != null) ? alterP.alterEAN : productEAN;
         }
 
@@ -686,6 +687,8 @@ namespace ae.services.EDI
             var outlet = this.agentNumberList.Outlets.Outlet.FirstOrDefault(x => x.OL_CODE.Equals(codeTT));
             return (outlet != null) ? outlet.OWNER_ID : 0;
         }
+
+
 
         //------------------------------------------------------------------
         public void actionInBox()

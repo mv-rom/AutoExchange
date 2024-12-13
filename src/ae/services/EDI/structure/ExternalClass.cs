@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 namespace ae.services.EDI.structure
 {
     [Serializable]
-    public class AlterProcutElementClass
+    public class AlterProductElementClass
     {
         public string NameProduct { get; set; }
         public long EAN { get; set; }
@@ -18,9 +18,9 @@ namespace ae.services.EDI.structure
     }
 
     [Serializable]
-    public class AlterProcutClass
+    public class AlterProductClass
     {
-        public AlterProcutElementClass[] AlterProcutList { get; set; }
+        public AlterProductElementClass[] AlterProductList { get; set; }
     }
 
 
