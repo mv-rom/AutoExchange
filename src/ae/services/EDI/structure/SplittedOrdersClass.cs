@@ -36,5 +36,6 @@ namespace ae.services.EDI.structure
 
         public string resut_orderNo { get; set; }
         public string result_outletId { get; set; }
+        public int resut_owner_id { get; set; }
     }
 }

@@ -532,6 +532,7 @@ namespace ae.services.EDI
                                 //updating SplittedOrders
                                 source[so.Key].resut_orderNo = PreSaleResult.result.orderNo.ToString();
                                 source[so.Key].result_outletId = PreSaleResult.result.outletId.ToString();
+                                source[so.Key].resut_owner_id = this.selectionAgent(PreSaleResult.result.outletCode);
 
                                 bool foundAtleastOne = false;
                                 var listItems = PreSaleResult.result.details;
@@ -616,6 +617,7 @@ namespace ae.services.EDI
                             codeTT_part1 = so.Value.codeTT_part1,
                             codeTT_part2 = so.Value.codeTT_part2,
                             codeTT_part3 = so.Value.codeTT_part3,
+                            owner_id = so.Value.resut_owner_id,
                             items = newItems
                         });
                     }

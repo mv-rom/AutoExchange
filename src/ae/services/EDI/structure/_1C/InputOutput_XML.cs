@@ -162,6 +162,8 @@ namespace ae.services.EDI.structure._1C
         [XmlAttribute(AttributeName = "codeTT_part3")]
         public int codeTT_part3 { get; set; }
 
+        [XmlAttribute(AttributeName = "owner_id")]
+        public int owner_id { get; set; }
 
         [XmlAttribute(AttributeName = "returnStatus")]
         public int returnStatus { get; set; }
