@@ -649,11 +649,20 @@ namespace ae.services.EDI
             var filePath = Path.Combine(workDir, "alterProductList.json");
             if (File.Exists(filePath)) {
                 this.AlterProcutList =  JSON.fromJSON<structure.AlterProcutClass>(File.ReadAllText(filePath));
-                if (this.AlterProcutList != null && this.AlterProcutList.AlterProcutList != null) {
+                if (this.AlterProcutList != null && 
+                    this.AlterProcutList.AlterProcutList != null && 
+                    this.AlterProcutList.AlterProcutList.Length > 0
+                ) {
                     return true;
                 }
             }
             return false;
+        }
+
+        private long selectionAlternativeProdut(long productEAN)
+        {
+            var alterP = this.AlterProcutList.AlterProcutList.FirstOrDefault(x => x.EAN == productEAN);
+            return (alterP != null) ? alterP.alterEAN : productEAN;
         }
 
         private bool loadAgentNumberList(string workDir)
@@ -662,11 +671,20 @@ namespace ae.services.EDI
             if (File.Exists(filePath))
             {
                 this.agentNumberList = XML.ConvertXMLTextToClass<structure.AgentNumberListClass>(File.ReadAllText(filePath));
-                if (this.agentNumberList != null && this.agentNumberList.Outlets != null) {
+                if (this.agentNumberList != null &&
+                    this.agentNumberList.Outlets != null &&
+                    this.agentNumberList.Outlets.Outlet.Count > 0
+                ) {
                     return true;
                 }
             }
             return false;
+        }
+
+        private int selectionAgent(string codeTT)
+        {
+            var outlet = this.agentNumberList.Outlets.Outlet.FirstOrDefault(x => x.OL_CODE.Equals(codeTT));
+            return (outlet != null) ? outlet.OWNER_ID : 0;
         }
 
         //------------------------------------------------------------------
