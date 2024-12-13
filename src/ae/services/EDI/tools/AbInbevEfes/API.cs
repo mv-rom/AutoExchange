@@ -164,6 +164,7 @@ namespace ae.services.EDI.tools.AbInbevEfes
 
         public PreSalesResponse getPreSales(Object packetPreSale)
         {
+            var errorDescription = "Error in " + this.GetType().Name + ".getPreSales(): ";
             try
             {
                 var requestString = JSON.toJSON(packetPreSale);
@@ -185,13 +186,14 @@ namespace ae.services.EDI.tools.AbInbevEfes
             }
             catch (Exception ex)
             {
-                Base.LogError("Error in " + this.GetType().Name + ".getPreSales(): " + ex.Message, ex);
+                Base.LogError(errorDescription + ex.Message, ex);
             }
             return null;
         }
 
         public LogsResponse getLogs(string traceIdentifier)
         {
+            var errorDescription = "Error in " + this.GetType().Name + ".getLogs(): ";
             if (!String.IsNullOrEmpty(traceIdentifier)) {
                 try
                 {
@@ -202,13 +204,14 @@ namespace ae.services.EDI.tools.AbInbevEfes
                     if (!String.IsNullOrEmpty(data)) {
                         var res1 = JSON.fromJSON<LogsErrorAnswer>(data);
                         if ((res1 == null) || (res1.error == null) || (res1.error.Length <= 0)) {
+                            Base.Log(errorDescription + "have data in dumpLogs file ...(response-getLogs).json");
                             return JSON.fromJSON<LogsResponse>(data);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Base.LogError("Error in " + this.GetType().Name + ".getLogs(): " + ex.Message, ex);
+                    Base.LogError(errorDescription + ex.Message, ex);
                 }
             }
             return null;
