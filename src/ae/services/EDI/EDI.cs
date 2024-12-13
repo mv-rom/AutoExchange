@@ -682,13 +682,14 @@ namespace ae.services.EDI
                 var arrExcludeFiles = new string[] { "orders.json", "splitted_orders.json" };
                 Base.CleanDirectory(this.InboxDir, arrExcludeFiles);
 
-                if (!loadAlternativeProdutList(this.WorkDir)) {
+                var ediDir = Path.GetFullPath(Path.Combine(this.WorkDir, @"..\"));
+
+                if (!loadAlternativeProdutList(ediDir)) {
                     this.log("loadAlternativeProdutList has problem!");
                     return;
                 }
 
-                if (!loadAgentNumberList(this.WorkDir))
-                {
+                if (!loadAgentNumberList(ediDir)) {
                     this.log("loadAgentNumberList has problem!");
                     return;
                 }
