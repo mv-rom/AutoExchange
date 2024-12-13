@@ -642,9 +642,9 @@ namespace ae.services.EDI
             return false;
         }
 
-        private void loadAlternativeProdutList()
+        private void loadAlternativeProdutList(string workDir)
         {
-
+            var alterFilePath = Path.Combine(workDir, "alterProductList.json");
         }
 
         private void loadAgentNumberList()
