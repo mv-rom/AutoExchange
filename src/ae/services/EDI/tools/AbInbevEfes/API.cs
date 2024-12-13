@@ -180,6 +180,9 @@ namespace ae.services.EDI.tools.AbInbevEfes
                         var response = JSON.fromJSON<PreSalesResponse>(responseString);
                         if (response.result == null) {
                             var responseLogs = this.getLogs(response.traceIdentifier);
+                        } else
+                        {
+                            return response;
                         }
                     }
                 }
