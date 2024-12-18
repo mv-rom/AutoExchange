@@ -286,7 +286,7 @@ namespace ae.services.EDI
                 int num = 1;
                 foreach (var it in listItems)
                 {
-                    var product_code = long.Parse(it.product_code);
+                    var product_code = this.selectionAlternativeProdut(long.Parse(it.product_code));
                     var title = it.title;
                     //var position = int.Parse(it.position);
                     //var buyer_code = long.Parse(it.buyer_code);
