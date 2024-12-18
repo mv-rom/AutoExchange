@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using ae.lib;
 
@@ -286,7 +285,7 @@ namespace ae.services.EDI
                 int num = 1;
                 foreach (var it in listItems)
                 {
-                    var product_code = this.selectionAlternativeProdut(long.Parse(it.product_code));
+                    var product_code = this.selectionAlternativeProduct(long.Parse(it.product_code));
                     var title = it.title;
                     //var position = int.Parse(it.position);
                     //var buyer_code = long.Parse(it.buyer_code);
@@ -643,7 +642,7 @@ namespace ae.services.EDI
         {
             var filePath = Path.Combine(workDir, "alterProductList.json");
             if (File.Exists(filePath)) {
-                this.AlterProductList =  JSON.fromJSON<structure.AlterProductClass>(File.ReadAllText(filePath));
+                this.AlterProductList = JSON.fromJSON<structure.AlterProductClass>(File.ReadAllText(filePath));
                 if (this.AlterProductList != null && 
                     this.AlterProductList.AlterProductList != null && 
                     this.AlterProductList.AlterProductList.Length > 0
@@ -654,10 +653,16 @@ namespace ae.services.EDI
             return false;
         }
 
-        private long selectionAlternativeProdut(long productEAN)
+        private long selectionAlternativeProduct(long productEAN)
         {
             var alterP = this.AlterProductList.AlterProductList.FirstOrDefault(x => x.EAN == productEAN);
-            return (alterP != null) ? alterP.alterEAN : productEAN;
+            if (alterP != null) {
+                this.log("selectionAlternativeProduct contains a position "+
+                    "[" + alterP.NameProduct + "] with an alternative product code EAN [" + alterP.alterEAN + "]!");
+                return alterP.EAN;
+            } else {
+                return productEAN;
+            }
         }
 
         private bool loadAgentNumberList(string workDir)

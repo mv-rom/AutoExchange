@@ -1,8 +1,5 @@
-﻿using ae.services.EDI.structure._1C;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 
