@@ -398,7 +398,7 @@ namespace ae.services.EDI
                             var listItems = o.as_json.items;
                             foreach (var it in listItems)
                             {
-                                var ean13 = long.Parse(it.product_code);
+                                var ean13 = this.selectionAlternativeProduct(long.Parse(it.product_code));
                                 var found_list_item = found_item.list.
                                     Where(x => (x.EAN == ean13 && x.ProductType == type_of_product)).FirstOrDefault();
                                 if (found_list_item != null)
