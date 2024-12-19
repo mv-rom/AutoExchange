@@ -49,7 +49,7 @@ namespace ae.lib
             catch (Exception ex) {
                 Base.Log("Error in JSON data: "+ex.Message);
             }
-            return default;
+            return default(Object);
         }
     }
 }
