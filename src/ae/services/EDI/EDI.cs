@@ -659,7 +659,7 @@ namespace ae.services.EDI
             if (alterP != null) {
                 this.log("selectionAlternativeProduct contains a position "+
                     "[" + alterP.NameProduct + "] with an alternative product code EAN [" + alterP.alterEAN + "]!");
-                return alterP.EAN;
+                return alterP.alterEAN;
             } else {
                 return productEAN;
             }
