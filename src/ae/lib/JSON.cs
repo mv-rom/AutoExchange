@@ -42,7 +42,14 @@ namespace ae.lib
 
         public static Object fromJSON<Object>(string jsonData)
         {
-            return JsonConvert.DeserializeObject<Object>(jsonData);
+            try
+            {
+                return JsonConvert.DeserializeObject<Object>(jsonData);
+            }
+            catch (Exception ex) {
+                Base.Log("Error in JSON data: "+ex.Message);
+            }
+            return default;
         }
     }
 }
