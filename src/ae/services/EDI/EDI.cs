@@ -60,10 +60,10 @@ namespace ae.services.EDI
             return "";
         }
 
-        private List<tools.VchasnoEDI.structure.Order> getOrdersFromEDI(tools.VchasnoEDI.API api)
+        private List<Order> getOrdersFromEDI(tools.VchasnoEDI.API api, int n_day_before=0)
         {
             //getting needed documents
-            var yesterdayDT = DateTime.Now.AddDays(0).ToString("yyyy-MM-dd");
+            var yesterdayDT = DateTime.Now.AddDays(n_day_before).ToString("yyyy-MM-dd");
             var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
 
             //var obj1 = VchasnoAPI.getDocument("0faac24e-1960-3b29-94a1-1384badb60b7");
@@ -791,23 +791,20 @@ namespace ae.services.EDI
                 this.WorkDir = this.OutboxDir;
                 try
                 {
-                    var yesterdayDT = DateTime.Now.AddDays(-3).ToString("yyyy-MM-dd");
-                    var nowDT = DateTime.Now.ToString("yyyy-MM-dd");
+                    var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
+                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI, -3);
 
-                    var VchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config); //this.config.VchasnoEDI_ApiSetting
-                    var ordersList = VchasnoAPI.getListDocuments(yesterdayDT, nowDT, 1);
-                    if (ordersList == null || ordersList.Count() <= 0)
-                        goto __exit;
-
-                    //filter only Orders
-                    var ordersListFiltered = new List<Order>();
-                    foreach (var item in ordersList.Where(x => x.type == 1))
-                    {
-                        ordersListFiltered.Add(item);
+                    var fp = Path.Combine(this.WorkDir, "orders.json");
+                    if (!File.Exists(fp)) {
+                        throw new Exception("STOP");
                     }
-                    ordersList = null;
-                    if (ordersListFiltered.Count() <= 0)
+                    ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
+
+                    if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
+                        this.log("There is no one order of EDI to the processing.");
                         goto __exit;
+                    }
+
 
                     //load _DESADV_file from directory in OutboxDir
                     var listCompanyFilesDESADV = new Dictionary<string, Dictionary<string, tools.VchasnoEDI.structure.DESADV>>();
