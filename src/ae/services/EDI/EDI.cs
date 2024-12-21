@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ae.lib;
+using ae.services.EDI.tools.VchasnoEDI.structure;
 
 
 
@@ -799,7 +800,7 @@ namespace ae.services.EDI
                         goto __exit;
 
                     //filter only Orders
-                    var ordersListFiltered = new List<tools.VchasnoEDI.structure.Order>();
+                    var ordersListFiltered = new List<Order>();
                     foreach (var item in ordersList.Where(x => x.type == 1))
                     {
                         ordersListFiltered.Add(item);
@@ -808,81 +809,95 @@ namespace ae.services.EDI
                     if (ordersListFiltered.Count() <= 0)
                         goto __exit;
 
-                    //var ordersListFilteredMaped = ordersListFiltered.ConvertAll<lib.classes.VchasnoEDI.Order>(x => VchasnoAPI.getDocument(x.id));
-                    //ordersListFiltered = null;
-
-                    //processing in OutboxDir
+                    //load _DESADV_file from directory in OutboxDir
+                    var listCompanyFilesDESADV = new Dictionary<string, Dictionary<string, tools.VchasnoEDI.structure.DESADV>>();
                     string pattern1 = @"^.+_DESADV_.+\.xml$";
                     var dirsList = Directory.GetDirectories(this.OutboxDir);
                     foreach (var dPath in dirsList)
                     {
                         if (Directory.Exists(dPath))
                         {
-                            var dName = new DirectoryInfo(dPath).Name;
-
+                            var dirName = new DirectoryInfo(dPath).Name;
+                            var listFilesDESADV = new Dictionary<string, tools.VchasnoEDI.structure.DESADV>();
                             //filter by company gln
-/*                          var Company = this.config.Companies.FirstOrDefault(x => x.erdpou == dName);
-                            if (Company != null) {
-                                var gln = Company.gln;
-                            }
- */                           //var ORDRSP = 1;
+                            //  if (this.config.Companies.FirstOrDefault(x => x.erdpou == dirName) == null) continue;
+
                             foreach (var file in Directory.GetFiles(dPath))
                             {
+                                var fileName = new FileInfo(file).Name;
                                 //parse *_DESADV_*.xml:
-                                if (Regex.IsMatch(file, pattern1) && File.Exists(file))
+                                if (Regex.IsMatch(fileName, pattern1) && File.Exists(file))
                                 {
                                     var desadvClass = XML.ConvertXMLFileToClass<tools.VchasnoEDI.structure.DESADV>(file);
-                                    if (desadvClass != null)
-                                    {
-                                        tools.VchasnoEDI.structure.Order _founded = null;
-                                        foreach (var item in ordersListFiltered.Where(x => x.number == desadvClass.ORDERNUMBER)) {
-                                            _founded = item;
-                                            break;
-                                        }
-
-                                        if (_founded != null)
-                                        {
-                                            var posList = desadvClass.HEAD.PACKINGSEQUENCE.POSITION;
-                                            for (int i = 0; i < posList.Count(); i++)
-                                            {
-                                                var item = _founded.as_json.items.FirstOrDefault<tools.VchasnoEDI.structure.OrderDataItem>(
-                                                    x => x.product_code == posList[i].PRODUCT
-                                                );
-                                                if (item != null)
-                                                {
-                                                    posList[i].PRODUCTIDBUYER = "" + (string.IsNullOrEmpty(item.buyer_code) ? "0" : item.buyer_code);
-                                                }
-                                            }
-                                        }
-
-                                        //this.log(desadvClass.HEAD.BUYER);
-                                        string newFilepath = file; //file + "_"
-                                        if (File.Exists(newFilepath)) File.Delete(newFilepath);
-
-                                        if (XML.ConvertClassToXMLFile(newFilepath, desadvClass, null)) ResCount++;
-                                        /*
-                                            if (Company != null) {
-                                                //add to orrsp array
-                                                var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
-                                                newFilepath = file+"_ordrsp";
-                                                if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) { 
-                                                }
-                                            }
-                                        */
+                                    if (desadvClass != null) {
+                                        listFilesDESADV.Add(fileName, desadvClass);
                                     }
-                                    else
-                                    {
-                                        if (File.Exists(file)) File.Delete(file);
+                                    else {
+                                        File.Move(file, Path.Combine(dPath, "bad_" + fileName));
+                                        this.log("File [" + fileName + "] in directory [" + dirName + "] have a bad structure! It was renamed!");
                                     }
+
                                 }
                             }
 
-/*                            if (Company != null)
-                            {
-                                //ORDRSP
-                            }
-*/                        }
+                            listCompanyFilesDESADV.Add(dirName, listFilesDESADV);
+                        }
                     }
+                    if (listCompanyFilesDESADV.Count <= 0)
+                        goto __exit;
+
+                    //analize in Orders
+                    var listOrdersFilesDESADV = new Dictionary<string, Dictionary<string, DESADV>>();
+                    foreach (var oLF in ordersListFiltered) {
+                        var listFilesDESADV = new Dictionary<string, DESADV>();
+                        if (listCompanyFilesDESADV.TryGetValue(oLF.company_from_edrpou, out listFilesDESADV)) {
+                            var lFilesDA = listFilesDESADV.Where(x => x.Value.ORDERNUMBER == oLF.number).ToList();
+                            foreach (var fDA in lFilesDA)
+                            {
+                                var posList = fDA.Value.HEAD.PACKINGSEQUENCE.POSITION;
+                                for (int i = 0; i < posList.Count(); i++)
+                                {
+                                    var item = oLF.as_json.items.FirstOrDefault<tools.VchasnoEDI.structure.OrderDataItem>(
+                                        x => x.product_code == posList[i].PRODUCT
+                                    );
+                                    if (item != null) {
+                                        posList[i].PRODUCTIDBUYER = "" + (string.IsNullOrEmpty(item.buyer_code) ? "0" : item.buyer_code);
+                                    }
+                                }
+                            }
+                            if (lFilesDA.Count > 0) {
+                                var new_listFilesDESADV = new Dictionary<string, DESADV>();
+                                foreach (var fDA in lFilesDA)
+                                    new_listFilesDESADV.Add(fDA.Key, fDA.Value);
+                                listOrdersFilesDESADV.Add(oLF.id, new_listFilesDESADV);
+                            }
+                        }
+                    }
+
+                    //Save XML files in ProcessingDir
+                    string processingDir = Path.Combine(this.WorkDir, "processing");
+                    Base.MakeFolder(processingDir);
+                    foreach (var lOFDA in listOrdersFilesDESADV)
+                    {
+                        var k = lOFDA.Key;
+                        var orderEDI = ordersListFiltered.FirstOrDefault(x => x.id == k);
+                        if (orderEDI != null) {
+                            var edrpouDir = Path.Combine(orderEDI.company_from_edrpou);
+                            Base.MakeFolder(edrpouDir);
+                            foreach (var fDA in lOFDA.Value) {
+                                var xmlFile = fDA.Key.ToString();
+                                var desadvClass = fDA.Value;
+                                //save xml file
+                                if (XML.ConvertClassToXMLFile(xmlFile, desadvClass, null)) ResCount++;
+                                /*
+                                        var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
+                                        newFilepath = file+"_ordrsp";
+                                        if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) {}
+                                */
+                            }
+                        }
+                    }
+                
                 }
                 catch (Exception ex)
                 {
