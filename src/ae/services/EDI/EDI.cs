@@ -795,12 +795,13 @@ namespace ae.services.EDI
                     var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI, -3);
 
                     var fp = Path.Combine(this.WorkDir, "orders.json");
-                    if (!File.Exists(fp)) {
+                    if (!File.Exists(fp))
+                    {
                         throw new Exception("STOP");
                     }
                     ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
 
-                    if (ordersListFiltered != null && ordersListFiltered.Count > 0) {
+                    if (ordersListFiltered == null || ordersListFiltered.Count <= 0) {
                         this.log("There is no one order of EDI to the processing.");
                         goto __exit;
                     }
@@ -879,17 +880,17 @@ namespace ae.services.EDI
                         var k = lOFDA.Key;
                         var orderEDI = ordersListFiltered.FirstOrDefault(x => x.id == k);
                         if (orderEDI != null) {
-                            var edrpouDir = Path.Combine(orderEDI.company_from_edrpou);
+                            var edrpouDir = Path.Combine(processingDir, orderEDI.company_from_edrpou);
                             Base.MakeFolder(edrpouDir);
                             foreach (var fDA in lOFDA.Value) {
-                                var xmlFile = fDA.Key.ToString();
+                                var xmlFile = Path.Combine(edrpouDir, fDA.Key.ToString());
                                 var desadvClass = fDA.Value;
                                 //save xml file
                                 if (XML.ConvertClassToXMLFile(xmlFile, desadvClass, null)) ResCount++;
                                 /*
-                                        var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
-                                        newFilepath = file+"_ordrsp";
-                                        if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) {}
+                                    var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
+                                    newFilepath = file+"_ordrsp";
+                                    if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) {}
                                 */
                             }
                         }
@@ -902,8 +903,8 @@ namespace ae.services.EDI
                 }
                 finally
                 {
-                    Base.SaveDirectory(Base.ArchivesDir, this.OutboxDir);
-                    Base.CleanDirectory(this.OutboxDir, null);
+                    Base.SaveDirectory(Base.ArchivesDir, this.WorkDir);
+                    Base.CleanDirectory(this.WorkDir, null);
                 }
             }
 
