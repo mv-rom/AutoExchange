@@ -3,7 +3,10 @@
 echo "Post build deployment .."
 echo %1
 echo %2
+
+if exist %1\..\..\ae.jsonconfig (
 copy /V /Y %1\..\..\ae.jsonconfig %1
+)
 rem copy /V /Y %2\libframework\*.* %1\libs
 
 rem copy 1c reports

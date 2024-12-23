@@ -792,14 +792,14 @@ namespace ae.services.EDI
                 try
                 {
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
-                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI, -3);
+                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI, -7);
 
-                    var fp = Path.Combine(this.WorkDir, "orders.json");
-                    if (!File.Exists(fp))
-                    {
-                        throw new Exception("STOP");
-                    }
-                    ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
+                    //var fp = Path.Combine(this.WorkDir, "orders.json");
+                    //if (!File.Exists(fp))
+                    //{
+                    //    throw new Exception("STOP");
+                    //}
+                    //ordersListFiltered = JSON.fromJSON<List<tools.VchasnoEDI.structure.Order>>(File.ReadAllText(fp));
 
                     if (ordersListFiltered == null || ordersListFiltered.Count <= 0) {
                         this.log("There is no one order of EDI to the processing.");
@@ -904,7 +904,7 @@ namespace ae.services.EDI
                 finally
                 {
                     Base.SaveDirectory(Base.ArchivesDir, this.WorkDir);
-                    Base.CleanDirectory(this.WorkDir, null);
+                    //Base.CleanDirectory(this.WorkDir, null);
                 }
             }
 
