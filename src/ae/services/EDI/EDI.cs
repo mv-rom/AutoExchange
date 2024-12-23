@@ -791,9 +791,21 @@ namespace ae.services.EDI
                 this.WorkDir = this.OutboxDir;
                 try
                 {
+/*
+                    var inst1C = _1C.getInstance(this.Reports1CDir);
+                    if (inst1C != null) {
+                        throw new Exception("Error in actionOutBox of run 1c!");
+                    }
+                    string report1cName = "vugruzka_edi";
+                    if (inst1C.runExternalReport(this.WorkDir, report1cName)) {
+                        throw new Exception("Error in actionOutBox of run 1c report [" + report1cName + "]!");
+                    }
+*/
                     var instVchasnoAPI = tools.VchasnoEDI.API.getInstance(this.config);
-                    var ordersListFiltered = getOrdersFromEDI(instVchasnoAPI, -7);
+                    var ordersListFiltered = this.getOrdersFromEDI(instVchasnoAPI, -7);
 
+                    //Testing read data from dump
+                    //--------------------------------------------------------
                     //var fp = Path.Combine(this.WorkDir, "orders.json");
                     //if (!File.Exists(fp))
                     //{
