@@ -773,10 +773,10 @@ namespace ae.services.EDI
                 }
                 finally
                 {
-                    if (_1C.Instance != null)
+                    if (_1C.Instance != null) {
                         _1C.Instance.runExit();
-                    _1C.Instance = null;
-
+                        _1C.Instance = null;
+                    }
                     Base.SaveDirectory(Base.ArchivesDir, this.InboxDir);
                 }
             }
@@ -915,6 +915,10 @@ namespace ae.services.EDI
                 }
                 finally
                 {
+                    if (_1C.Instance != null) {
+                        _1C.Instance.runExit();
+                        _1C.Instance = null;
+                    }
                     Base.SaveDirectory(Base.ArchivesDir, this.WorkDir);
                     //Base.CleanDirectory(this.WorkDir, null);
                 }
