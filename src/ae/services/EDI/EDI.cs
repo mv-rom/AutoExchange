@@ -846,7 +846,6 @@ namespace ae.services.EDI
                                         File.Move(file, Path.Combine(dPath, "bad_" + fileName));
                                         this.log("File [" + fileName + "] in directory [" + dirName + "] have a bad structure! It was renamed!");
                                     }
-
                                 }
                             }
 

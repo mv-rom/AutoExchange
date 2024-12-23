@@ -225,8 +225,6 @@ namespace ae.lib
 
         public static T runReportProcessingData<T>(string workDir, string reports1c_Dir, string report1c_Name, T inputObjectClass)
         {
-            var result = default(T);
-
             var inst1C = _1C.getInstance(reports1c_Dir);
             if (inst1C != null) {
                 var stringInput = XML.ConvertClassToXMLText(inputObjectClass, Encoding.GetEncoding("windows-1251"));
@@ -240,7 +238,7 @@ namespace ae.lib
                         string stringOutput = "";
                         if (inst1C.doReportFileOutput(workDir, out stringOutput)) {
                             Base.DumpToFile(workDir, "(output-1C).xml", stringOutput);
-                            result = XML.ConvertXMLTextToClass<T>(stringOutput);
+                            return XML.ConvertXMLTextToClass<T>(stringOutput);
                         }
                     } else {
                         Base.Log1("Error of run 1c report [" + report1c_Name + "]!");
@@ -249,7 +247,7 @@ namespace ae.lib
                     Base.Log1("Error before run 1c report [" + report1c_Name + "]: the problem with initialization of instance 1c!");
                 }
             }
-            return result;
+            return default(T);
         }
 
 
