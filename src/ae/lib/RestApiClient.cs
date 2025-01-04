@@ -64,10 +64,12 @@ namespace ae.lib
                 System.Net.Cache.RequestCacheLevel.NoCacheNoStore
             );
 
-            /*
+            webrequest.Proxy = null;
+            string proxyHost = "";
+            string proxyPort = "";
+            if (Base.Config.ConfigSettings.ProxySetting.TryGetValue("proxyHost", out proxyHost) &&
+                Base.Config.ConfigSettings.ProxySetting.TryGetValue("proxyPort", out proxyPort)) {
                 // used proxy like: https://github.com/jthomperoo/simple-proxy/
-                string proxyHost = "127.0.0.1";
-                string proxyPort = "8888";
                 var proxy = new WebProxy {
                     Address = new Uri($"http://{proxyHost}:{proxyPort}"),
                     BypassProxyOnLocal = false,
@@ -76,8 +78,7 @@ namespace ae.lib
                     //Credentials = new NetworkCredential(userName: proxyUserName, password: proxyPassword)
                 };
                 webrequest.Proxy = proxy;
-            */
-            webrequest.Proxy = null;
+            }
             webrequest.ContentType = this.ContentType + "; charset=utf-8";
 
             // Set some reasonable limits on resources used by this request
