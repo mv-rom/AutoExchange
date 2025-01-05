@@ -67,7 +67,8 @@ namespace ae.lib
             webrequest.Proxy = null;
             string proxyHost = "";
             string proxyPort = "";
-            if (Base.Config.ConfigSettings.ProxySetting.TryGetValue("proxyHost", out proxyHost) &&
+            if (Base.Config.ConfigSettings.ProxySetting != null &&
+                Base.Config.ConfigSettings.ProxySetting.TryGetValue("proxyHost", out proxyHost) &&
                 Base.Config.ConfigSettings.ProxySetting.TryGetValue("proxyPort", out proxyPort)) {
                 // used proxy like: https://github.com/jthomperoo/simple-proxy/
                 var proxy = new WebProxy {
