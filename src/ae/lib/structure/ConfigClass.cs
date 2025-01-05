@@ -17,7 +17,7 @@ namespace ae.lib.structure
     {
         public Dictionary<string, string> BaseSetting { get; set; }
         public Dictionary<string, string> App1cSetting { get; set; }
-        //public Dictionary<string, string> HttpsProxy { get; set; }
+        public Dictionary<string, string> ProxySetting { get; set; }
         public Dictionary<string, string> EmailInformer { get; set; }
         public ServicesList Services { get; set; }
         public SS SchedulerSetting { get; set; }
