@@ -897,7 +897,11 @@ namespace ae.services.EDI
                                 var xmlFile = Path.Combine(edrpouDir, fDA.Key.ToString());
                                 var desadvClass = fDA.Value;
                                 //save xml file
-                                if (XML.ConvertClassToXMLFile(xmlFile, desadvClass, null)) ResCount++;
+                                if (XML.ConvertClassToXMLFile(xmlFile, desadvClass, null))
+                                {
+                                    //var p = instVchasnoAPI.sendNewDocument();
+                                    ResCount++;
+                                }
                                 /*
                                     var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
                                     newFilepath = file+"_ordrsp";

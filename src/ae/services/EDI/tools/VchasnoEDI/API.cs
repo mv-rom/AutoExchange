@@ -149,5 +149,27 @@ namespace ae.services.EDI.tools.VchasnoEDI
             }
             return result;
         }
+
+        /*
+        public PostAnswer sendNewDocument(string deal_id, string rawdata)
+        {
+            PostAnswer result = null;
+            PostData raw_data = new PostData() { deal_id = deal_id };
+
+            try
+            {
+                string data = this.RAC.POST("additional-documents/mark-processed", "", JSON.toJSON(raw_data));
+                if (!String.IsNullOrEmpty(data))
+                {
+                    result = JSON.fromJSON<PostAnswer>(data);
+                }
+            }
+            catch (Exception ex)
+            {
+                Base.Log("Error in " + this.ToString() + "->Mark_DocumentProcessed(): " + ex.Message);
+            }
+            return result;
+        }
+        */
     }
 }
