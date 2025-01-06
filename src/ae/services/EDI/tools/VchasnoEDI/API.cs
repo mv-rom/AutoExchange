@@ -151,6 +151,9 @@ namespace ae.services.EDI.tools.VchasnoEDI
         }
 
         /*
+        
+        //https://docs.google.com/document/d/1h2fsnTa3M70PYQxCmOTDIGtJKOKXNXweTHet2gtJFcY/edit?pli=1&tab=t.0
+
         public PostAnswer sendNewDocument(string deal_id, string rawdata)
         {
             PostAnswer result = null;
