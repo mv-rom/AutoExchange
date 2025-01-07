@@ -72,7 +72,7 @@ namespace ae.lib
                 Base.Config.ConfigSettings.HttpProxySetting.TryGetValue("port", out proxyPort)) {
                 // used proxy like: https://github.com/jthomperoo/simple-proxy/
                 var proxy = new WebProxy {
-                    Address = new Uri($"http://{proxyHost}:{proxyPort}"),
+                    Address = new Uri("http://"+proxyHost+":"+proxyPort),
                     BypassProxyOnLocal = false,
                     UseDefaultCredentials = true
                     //UseDefaultCredentials = false,
