@@ -20,7 +20,7 @@ namespace ae.lib
     {
         private string BaseUrl;
         private string Authorization;
-        private string ContentType;
+        public string ContentType;
         private int Timeout;
 
         public void Init(string BaseUrl, string Authorization, string ContentType="application/json", int Timeout=10000)

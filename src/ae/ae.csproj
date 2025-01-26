@@ -103,6 +103,7 @@
     <Compile Include="lib\structure\ConfigClass.cs" />
     <Compile Include="services\EDI\structure\_1C\InputOutput_XML.cs" />
     <Compile Include="services\EDI\tools\VchasnoEDI\API.cs" />
+    <Compile Include="services\EDI\tools\VchasnoEDI\structure\OrderResponse.cs" />
     <Compile Include="services\EDI\tools\VchasnoEDI\structure\ORDRSP_XML.cs" />
     <Compile Include="services\EDI\tools\VchasnoEDI\structure\DESADV_XML.cs" />
     <Compile Include="services\EDI\tools\VchasnoEDI\structure\Order.cs" />

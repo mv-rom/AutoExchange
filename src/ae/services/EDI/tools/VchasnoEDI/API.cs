@@ -150,29 +150,27 @@ namespace ae.services.EDI.tools.VchasnoEDI
             return result;
         }
 
-        /*
-        
+
         //https://docs.google.com/document/d/1h2fsnTa3M70PYQxCmOTDIGtJKOKXNXweTHet2gtJFcY/edit?pli=1&tab=t.0
-
-        public PostAnswer sendNewDocument(string deal_id, string rawdata)
+        //https://www.postman.com/planetary-eclipse-102992/edi-origin/request/vqudul0/copy?tab=overview
+        public OrderResponse sendNewDocument(string dealId, string rawData)
         {
-            PostAnswer result = null;
-            PostData raw_data = new PostData() { deal_id = deal_id };
-
+            OrderResponse result = null;
+            var oldContentType = this.ContentType;
             try
             {
-                string data = this.RAC.POST("additional-documents/mark-processed", "", JSON.toJSON(raw_data));
-                if (!String.IsNullOrEmpty(data))
-                {
-                    result = JSON.fromJSON<PostAnswer>(data);
+                this.ContentType = "multipart/form-data";
+                string data = this.RAC.POST("api/documents", "deal_id="+dealId, JSON.toJSON(rawData));
+                if (!String.IsNullOrEmpty(data)) {
+                    result = JSON.fromJSON<OrderResponse>(data);
                 }
             }
             catch (Exception ex)
             {
-                Base.Log("Error in " + this.ToString() + "->Mark_DocumentProcessed(): " + ex.Message);
+                Base.Log("Error in " + this.ToString() + "->sendNewDocument(): " + ex.Message);
             }
+            this.ContentType = oldContentType;
             return result;
         }
-        */
     }
 }

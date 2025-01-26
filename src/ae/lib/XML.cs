@@ -33,7 +33,7 @@ namespace ae.lib
         }
 
         public static bool ConvertClassToXMLFile(
-            string toXmlFilePath, object objectClass, Encoding TextEncoding
+            string toXmlFilePath, object objectClass, Encoding TextEncoding = null
         )
         {
             bool res = false;

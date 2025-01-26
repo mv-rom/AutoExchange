@@ -896,17 +896,16 @@ namespace ae.services.EDI
                             foreach (var fDA in lOFDA.Value) {
                                 var xmlFile = Path.Combine(edrpouDir, fDA.Key.ToString());
                                 var desadvClass = fDA.Value;
-                                //save xml file
-                                if (XML.ConvertClassToXMLFile(xmlFile, desadvClass, null))
+                                //save to xml file
+                                if (XML.ConvertClassToXMLFile(xmlFile, desadvClass))
                                 {
-                                    //var p = instVchasnoAPI.sendNewDocument();
-                                    ResCount++;
+                                    string xmlText = XML.ConvertClassToXMLText(desadvClass);
+                                    if (!string.IsNullOrEmpty(xmlText)) {
+                                        var p = instVchasnoAPI.sendNewDocument(orderEDI.deal_id, xmlText);
+                                        if (p != null && p.deal_status == "in_work")
+                                            ResCount++;
+                                    }
                                 }
-                                /*
-                                    var ordrspClass = new lib.classes.VchasnoEDI.ORDRSP();
-                                    newFilepath = file+"_ordrsp";
-                                    if (XML.ConvertClassToXMLFile(newFilepath, ordrspClass)) {}
-                                */
                             }
                         }
                     }
