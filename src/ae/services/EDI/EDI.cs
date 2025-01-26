@@ -922,7 +922,7 @@ namespace ae.services.EDI
                         _1C.Instance = null;
                     }
                     Base.SaveDirectory(Base.ArchivesDir, this.WorkDir);
-                    //Base.CleanDirectory(this.WorkDir, null);
+                    Base.CleanDirectory(this.WorkDir, null);
                 }
             }
 
