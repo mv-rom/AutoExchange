@@ -902,8 +902,10 @@ namespace ae.services.EDI
                                     string xmlText = XML.ConvertClassToXMLText(desadvClass);
                                     if (!string.IsNullOrEmpty(xmlText)) {
                                         var p = instVchasnoAPI.sendNewDocument(orderEDI.deal_id, xmlText);
-                                        if (p != null && p.deal_status == "in_work")
+                                        if (p != null && p.deal_status == "in_work") {
                                             ResCount++;
+                                            this.log("sendNewDocument: deal_id "+ orderEDI.deal_id+" is sended.");
+                                        }
                                     }
                                 }
                             }
